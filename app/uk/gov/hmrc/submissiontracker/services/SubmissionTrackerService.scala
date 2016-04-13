@@ -21,17 +21,22 @@ import uk.gov.hmrc.submissiontracker.config.MicroserviceAuditConnector
 import uk.gov.hmrc.submissiontracker.connector._
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.submissiontracker.domain.{TrackingData, Milestone, TrackingDataSeq}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
-trait submissiontrackerService {
+trait SubmissiontrackerService {
   def ping()(implicit hc:HeaderCarrier): Future[Boolean]
+
+  def trackingData(id: String, idType:String)(implicit hc:HeaderCarrier): Future[TrackingDataSeq]
 }
 
-trait LivesubmissiontrackerService extends submissiontrackerService {
+trait LivesubmissiontrackerService extends SubmissiontrackerService {
   def authConnector: AuthConnector
+  def trackingConnector: TrackingConnector
+
 
   def audit(service:String, details:Map[String, String])(implicit hc:HeaderCarrier) = {
     def auditResponse(): Unit = {
@@ -49,16 +54,30 @@ trait LivesubmissiontrackerService extends submissiontrackerService {
 
   def ping()(implicit hc:HeaderCarrier): Future[Boolean]
 
+  def trackingData(id: String, idType:String)(implicit hc:HeaderCarrier): Future[TrackingDataSeq] = {
+    withAudit("trackingData", Map("id" -> id, "idType" -> idType)) {
+      trackingConnector.getUserTrackingData(id, idType)
+    }
+  }
+
 }
 
-object SandboxsubmissiontrackerService extends submissiontrackerService with FileResource {
+object SandboxsubmissiontrackerService extends SubmissiontrackerService with FileResource {
 
   def ping()(implicit hc:HeaderCarrier): Future[Boolean] = Future.successful(true)
+
+  def trackingData(id: String, idType:String)(implicit hc:HeaderCarrier): Future[TrackingDataSeq] = {
+    val milestones =  Seq(Milestone("one","open"))
+    val trackingData = TrackingDataSeq(Some(Seq(TrackingData("formId", "formName", "ref1", "some-business", "20150801", "20150801", milestones))))
+    Future.successful(trackingData)
+  }
+
 
 }
 
 object LivesubmissiontrackerService extends LivesubmissiontrackerService {
   override val authConnector: AuthConnector = AuthConnector
+  override val trackingConnector = TrackingConnector
 
   def ping()(implicit hc:HeaderCarrier): Future[Boolean] = Future.successful(true)
 }
