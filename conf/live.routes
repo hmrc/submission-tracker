@@ -1,3 +1,4 @@
 # microservice specific routes
 
-GET         /messages                                       uk.gov.hmrc.submissiontracker.controllers.LiveCustomerProfileController.ping()
+GET         /tracking                   uk.gov.hmrc.submissiontracker.controllers.LiveCustomerProfileController.ping()
+GET         /tracking/:id/:idType       uk.gov.hmrc.submissiontracker.controllers.LiveCustomerProfileController.trackingData(id:String, idType:String)

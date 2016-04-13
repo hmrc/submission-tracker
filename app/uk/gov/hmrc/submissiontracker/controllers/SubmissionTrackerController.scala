@@ -16,10 +16,8 @@
 
 package uk.gov.hmrc.submissiontracker.controllers
 
-import play.api.mvc.{Action, BodyParsers}
 import uk.gov.hmrc.submissiontracker.controllers.action.{AccountAccessControlForSandbox, AccountAccessControlWithHeaderCheck}
-import uk.gov.hmrc.submissiontracker.services.{submissiontrackerService, LivesubmissiontrackerService, SandboxsubmissiontrackerService}
-import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.submissiontracker.services.{SubmissiontrackerService, LivesubmissiontrackerService, SandboxsubmissiontrackerService}
 import play.api.{Logger, mvc}
 import uk.gov.hmrc.play.http.{ForbiddenException, HeaderCarrier, NotFoundException, UnauthorizedException}
 import uk.gov.hmrc.play.microservice.controller.BaseController
@@ -47,11 +45,11 @@ trait ErrorHandling {
   }
 }
 
-trait CustomerProfileController extends BaseController with HeaderValidator with ErrorHandling {
+trait SubmissionTrackerController extends BaseController with HeaderValidator with ErrorHandling {
 
   import ErrorResponse.writes
 
-  val service: submissiontrackerService
+  val service: SubmissiontrackerService
   val accessControl:AccountAccessControlWithHeaderCheck
 
   final def ping() = accessControl.validateAccept(acceptHeaderValidationRules).async {
@@ -59,14 +57,21 @@ trait CustomerProfileController extends BaseController with HeaderValidator with
     implicit val hc = HeaderCarrier.fromHeadersAndSession(request.headers, None)
     errorWrapper(service.ping().map(as => Ok(Json.toJson(as))))
   }
+
+  final def trackingData(id:String, idType:String) = accessControl.validateAccept(acceptHeaderValidationRules).async {
+    implicit request =>
+      implicit val hc = HeaderCarrier.fromHeadersAndSession(request.headers, None)
+      errorWrapper(service.trackingData(id, idType).map(as => Ok(Json.toJson(as))))
+  }
+
 }
 
-object SandboxCustomerProfileController extends CustomerProfileController {
+object SandboxCustomerProfileController extends SubmissionTrackerController {
   override val service = SandboxsubmissiontrackerService
   override val accessControl = AccountAccessControlForSandbox
 }
 
-object LiveCustomerProfileController extends CustomerProfileController {
+object LiveCustomerProfileController extends SubmissionTrackerController {
   override val service = LivesubmissiontrackerService
   override val accessControl = AccountAccessControlWithHeaderCheck
 }

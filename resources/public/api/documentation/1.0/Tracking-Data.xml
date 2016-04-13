@@ -1,9 +1,9 @@
 <endpoint>
-  <name>Get Profile</name>
-  <description>This endpoint retrieves the tax summary.</description>
+  <name>Tracking-Data</name>
+  <description>This endpoint retrieves the tracking data from a tax identifier.</description>
   <section id="resource">
     <title>Resource</title>
-    <resource>GET /:nino/tax-summary/:year</resource>
+    <resource>GET /tracking/:id/:idType</resource>
   </section>
   <section id="path-parameters">
     <title>Path Parameters</title>
@@ -16,16 +16,16 @@
       </headings>
       <rows>
         <row>
-          <cell><code>NINO</code></cell>
+          <cell><code>Id</code></cell>
           <cell><code>String</code></cell>
           <cell><code>NS123456B</code></cell>
-          <cell>The NINO for the individual.</cell>
+          <cell>The NINO for the individual. This could also be a UTR.</cell>
         </row>
         <row>
-          <cell><code>Year</code></cell>
-          <cell><code>Int</code></cell>
-          <cell><code>10</code></cell>
-          <cell>The tax-summary for the specific year.</cell>
+          <cell><code>idType</code></cell>
+          <cell><code>String</code></cell>
+          <cell><code>nino</code></cell>
+          <cell>The name of the tax identifier that is supplied in the 'id' field.</cell>
         </row>
       </rows>
     </table>
@@ -34,7 +34,7 @@
     <title>Authorisation</title>
     <authorisation>
       <type>USER</type>
-      <scope>read:personal-income</scope>
+      <scope>read:submission-tracker</scope>
     </authorisation>
   </section>
   <section id="content-types">
@@ -49,12 +49,22 @@
     <title>Response</title>
     <httpStatus>200 (OK)</httpStatus>
     <json><![CDATA[{
-        "nino":"KM569110B",
-        "version":1,
-        "workingTaxableTotal":0,
-        "actualTaxableTotal":0,
-        "remainingTaxFree":0,
-        "adjustedNetIncome":0
+  "submissions": [
+    {
+      "formId": "formId",
+      "formName": "formName",
+      "dfsSubmissionReference": "ref1",
+      "businessArea": "some-business",
+      "receivedDate": "20150801",
+      "completionDate": "20150801",
+      "milestones": [
+        {
+          "milestone": "one",
+          "status": "open"
+        }
+      ]
+    }
+  ]
 }]]></json>
     <table>
       <headings>
@@ -65,22 +75,22 @@
       </headings>
       <rows>
         <row>
-          <cell><code>NINO</code></cell>
+          <cell><code>formId</code></cell>
           <cell><code>String</code></cell>
-          <cell><code>KM569110B</code></cell>
-          <cell>An example NINO.</cell>
+          <cell><code>formId</code></cell>
+          <cell>An example String value.</cell>
         </row>
         <row>
-          <cell><code>Version</code></cell>
-          <cell><code>Int</code></cell>
-          <cell><code>1</code></cell>
-          <cell>An example version number.</cell>
+          <cell><code>formName</code></cell>
+          <cell><code>String</code></cell>
+          <cell><code>formName</code></cell>
+          <cell>An example String value for the form name</cell>
         </row>
         <row>
-          <cell><code>workingTaxableTotal</code></cell>
-          <cell><code>Int</code></cell>
-          <cell><code>1</code></cell>
-          <cell>An example version number.</cell>
+          <cell><code>dfsSubmissionReference</code></cell>
+          <cell><code>String</code></cell>
+          <cell><code>some value</code></cell>
+          <cell>An example dfsSubmissionReference.</cell>
         </row>
       </rows>
     </table>
