@@ -16,8 +16,16 @@
         "status":"PROTOTYPED",
         "endpoints":[
           {
-            "uriPattern":"/tracking/:id/:idType",
+            "uriPattern":"/tracking",
             "endpointName":"Tracking-Data",
+            "method":"GET",
+            "authType":"USER",
+            "throttlingTier":"UNLIMITED",
+            "scope":"read:submission-tracker"
+          },
+          {
+            "uriPattern":"/tracking/:id/:idType",
+            "endpointName":"Tracking Data for Id Type",
             "method":"GET",
             "authType":"USER",
             "throttlingTier":"UNLIMITED",
