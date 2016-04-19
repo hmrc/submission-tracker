@@ -1,9 +1,9 @@
 <endpoint>
   <name>Tracking-Data</name>
-  <description>This endpoint performs a ping</description>
+  <description>This endpoint retrieves the tracking data from a tax identifier.</description>
   <section id="resource">
     <title>Resource</title>
-    <resource>GET /tracking</resource>
+    <resource>GET /tracking/:id/:idType</resource>
   </section>
   <section id="path-parameters">
     <title>Path Parameters</title>

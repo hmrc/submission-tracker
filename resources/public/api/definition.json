@@ -25,7 +25,7 @@
           },
           {
             "uriPattern":"/tracking/:id/:idType",
-            "endpointName":"Tracking Data for Id Type",
+            "endpointName":"Tracking Data for IdType",
             "method":"GET",
             "authType":"USER",
             "throttlingTier":"UNLIMITED",
