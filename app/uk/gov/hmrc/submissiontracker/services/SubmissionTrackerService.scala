@@ -37,11 +37,10 @@ trait LivesubmissiontrackerService extends SubmissiontrackerService {
   def authConnector: AuthConnector
   def trackingConnector: TrackingConnector
 
-
   def audit(service:String, details:Map[String, String])(implicit hc:HeaderCarrier) = {
     def auditResponse(): Unit = {
       MicroserviceAuditConnector.sendEvent(
-        DataEvent("mobile-messages", "ServiceResponseSent",
+        DataEvent("submission-tracker", "ServiceResponseSent",
           tags = Map("transactionName" -> service),
           detail = details))
     }
@@ -71,7 +70,6 @@ object SandboxsubmissiontrackerService extends SubmissiontrackerService with Fil
     val trackingData = TrackingDataSeq(Some(Seq(TrackingData("formId", "formName", "ref1", "some-business", "20150801", "20150801", milestones))))
     Future.successful(trackingData)
   }
-
 
 }
 

@@ -66,12 +66,12 @@ trait SubmissionTrackerController extends BaseController with HeaderValidator wi
 
 }
 
-object SandboxCustomerProfileController extends SubmissionTrackerController {
+object SandboxSubmissionTrackerController extends SubmissionTrackerController {
   override val service = SandboxsubmissiontrackerService
   override val accessControl = AccountAccessControlForSandbox
 }
 
-object LiveCustomerProfileController extends SubmissionTrackerController {
+object LiveSubmissionTrackerController extends SubmissionTrackerController {
   override val service = LivesubmissiontrackerService
   override val accessControl = AccountAccessControlWithHeaderCheck
 }
