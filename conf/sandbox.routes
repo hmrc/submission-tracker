@@ -1,4 +1,4 @@
 # microservice specific routes
 
-GET         /tracking               uk.gov.hmrc.submissiontracker.controllers.SandboxCustomerProfileController.ping()
-GET         /tracking/:id/idType    uk.gov.hmrc.submissiontracker.controllers.SandboxCustomerProfileController.trackingData(id:String, idType:String)
+GET         /tracking               uk.gov.hmrc.submissiontracker.controllers.SandboxSubmissionTrackerController.ping()
+GET         /tracking/:id/idType    uk.gov.hmrc.submissiontracker.controllers.SandboxSubmissionTrackerController.trackingData(id:String, idType:String)
