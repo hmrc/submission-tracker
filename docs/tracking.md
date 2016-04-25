@@ -52,13 +52,16 @@ The Tracking object
  
 * **Error Response:**
 
+  * **Code:** 400 BADREQUEST <br />
+    **Content:** `{"code":"BAD_REQUEST","message":"Bad Request"}`
+
   * **Code:** 401 UNAUTHORIZED <br />
     **Content:** `{"code":"UNAUTHORIZED","message":"NINO does not exist on account"}`
 
   * **Code:** 406 NOT ACCEPTABLE <br />
     **Content:** `{"code":"ACCEPT_HEADER_INVALID","message":"The accept header is missing or invalid"}`
 
-  OR when a user does not exist
+  OR when data cannot be resolved.
 
   * **Code:** 500 INTERNAL_SERVER_ERROR <br />
 
