@@ -33,7 +33,7 @@ trait TrackingConnector extends ServicesConfig {
   def trackingDataLink(id: String, idType:String): String = s"$trackingBaseUrl/tracking-data/user/$idType/$id"
 
 	def getUserTrackingData(id: String,idType:String)(implicit hc: HeaderCarrier): Future[TrackingDataSeq] = {
-		Logger.debug("tracking-frontend: Requesting tracking data")
+		Logger.debug("submission-tracker: Requesting tracking data")
 		httpGet.GET[TrackingDataSeq](trackingDataLink(id,idType))
 	}
 
