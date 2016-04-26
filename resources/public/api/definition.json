@@ -10,6 +10,7 @@
     "name":"submission-tracker",
     "description":"The API is used to retrieve tracking information.",
     "context":"submission-tracker",
+    "requiresTrust": true,
     "versions":[
       {
         "version":"1.0",
