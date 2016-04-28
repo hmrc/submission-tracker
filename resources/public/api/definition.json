@@ -7,7 +7,7 @@
     }
   ],
   "api":{
-    "name":"submission-tracker",
+    "name":"Submission Tracker",
     "description":"The API is used to retrieve tracking information.",
     "context":"submission-tracker",
     "requiresTrust": true,
@@ -25,7 +25,7 @@
             "scope":"read:submission-tracker"
           },
           {
-            "uriPattern":"/tracking/:id/:idType",
+            "uriPattern":"/tracking/{id}/{idType}",
             "endpointName":"Tracking Data Id",
             "method":"GET",
             "authType":"USER",
