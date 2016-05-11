@@ -47,8 +47,6 @@ trait ErrorHandling {
 
 trait SubmissionTrackerController extends BaseController with HeaderValidator with ErrorHandling {
 
-  import ErrorResponse.writes
-
   val service: SubmissiontrackerService
   val accessControl:AccountAccessControlWithHeaderCheck
 

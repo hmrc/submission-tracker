@@ -16,12 +16,13 @@
 
 package uk.gov.hmrc.submissiontracker.services
 
+import org.joda.time.format.DateTimeFormat
 import uk.gov.hmrc.api.sandbox.FileResource
 import uk.gov.hmrc.submissiontracker.config.MicroserviceAuditConnector
 import uk.gov.hmrc.submissiontracker.connector._
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.http.HeaderCarrier
-import uk.gov.hmrc.submissiontracker.domain.{TrackingData, Milestone, TrackingDataSeq}
+import uk.gov.hmrc.submissiontracker.domain.{TrackingDataSeq, TrackingData, Milestone}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -36,6 +37,9 @@ trait SubmissiontrackerService {
 trait LivesubmissiontrackerService extends SubmissiontrackerService {
   def authConnector: AuthConnector
   def trackingConnector: TrackingConnector
+  val inFormat = DateTimeFormat.forPattern("dd MMM yyyy")
+  val outFormat = DateTimeFormat.forPattern("yyyyMMdd")
+
 
   def audit(service:String, details:Map[String, String])(implicit hc:HeaderCarrier) = {
     def auditResponse(): Unit = {
@@ -53,9 +57,18 @@ trait LivesubmissiontrackerService extends SubmissiontrackerService {
 
   def ping()(implicit hc:HeaderCarrier): Future[Boolean]
 
+  private def convert(in:String) = outFormat.print(inFormat.parseDateTime(in))
+  private def convertData(data:TrackingDataSeq): TrackingDataSeq = {
+    data.submissions.fold(data){ found =>
+      TrackingDataSeq(Some(found.map(item => {
+        item.copy(completionDate = convert(item.completionDate), receivedDate = convert(item.receivedDate))
+      })))
+    }
+  }
+
   def trackingData(id: String, idType:String)(implicit hc:HeaderCarrier): Future[TrackingDataSeq] = {
     withAudit("trackingData", Map("id" -> id, "idType" -> idType)) {
-      trackingConnector.getUserTrackingData(id, idType)
+      trackingConnector.getUserTrackingData(id, idType).map(data => convertData(data))
     }
   }
 
@@ -67,7 +80,7 @@ object SandboxsubmissiontrackerService extends SubmissiontrackerService with Fil
 
   def trackingData(id: String, idType:String)(implicit hc:HeaderCarrier): Future[TrackingDataSeq] = {
     val milestones =  Seq(Milestone("one","open"))
-    val trackingData = TrackingDataSeq(Some(Seq(TrackingData("formId", "formName", "ref1", "some-business", "20150801", "20150801", milestones))))
+    val trackingData = TrackingDataSeq(Some(Seq(TrackingData("formId", "formName", "ref1", "some-business", "20160801", "20160620", milestones))))
     Future.successful(trackingData)
   }
 

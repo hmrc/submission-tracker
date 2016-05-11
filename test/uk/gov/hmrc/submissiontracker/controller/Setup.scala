@@ -78,7 +78,8 @@ trait Setup {
   implicit val hc = HeaderCarrier()
 
   val milestones =  Seq(Milestone("one","open"))
-  val trackingData = TrackingDataSeq(Some(Seq(TrackingData("formId", "formName", "ref1", "some-business", "20150801", "20150801", milestones))))
+  val trackingData = TrackingDataSeq(Some(Seq(TrackingData("formId", "formName", "ref1", "some-business", "20160801", "20160620", milestones))))
+  val trackingDataConnector = TrackingDataSeq(Some(Seq(TrackingData("formId", "formName", "ref1", "some-business", "01 Aug 2016", "20 June 2016", milestones))))
   val nino = Nino("CS700100A")
 
   def fakeRequest(body:JsValue) = FakeRequest(POST, "url").withBody(body)
@@ -93,7 +94,7 @@ trait Setup {
     "Accept" -> "application/vnd.hmrc.1.0+json")
 
   val authConnector = new TestAuthConnector(Some(nino))
-  val trackingConnector = new TestTrackingConnector(trackingData)
+  val trackingConnector = new TestTrackingConnector(trackingDataConnector)
   val testAccess = new TestAccessCheck(authConnector)
   val testCompositeAction = new TestAccountAccessControlWithAccept(testAccess)
   val testService = new TestSubmissionTrackingService(authConnector, trackingConnector)
@@ -116,7 +117,7 @@ trait AuthWithoutNino extends Setup {
   }
 
   override val testAccess = new TestAccessCheck(authConnector)
-  override val trackingConnector = new TestTrackingConnector(trackingData)
+  override val trackingConnector = new TestTrackingConnector(trackingDataConnector)
   override val testCompositeAction = new TestAccountAccessControlWithAccept(testAccess)
   override val testService = new TestSubmissionTrackingService(authConnector, trackingConnector)
 
