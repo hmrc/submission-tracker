@@ -80,7 +80,7 @@ object SandboxsubmissiontrackerService extends SubmissiontrackerService with Fil
 
   def trackingData(id: String, idType:String)(implicit hc:HeaderCarrier): Future[TrackingDataSeq] = {
     val milestones =  Seq(Milestone("one","open"))
-    val trackingData = TrackingDataSeq(Some(Seq(TrackingData("formId", "formName", "ref1", "some-business", "20160801", "20160620", milestones))))
+    val trackingData = TrackingDataSeq(Some(Seq(TrackingData("E4H-384D-EFZ", "Claim a tax refund", "ref1", "some-business", "20160801", "20160620", milestones))))
     Future.successful(trackingData)
   }
 

@@ -78,8 +78,8 @@ trait Setup {
   implicit val hc = HeaderCarrier()
 
   val milestones =  Seq(Milestone("one","open"))
-  val trackingData = TrackingDataSeq(Some(Seq(TrackingData("formId", "formName", "ref1", "some-business", "20160801", "20160620", milestones))))
-  val trackingDataConnector = TrackingDataSeq(Some(Seq(TrackingData("formId", "formName", "ref1", "some-business", "01 Aug 2016", "20 June 2016", milestones))))
+  val trackingData = TrackingDataSeq(Some(Seq(TrackingData("E4H-384D-EFZ", "Claim a tax refund", "ref1", "some-business", "20160801", "20160620", milestones))))
+  val trackingDataConnector = TrackingDataSeq(Some(Seq(TrackingData("E4H-384D-EFZ", "Claim a tax refund", "ref1", "some-business", "01 Aug 2016", "20 June 2016", milestones))))
   val nino = Nino("CS700100A")
 
   def fakeRequest(body:JsValue) = FakeRequest(POST, "url").withBody(body)
