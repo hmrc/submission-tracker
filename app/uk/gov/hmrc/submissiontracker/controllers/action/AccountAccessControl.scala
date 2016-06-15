@@ -51,11 +51,11 @@ trait AccountAccessControl extends ActionBuilder[Request] with Results {
 
       case ex:UnauthorizedException =>
         Logger.info("Unauthorized! NINO not found on account!")
-        Unauthorized(Json.toJson(ErrorUnauthorizedNoNino))
+        Unauthorized(Json.toJson(ErrorNinoInvalid))
 
       case ex:NinoNotFoundOnAccount =>
         Logger.info("Unauthorised! Bad Request invalid Nino")
-        BadRequest(Json.toJson(ErrorNinoInvalid))
+        BadRequest(Json.toJson(ErrorUnauthorizedNoNino))
     }
   }
 }
