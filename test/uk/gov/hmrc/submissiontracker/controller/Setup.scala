@@ -16,17 +16,17 @@
 
 package uk.gov.hmrc.submissiontracker.controller
 
-import play.api.libs.json.{Json, JsValue}
+import play.api.libs.json.{JsValue, Json}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.play.auth.microservice.connectors.ConfidenceLevel
-import uk.gov.hmrc.play.http.{Upstream4xxResponse, HeaderCarrier, HttpGet}
+import uk.gov.hmrc.play.http.{ForbiddenException, HeaderCarrier, HttpGet, Upstream4xxResponse}
 import uk.gov.hmrc.submissiontracker.connector.{AuthConnector, TrackingConnector}
 import uk.gov.hmrc.submissiontracker.controllers.SubmissionTrackerController
-import uk.gov.hmrc.submissiontracker.controllers.action.{AccountAccessControlForSandbox, AccountAccessControlWithHeaderCheck, AccountAccessControl}
-import uk.gov.hmrc.submissiontracker.domain.{TrackingData, Milestone, Accounts, TrackingDataSeq}
-import uk.gov.hmrc.submissiontracker.services.{SubmissiontrackerService, SandboxsubmissiontrackerService, LivesubmissiontrackerService}
+import uk.gov.hmrc.submissiontracker.controllers.action.{AccountAccessControl, AccountAccessControlForSandbox, AccountAccessControlWithHeaderCheck}
+import uk.gov.hmrc.submissiontracker.domain.{Accounts, Milestone, TrackingData, TrackingDataSeq}
+import uk.gov.hmrc.submissiontracker.services.{LivesubmissiontrackerService, SandboxsubmissiontrackerService, SubmissiontrackerService}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -132,4 +132,24 @@ trait SandboxSuccess extends Setup {
     override val service: SubmissiontrackerService = testSandboxPersonalIncomeService
     override val accessControl: AccountAccessControlWithHeaderCheck = sandboxCompositeAction
   }
+}
+
+
+trait AuthWithLowCL extends Setup {
+
+  override val authConnector =  new TestAuthConnector(None) {
+    override def grantAccess()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = Future.failed(new ForbiddenException("Error"))
+  }
+
+  override val testAccess = new TestAccessCheck(authConnector)
+  override val trackingConnector = new TestTrackingConnector(trackingDataConnector)
+  override val testCompositeAction = new TestAccountAccessControlWithAccept(testAccess)
+  override val testService = new TestSubmissionTrackingService(authConnector, trackingConnector)
+
+
+  val controller = new SubmissionTrackerController {
+    override val service: SubmissiontrackerService = testService
+    override val accessControl: AccountAccessControlWithHeaderCheck = testCompositeAction
+  }
+
 }
