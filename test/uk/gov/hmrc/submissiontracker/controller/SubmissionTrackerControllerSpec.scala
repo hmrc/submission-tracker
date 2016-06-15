@@ -45,6 +45,12 @@ class TestSubmissionTrackingSpec extends UnitSpec with WithFakeApplication with 
       testService.saveDetails shouldBe Map.empty
     }
 
+    "return forbidden when authority record does not have correct confidence level" in new AuthWithLowCL {
+      val result = await(controller.trackingData("some-id", "some-id-type")(emptyRequestWithAcceptHeader))
+
+      status(result) shouldBe 403
+    }
+
     "return status code 406 when the headers are invalid" in new Success {
       val result = await(controller.trackingData("some-id", "some-id-type")(emptyRequest))
 

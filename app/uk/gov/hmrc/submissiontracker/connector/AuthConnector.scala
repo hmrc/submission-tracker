@@ -26,6 +26,8 @@ import uk.gov.hmrc.submissiontracker.domain.Accounts
 
 import scala.concurrent.{ExecutionContext, Future}
 
+class NinoNotFoundOnAccount(message:String) extends uk.gov.hmrc.play.http.HttpException(message, 401)
+
 trait AuthConnector {
 
   import uk.gov.hmrc.domain.{Nino, SaUtr}
@@ -54,7 +56,7 @@ trait AuthConnector {
           case Accounts(None, _) => {
             //TODO add a metric for this ????
             Logger.warn("User without a NINO has accessed the service this should not be possible")
-            throw new UnauthorizedException("The user must have a National Insurance Number")
+            throw new NinoNotFoundOnAccount("The user must have a National Insurance Number")
           }
           case _ => acc
         }

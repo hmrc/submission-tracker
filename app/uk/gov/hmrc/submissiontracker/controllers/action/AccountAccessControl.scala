@@ -16,11 +16,12 @@
 
 package uk.gov.hmrc.submissiontracker.controllers.action
 
+import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{ActionBuilder, Request, Result, Results}
 import uk.gov.hmrc.api.controllers.{ErrorAcceptHeaderInvalid, HeaderValidator}
-import uk.gov.hmrc.submissiontracker.connector.AuthConnector
-import uk.gov.hmrc.submissiontracker.controllers.ErrorUnauthorizedNoNino
+import uk.gov.hmrc.submissiontracker.connector.{AuthConnector, NinoNotFoundOnAccount}
+import uk.gov.hmrc.submissiontracker.controllers.{ErrorNinoInvalid, ErrorUnauthorizedNoNino, ForbiddenAccess}
 import uk.gov.hmrc.play.auth.microservice.connectors.ConfidenceLevel
 import uk.gov.hmrc.play.http._
 import uk.gov.hmrc.play.http.hooks.HttpHook
@@ -41,10 +42,22 @@ trait AccountAccessControl extends ActionBuilder[Request] with Results {
       _ =>
         block(request)
     }.recover {
+
       case ex:uk.gov.hmrc.play.http.Upstream4xxResponse => Unauthorized(Json.toJson(ErrorUnauthorizedNoNino))
+
+      case ex:ForbiddenException =>
+        Logger.info("Unauthorized! ForbiddenException caught and returning 403 status!")
+        Forbidden(Json.toJson(ForbiddenAccess))
+
+      case ex:UnauthorizedException =>
+        Logger.info("Unauthorized! NINO not found on account!")
+        Unauthorized(Json.toJson(ErrorUnauthorizedNoNino))
+
+      case ex:NinoNotFoundOnAccount =>
+        Logger.info("Unauthorised! Bad Request invalid Nino")
+        BadRequest(Json.toJson(ErrorNinoInvalid))
     }
   }
-
 }
 
 trait AccountAccessControlWithHeaderCheck extends HeaderValidator {
