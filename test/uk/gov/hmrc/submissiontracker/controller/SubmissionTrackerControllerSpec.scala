@@ -38,6 +38,14 @@ class TestSubmissionTrackingSpec extends UnitSpec with WithFakeApplication with 
       testService.saveDetails shouldBe Map("id" -> "some-id", "idType" -> "some-id-type")
     }
 
+    "return the tracking data successfully when journeyId is supplied" in new Success {
+      val result: Result = await(controller.trackingData("some-id", "some-id-type", journeyId)(emptyRequestWithAcceptHeader))
+
+      status(result) shouldBe 200
+      contentAsJson(result) shouldBe Json.toJson(trackingData)
+      testService.saveDetails shouldBe Map("id" -> "some-id", "idType" -> "some-id-type")
+    }
+
     "return unauthorized when authority record does not contain a NINO" in new AuthWithoutNino {
       val result = await(controller.trackingData("some-id", "some-id-type")(emptyRequestWithAcceptHeader))
 

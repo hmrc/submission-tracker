@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.submissiontracker.controller
 
+import java.util.UUID
+
 import play.api.libs.json.{JsValue, Json}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -76,6 +78,8 @@ class TestAccountAccessControlWithAccept(testAccessCheck:AccountAccessControl) e
 
 trait Setup {
   implicit val hc = HeaderCarrier()
+
+  val journeyId = Option(UUID.randomUUID().toString)
 
   val milestones =  Seq(Milestone("one","open"))
   val trackingData = TrackingDataSeq(Some(Seq(TrackingData("E4H-384D-EFZ", "Claim a tax refund", "ref1", "some-business", "20160801", "20160620", milestones))))
