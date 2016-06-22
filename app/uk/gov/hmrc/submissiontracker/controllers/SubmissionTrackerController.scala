@@ -56,7 +56,7 @@ trait SubmissionTrackerController extends BaseController with HeaderValidator wi
     errorWrapper(service.ping().map(as => Ok(Json.toJson(as))))
   }
 
-  final def trackingData(id:String, idType:String) = accessControl.validateAccept(acceptHeaderValidationRules).async {
+  final def trackingData(id:String, idType:String, journeyId: Option[String] = None) = accessControl.validateAccept(acceptHeaderValidationRules).async {
     implicit request =>
       implicit val hc = HeaderCarrier.fromHeadersAndSession(request.headers, None)
       errorWrapper(service.trackingData(id, idType).map(as => Ok(Json.toJson(as))))
