@@ -30,13 +30,7 @@
             "method":"GET",
             "authType":"USER",
             "throttlingTier":"UNLIMITED",
-            "scope":"read:submission-tracker",
-            "queryParameters": [
-              {
-                "name": "journeyId",
-                "required": false
-              }
-            ]
+            "scope":"read:submission-tracker"
           }
         ]
       }
