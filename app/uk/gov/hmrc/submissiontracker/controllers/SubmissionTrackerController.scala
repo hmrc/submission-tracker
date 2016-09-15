@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.submissiontracker.controllers
 
-import uk.gov.hmrc.submissiontracker.controllers.action.{AccountAccessControlForSandbox, AccountAccessControlWithHeaderCheck}
+import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.submissiontracker.controllers.action.{AccountAccessControlCheckOff, AccountAccessControlWithHeaderCheck}
 import uk.gov.hmrc.submissiontracker.services.{SubmissiontrackerService, LivesubmissiontrackerService, SandboxsubmissiontrackerService}
 import play.api.{Logger, mvc}
 import uk.gov.hmrc.play.http.{ForbiddenException, HeaderCarrier, NotFoundException, UnauthorizedException}
@@ -50,23 +51,16 @@ trait SubmissionTrackerController extends BaseController with HeaderValidator wi
   val service: SubmissiontrackerService
   val accessControl:AccountAccessControlWithHeaderCheck
 
-  final def ping() = accessControl.validateAccept(acceptHeaderValidationRules).async {
-  implicit request =>
-    implicit val hc = HeaderCarrier.fromHeadersAndSession(request.headers, None)
-    errorWrapper(service.ping().map(as => Ok(Json.toJson(as))))
-  }
-
-  final def trackingData(id:String, idType:String, journeyId: Option[String] = None) = accessControl.validateAccept(acceptHeaderValidationRules).async {
+  final def trackingData(id:String, idType:String, journeyId: Option[String] = None) = accessControl.validateAcceptWithAuth(acceptHeaderValidationRules, Some(Nino(id))).async {
     implicit request =>
       implicit val hc = HeaderCarrier.fromHeadersAndSession(request.headers, None)
       errorWrapper(service.trackingData(id, idType).map(as => Ok(Json.toJson(as))))
   }
-
 }
 
 object SandboxSubmissionTrackerController extends SubmissionTrackerController {
   override val service = SandboxsubmissiontrackerService
-  override val accessControl = AccountAccessControlForSandbox
+  override val accessControl = AccountAccessControlCheckOff
 }
 
 object LiveSubmissionTrackerController extends SubmissionTrackerController {
