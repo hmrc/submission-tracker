@@ -31,36 +31,42 @@ class TestSubmissionTrackingSpec extends UnitSpec with WithFakeApplication with 
   "trackingData Live" should {
 
     "return the tracking data successfully" in new Success {
-      val result: Result = await(controller.trackingData("some-id", "some-id-type")(emptyRequestWithAcceptHeader))
+      val result: Result = await(controller.trackingData(nino.value, "some-id-type")(emptyRequestWithAcceptHeader))
 
       status(result) shouldBe 200
       contentAsJson(result) shouldBe Json.toJson(trackingData)
-      testService.saveDetails shouldBe Map("id" -> "some-id", "idType" -> "some-id-type")
+      testService.saveDetails shouldBe Map("id" -> nino.value, "idType" -> "some-id-type")
     }
 
     "return the tracking data successfully when journeyId is supplied" in new Success {
-      val result: Result = await(controller.trackingData("some-id", "some-id-type", journeyId)(emptyRequestWithAcceptHeader))
+      val result: Result = await(controller.trackingData(nino.value, "some-id-type", journeyId)(emptyRequestWithAcceptHeader))
 
       status(result) shouldBe 200
       contentAsJson(result) shouldBe Json.toJson(trackingData)
-      testService.saveDetails shouldBe Map("id" -> "some-id", "idType" -> "some-id-type")
+      testService.saveDetails shouldBe Map("id" -> nino.value, "idType" -> "some-id-type")
     }
 
     "return unauthorized when authority record does not contain a NINO" in new AuthWithoutNino {
-      val result = await(controller.trackingData("some-id", "some-id-type")(emptyRequestWithAcceptHeader))
+      val result = await(controller.trackingData(nino.value, "some-id-type")(emptyRequestWithAcceptHeader))
 
       status(result) shouldBe 401
       testService.saveDetails shouldBe Map.empty
     }
 
+    "return 401 when the nino in the request does not match the authority nino" in new AccessCheck {
+      val result = await(controller.trackingData(nino.value, "some-id-type")(emptyRequestWithAcceptHeader))
+
+      status(result) shouldBe 401
+    }
+
     "return forbidden when authority record does not have correct confidence level" in new AuthWithLowCL {
-      val result = await(controller.trackingData("some-id", "some-id-type")(emptyRequestWithAcceptHeader))
+      val result = await(controller.trackingData(nino.value, "some-id-type")(emptyRequestWithAcceptHeader))
 
       status(result) shouldBe 403
     }
 
     "return status code 406 when the headers are invalid" in new Success {
-      val result = await(controller.trackingData("some-id", "some-id-type")(emptyRequest))
+      val result = await(controller.trackingData(nino.value, "some-id-type")(emptyRequest))
 
       status(result) shouldBe 406
 
@@ -71,7 +77,7 @@ class TestSubmissionTrackingSpec extends UnitSpec with WithFakeApplication with 
   "trackingData Sandbox" should {
 
     "return the summary response from a static value" in new SandboxSuccess {
-      val result = await(controller.trackingData("some-id", "some-id-type")(emptyRequestWithAcceptHeader))
+      val result = await(controller.trackingData(nino.value, "some-id-type")(emptyRequestWithAcceptHeader))
 
       status(result) shouldBe 200
       contentAsJson(result) shouldBe Json.toJson(trackingData)
@@ -80,7 +86,7 @@ class TestSubmissionTrackingSpec extends UnitSpec with WithFakeApplication with 
     }
 
     "return status code 406 when the Accept header is invalid" in new Success {
-      val  result = await(controller.trackingData("some-id", "some-id-type")(emptyRequest))
+      val  result = await(controller.trackingData(nino.value, "some-id-type")(emptyRequest))
 
       status(result) shouldBe 406
 

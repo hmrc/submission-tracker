@@ -24,32 +24,37 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.play.auth.microservice.connectors.ConfidenceLevel
 import uk.gov.hmrc.play.http.{ForbiddenException, HeaderCarrier, HttpGet, Upstream4xxResponse}
-import uk.gov.hmrc.submissiontracker.connector.{AuthConnector, TrackingConnector}
+import uk.gov.hmrc.submissiontracker.connector.{FailToMatchTaxIdOnAuth, AuthConnector, TrackingConnector}
 import uk.gov.hmrc.submissiontracker.controllers.SubmissionTrackerController
-import uk.gov.hmrc.submissiontracker.controllers.action.{AccountAccessControl, AccountAccessControlForSandbox, AccountAccessControlWithHeaderCheck}
+import uk.gov.hmrc.submissiontracker.controllers.action.{AccountAccessControlCheckOff, AccountAccessControl, AccountAccessControlWithHeaderCheck}
 import uk.gov.hmrc.submissiontracker.domain.{Accounts, Milestone, TrackingData, TrackingDataSeq}
 import uk.gov.hmrc.submissiontracker.services.{LivesubmissiontrackerService, SandboxsubmissiontrackerService, SubmissiontrackerService}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class TestTrackingConnector(trackingDetails:TrackingDataSeq) extends TrackingConnector {
-  override def httpGet: HttpGet = ???
+  override def httpGet: HttpGet = throw new Exception("Should not be called")
 
   override def getUserTrackingData(id: String,idType:String)(implicit hc: HeaderCarrier): Future[TrackingDataSeq] = {
     Future.successful(trackingDetails)
   }
 }
 
-class TestAuthConnector(nino:Option[Nino]) extends AuthConnector {
+class TestAuthConnector(nino: Option[Nino], ex:Option[Exception]=None) extends AuthConnector {
   override val serviceUrl: String = "someUrl"
 
-  override def serviceConfidenceLevel: ConfidenceLevel = ???
+  override def serviceConfidenceLevel: ConfidenceLevel = throw new Exception("Should not be invoked!")
 
-  override def http: HttpGet = ???
+  override def http: HttpGet = throw new Exception("Should not be invoked!")
 
   override def accounts()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Accounts] = Future(Accounts(nino, None))
 
-  override def grantAccess()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = Future(Unit)
+  override def grantAccess(taxId:Option[Nino])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+    ex match {
+      case None => Future(Unit)
+      case Some(failure) => Future.failed(failure)
+    }
+  }
 }
 
 class TestSubmissionTrackingService(testAuthConnector:TestAuthConnector, testTrackingConnector:TestTrackingConnector) extends LivesubmissiontrackerService {
@@ -57,14 +62,11 @@ class TestSubmissionTrackingService(testAuthConnector:TestAuthConnector, testTra
 
   override def authConnector: AuthConnector = testAuthConnector
 
-  override def ping()(implicit hc: HeaderCarrier): Future[Boolean] = ???
-
   override val trackingConnector = testTrackingConnector
 
   override def audit(method:String, details:Map[String, String])(implicit hc: HeaderCarrier): Unit = {
     saveDetails=details
   }
-
 }
 
 class TestAccessCheck(testAuthConnector: TestAuthConnector) extends AccountAccessControl {
@@ -104,7 +106,7 @@ trait Setup {
   val testService = new TestSubmissionTrackingService(authConnector, trackingConnector)
 
   val testSandboxPersonalIncomeService = SandboxsubmissiontrackerService
-  val sandboxCompositeAction = AccountAccessControlForSandbox
+  val sandboxCompositeAction = AccountAccessControlCheckOff
 }
 
 trait Success extends Setup {
@@ -117,7 +119,8 @@ trait Success extends Setup {
 trait AuthWithoutNino extends Setup {
 
   override val authConnector =  new TestAuthConnector(None) {
-    override def grantAccess()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = Future.failed(new Upstream4xxResponse("Error", 401, 401))
+    override def grantAccess(taxId:Option[Nino])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] =
+      Future.failed(new Upstream4xxResponse("Error", 401, 401))
   }
 
   override val testAccess = new TestAccessCheck(authConnector)
@@ -138,11 +141,23 @@ trait SandboxSuccess extends Setup {
   }
 }
 
+trait AccessCheck extends Setup {
+  override val authConnector = new TestAuthConnector(Some(Nino("CS123456A")), Some(new FailToMatchTaxIdOnAuth("controlled explosion")))
+  override val testAccess = new TestAccessCheck(authConnector)
+  override val testCompositeAction = new TestAccountAccessControlWithAccept(testAccess)
+
+  val controller = new SubmissionTrackerController {
+    override val service: SubmissiontrackerService = testSandboxPersonalIncomeService
+    override val accessControl: AccountAccessControlWithHeaderCheck = testCompositeAction
+  }
+}
 
 trait AuthWithLowCL extends Setup {
 
   override val authConnector =  new TestAuthConnector(None) {
-    override def grantAccess()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = Future.failed(new ForbiddenException("Error"))
+    override def grantAccess(taxId:Option[Nino])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+      Future.failed(new ForbiddenException("Error"))
+    }
   }
 
   override val testAccess = new TestAccessCheck(authConnector)

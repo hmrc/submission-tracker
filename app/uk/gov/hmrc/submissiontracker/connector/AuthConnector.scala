@@ -16,22 +16,25 @@
 
 package uk.gov.hmrc.submissiontracker.connector
 
-import play.api.{Logger, Play}
+import java.util.UUID
+import play.api.Play
 import play.api.libs.json.JsValue
-import uk.gov.hmrc.submissiontracker.config.WSHttp
-import uk.gov.hmrc.play.auth.microservice.connectors.ConfidenceLevel
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http.{ForbiddenException, HeaderCarrier, HttpGet, UnauthorizedException}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet}
+import uk.gov.hmrc.submissiontracker.config.WSHttp
 import uk.gov.hmrc.submissiontracker.domain.Accounts
 
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.domain.{Nino, SaUtr}
+import uk.gov.hmrc.play.auth.microservice.connectors.ConfidenceLevel
 
+
+class FailToMatchTaxIdOnAuth(message:String) extends uk.gov.hmrc.play.http.HttpException(message, 401)
 class NinoNotFoundOnAccount(message:String) extends uk.gov.hmrc.play.http.HttpException(message, 401)
+class AccountWithLowCL(message:String) extends uk.gov.hmrc.play.http.HttpException(message, 401)
+class AccountWithWeakCredStrength(message:String) extends uk.gov.hmrc.play.http.HttpException(message, 401)
 
 trait AuthConnector {
-
-  import uk.gov.hmrc.domain.{Nino, SaUtr}
-  import uk.gov.hmrc.play.auth.microservice.connectors.ConfidenceLevel
 
   val serviceUrl: String
 
@@ -39,48 +42,57 @@ trait AuthConnector {
 
   def serviceConfidenceLevel: ConfidenceLevel
 
+  val credStrengthStrong = "strong"
+
   def accounts()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Accounts] = {
     http.GET(s"$serviceUrl/auth/authority") map {
       resp =>
         val json = resp.json
-        confirmConfiendenceLevel(json)
-
         val accounts = json \ "accounts"
-
         val utr = (accounts \ "sa" \ "utr").asOpt[String]
-
         val nino = (accounts \ "paye" \ "nino").asOpt[String]
 
-        val acc = Accounts(nino.map(Nino(_)), utr.map(SaUtr(_)))
-        acc match {
-          case Accounts(None, _) => {
-            //TODO add a metric for this ????
-            Logger.warn("User without a NINO has accessed the service this should not be possible")
-            throw new NinoNotFoundOnAccount("The user must have a National Insurance Number")
-          }
-          case _ => acc
-        }
+        Accounts(nino.map(Nino(_)), utr.map(SaUtr(_)))
     }
   }
 
-  def grantAccess()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+  def grantAccess(taxId:Option[Nino])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
+
     http.GET(s"$serviceUrl/auth/authority") map {
       resp => {
         val json = resp.json
         confirmConfiendenceLevel(json)
+        val nino = (json \ "accounts" \ "paye" \ "nino").asOpt[String]
 
-        if((json \ "accounts" \ "paye" \ "nino").asOpt[String].isEmpty)
-          throw new UnauthorizedException("The user must have a National Insurance Number to access this service")
+        if (nino.isEmpty)
+          throw new NinoNotFoundOnAccount("The user must have a National Insurance Number")
+
+        if (taxId.nonEmpty && !taxId.get.value.equals(nino.get))
+          throw new FailToMatchTaxIdOnAuth("The nino in the URL failed to match auth!")
       }
     }
   }
 
-  private def confirmConfiendenceLevel(jsValue : JsValue) = {
-    val usersCL = (jsValue \ "confidenceLevel").as[Int]
-    if (serviceConfidenceLevel.level > usersCL) {
-      throw new ForbiddenException("The user does not have sufficient permissions to access this service")
+  private def confirmConfiendenceLevel(jsValue : JsValue) =
+    if (upliftRequired(jsValue)) {
+      throw new AccountWithLowCL("The user does not have sufficient CL permissions to access this service")
     }
+
+  private def upliftRequired(jsValue : JsValue) = {
+    val usersCL = (jsValue \ "confidenceLevel").as[Int]
+    serviceConfidenceLevel.level > usersCL
   }
+
+  private def confirmCredStrength(jsValue : JsValue) =
+    if (twoFactorRequired(jsValue)) {
+      throw new AccountWithWeakCredStrength("The user does not have sufficient credential strength permissions to access this service")
+    }
+
+  private def twoFactorRequired(jsValue : JsValue) = {
+    val credStrength = (jsValue \ "credentialStrength").as[String]
+    credStrength != credStrengthStrong
+  }
+
 }
 
 object AuthConnector extends AuthConnector with ServicesConfig {
