@@ -29,8 +29,6 @@ import scala.concurrent.Future
 
 
 trait SubmissiontrackerService {
-  def ping()(implicit hc:HeaderCarrier): Future[Boolean]
-
   def trackingData(id: String, idType:String)(implicit hc:HeaderCarrier): Future[TrackingDataSeq]
 }
 
@@ -55,8 +53,6 @@ trait LivesubmissiontrackerService extends SubmissiontrackerService {
     func
   }
 
-  def ping()(implicit hc:HeaderCarrier): Future[Boolean]
-
   private def convert(in:String) = outFormat.print(inFormat.parseDateTime(in))
   private def convertData(data:TrackingDataSeq): TrackingDataSeq = {
     data.submissions.fold(data){ found =>
@@ -76,19 +72,14 @@ trait LivesubmissiontrackerService extends SubmissiontrackerService {
 
 object SandboxsubmissiontrackerService extends SubmissiontrackerService with FileResource {
 
-  def ping()(implicit hc:HeaderCarrier): Future[Boolean] = Future.successful(true)
-
   def trackingData(id: String, idType:String)(implicit hc:HeaderCarrier): Future[TrackingDataSeq] = {
     val milestones =  Seq(Milestone("one","open"))
     val trackingData = TrackingDataSeq(Some(Seq(TrackingData("E4H-384D-EFZ", "Claim a tax refund", "ref1", "some-business", "20160801", "20160620", milestones))))
     Future.successful(trackingData)
   }
-
 }
 
 object LivesubmissiontrackerService extends LivesubmissiontrackerService {
   override val authConnector: AuthConnector = AuthConnector
   override val trackingConnector = TrackingConnector
-
-  def ping()(implicit hc:HeaderCarrier): Future[Boolean] = Future.successful(true)
 }

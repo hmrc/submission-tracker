@@ -18,6 +18,7 @@ package uk.gov.hmrc.submissiontracker.connector
 
 import org.scalatest.concurrent.ScalaFutures
 import play.api.libs.json.Json
+import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.play.http.hooks.HttpHook
 import uk.gov.hmrc.play.http.{HeaderCarrier, _}
 import uk.gov.hmrc.play.test.UnitSpec
@@ -35,6 +36,7 @@ class TrackingConnectorSpec
 
     val milestones =  Seq(Milestone("one","open"))
     val trackingData = TrackingDataSeq(Some(Seq(TrackingData("formId", "formName", "ref1", "some-business", "21-12-2016", "12-14-2016", milestones))))
+    val nino = Nino("CS700100A")
 
     lazy val http500Response = Future.failed(new Upstream5xxResponse("Error", 500, 500))
     lazy val http400Response = Future.failed(new BadRequestException("bad request"))
@@ -59,20 +61,20 @@ class TrackingConnectorSpec
     "throw BadRequestException when a 400 response is returned" in new Setup {
       override lazy val response = http400Response
         intercept[BadRequestException] {
-          await(connector.getUserTrackingData("some-id", "some-id-type"))
+          await(connector.getUserTrackingData(nino.value, "some-id-type"))
       }
     }
 
     "throw Upstream5xxResponse when a 500 response is returned" in new Setup {
       override lazy val response = http500Response
       intercept[Upstream5xxResponse] {
-        await(connector.getUserTrackingData("some-id", "some-id-type"))
+        await(connector.getUserTrackingData(nino.value, "some-id-type"))
       }
     }
 
     "return a valid response when a 200 response is received" in new Setup {
       override lazy val response = http200Response
-      val result: TrackingDataSeq = await(connector.getUserTrackingData("some-id", "some-id-type"))
+      val result: TrackingDataSeq = await(connector.getUserTrackingData(nino.value, "some-id-type"))
       result shouldBe trackingData
     }
   }
