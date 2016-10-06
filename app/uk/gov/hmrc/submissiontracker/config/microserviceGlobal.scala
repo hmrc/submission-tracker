@@ -25,11 +25,13 @@ import play.api._
 import uk.gov.hmrc.api.config.{ServiceLocatorConfig, ServiceLocatorRegistration}
 import uk.gov.hmrc.api.connector.ServiceLocatorConnector
 import uk.gov.hmrc.api.controllers._
+import uk.gov.hmrc.api.filters.CacheControlFilter
 import uk.gov.hmrc.submissiontracker.controllers._
 import uk.gov.hmrc.play.audit.filters.AuditFilter
 import uk.gov.hmrc.play.auth.controllers.AuthParamsControllerConfig
 import uk.gov.hmrc.play.auth.microservice.filters.AuthorisationFilter
 import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode}
+import uk.gov.hmrc.play.filters.NoCacheFilter
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.http.logging.filters.LoggingFilter
 import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
@@ -75,6 +77,10 @@ object MicroserviceGlobal extends DefaultMicroserviceGlobal with RunMode with Se
   override val authFilter = Some(MicroserviceAuthFilter)
 
   override val slConnector: ServiceLocatorConnector = ServiceLocatorConnector(WSHttp)
+
+  val cacheFilter = CacheControlFilter.fromConfig(CacheControlFilter.configKey)
+
+  override val microserviceFilters = defaultMicroserviceFilters.filterNot( _.isInstanceOf[NoCacheFilter.type] ) :+ cacheFilter
 
   override implicit val hc: HeaderCarrier = HeaderCarrier()
 
