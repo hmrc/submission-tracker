@@ -19,14 +19,11 @@ package uk.gov.hmrc.submissiontracker.controller
 import org.scalatest.concurrent.ScalaFutures
 import play.api.libs.json.Json
 import play.api.mvc.Result
-import play.api.test.FakeApplication
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import uk.gov.hmrc.play.test.UnitSpec
 
 
-class TestSubmissionTrackingSpec extends UnitSpec with WithFakeApplication with ScalaFutures with StubApplicationConfiguration {
-
-  override lazy val fakeApplication = FakeApplication(additionalConfiguration = config)
+class TestSubmissionTrackingSpec extends UnitSpec with ScalaFutures with StubApplicationConfiguration {
 
   "trackingData Live" should {
 
