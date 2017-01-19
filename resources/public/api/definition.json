@@ -14,37 +14,7 @@
     "versions":[
       {
         "version":"1.0",
-        "status":"PUBLISHED",
-        "endpoints":[
-          {
-            "uriPattern":"/tracking",
-            "endpointName":"Tracking-Data",
-            "method":"GET",
-            "authType":"USER",
-            "throttlingTier":"UNLIMITED",
-            "scope":"read:submission-tracker",
-            "queryParameters": [
-              {
-                "name": "journeyId",
-                "required": false
-              }
-            ]
-          },
-          {
-            "uriPattern":"/tracking/{id}/{idType}",
-            "endpointName":"Tracking Data Id",
-            "method":"GET",
-            "authType":"USER",
-            "throttlingTier":"UNLIMITED",
-            "scope":"read:submission-tracker",
-            "queryParameters": [
-              {
-                "name": "journeyId",
-                "required": false
-              }
-            ]
-          }
-        ]
+        "status":"PUBLISHED"
       }
     ]
   }
