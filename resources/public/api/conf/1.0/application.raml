@@ -1,0 +1,73 @@
+#%RAML 1.0
+---
+
+title: Submission Tracker
+version: 1.0
+protocols: [ HTTPS ]
+baseUri: https://api.service.hmrc.gov.uk/
+
+documentation:
+ - title: Overview
+   content: !include docs/overview.md
+ - title: Versioning
+   content: !include http://api-documentation-raml-frontend.service/api-documentation/assets/common/docs/versioning.md
+ - title: Errors
+   content: !include http://api-documentation-raml-frontend.service/api-documentation/assets/common/docs/errors.md
+
+mediaType: [ application/json, application/hal+json ]
+
+uses:
+  sec: http://api-documentation-raml-frontend.service/api-documentation/assets/common/modules/securitySchemes.raml
+  headers: http://api-documentation-raml-frontend.service/api-documentation/assets/common/modules/headers.raml
+  annotations: http://api-documentation-raml-frontend.service/api-documentation/assets/common/modules/annotations.raml
+  types: http://api-documentation-raml-frontend.service/api-documentation/assets/common/modules/types.raml
+
+/submission-tracker:
+  /tracking:
+    get:
+      displayName: Tracking-data
+      description: This endpoint performs a ping
+      is: [headers.acceptHeader]
+      (annotations.scope): "read:submission-tracker"
+      securedBy: [ sec.oauth_2_0: { scopes: [ "read:submission-tracker" ] } ]
+      queryParameters:
+        journeyId:
+          type: string
+          required: false
+      responses:
+        200:
+          body:
+            application/json:
+              examples:
+                example-1:
+                  value: !include examples/tracking-data-example-1.json
+    /{id}:
+      uriParameters:
+        id:
+          description: The NINO for the individual. This could also be a UTR.
+          type: string
+          example: NS123456B
+      /{idType}:
+        uriParameters:
+          idType:
+            description: The name of the tax identifier that is supplied in the 'id' field.
+            type: string
+            example: nino
+        get:
+          displayName: Tracking data id
+          description: This endpoint retrieves the tracking data from a tax identifier.
+          is: [headers.acceptHeader]
+          (annotations.scope): "read:submission-tracker"
+          securedBy: [ sec.oauth_2_0: { scopes: [ "read:submission-tracker" ] } ]
+          queryParameters:
+            journeyId:
+              type: string
+              required: false
+          responses:
+            200:
+              body:
+                application/json:
+                  examples:
+                    example-1:
+                      value: !include examples/tracking-data-id-example-1.json
+
