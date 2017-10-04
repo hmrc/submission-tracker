@@ -21,11 +21,11 @@ import uk.gov.hmrc.api.sandbox.FileResource
 import uk.gov.hmrc.submissiontracker.config.MicroserviceAuditConnector
 import uk.gov.hmrc.submissiontracker.connector._
 import uk.gov.hmrc.play.audit.model.DataEvent
-import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.submissiontracker.domain.{TrackingDataSeq, TrackingData, Milestone}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 
 trait SubmissiontrackerService {

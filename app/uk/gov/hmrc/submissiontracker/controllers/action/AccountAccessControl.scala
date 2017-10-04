@@ -16,16 +16,19 @@
 
 package uk.gov.hmrc.submissiontracker.controllers.action
 
-import uk.gov.hmrc.api.controllers._
-import uk.gov.hmrc.domain.Nino
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{ActionBuilder, Request, Result, Results}
+import uk.gov.hmrc.api.controllers._
+import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.http.hooks.HttpHook
+import uk.gov.hmrc.http._
+import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.auth.microservice.connectors.ConfidenceLevel
-import uk.gov.hmrc.play.http._
-import uk.gov.hmrc.play.http.hooks.HttpHook
+import uk.gov.hmrc.play.http.ws.WSGet
 import uk.gov.hmrc.submissiontracker.connector._
-import uk.gov.hmrc.submissiontracker.controllers.{ErrorNinoInvalid, ForbiddenAccess, ErrorUnauthorizedNoNino}
+import uk.gov.hmrc.submissiontracker.controllers.{ErrorNinoInvalid, ErrorUnauthorizedNoNino, ForbiddenAccess}
+
 import scala.concurrent.Future
 
 case object ErrorUnauthorizedMicroService extends ErrorResponse(401, "UNAUTHORIZED", "Unauthorized to access resource")
@@ -41,12 +44,12 @@ trait AccountAccessControl extends Results {
   case object ErrorUnauthorized extends ErrorResponse(401, "UNAUTHORIZED", "Invalid request")
 
   def invokeAuthBlock[A](request: Request[A], block: (Request[A]) => Future[Result], taxId:Option[Nino]) = {
-    implicit val hc = HeaderCarrier.fromHeadersAndSession(request.headers, None)
+    implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, None)
 
     authConnector.grantAccess(taxId).flatMap { access =>
       block(request)
     }.recover {
-      case ex: uk.gov.hmrc.play.http.Upstream4xxResponse =>
+      case ex: uk.gov.hmrc.http.Upstream4xxResponse =>
         Logger.info("Unauthorized! Failed to grant access since 4xx response!")
         Unauthorized(Json.toJson(ErrorUnauthorizedMicroService))
 
@@ -125,8 +128,13 @@ object AccountAccessControlOff extends AccountAccessControl {
     override def serviceConfidenceLevel: ConfidenceLevel = ConfidenceLevel.L0
 
     override def http: HttpGet = new HttpGet {
-      override protected def doGet(url: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = Future.failed(new IllegalArgumentException("Sandbox mode!"))
+      override def doGet(url: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = Future.failed(sandboxMode)
+
+      override def configuration = throw sandboxMode
+
       override val hooks: Seq[HttpHook] = NoneRequired
+
+      private def sandboxMode = new IllegalArgumentException("Sandbox mode!")
     }
   }
 }

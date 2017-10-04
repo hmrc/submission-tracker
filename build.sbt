@@ -16,7 +16,7 @@ publishingSettings
 unmanagedResourceDirectories in Compile += baseDirectory.value / "resources"
 defaultSettings()
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.11.11"
 crossScalaVersions := Seq("2.11.8")
 
 libraryDependencies ++= AppDependencies()
