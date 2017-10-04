@@ -18,12 +18,11 @@ package uk.gov.hmrc.submissiontracker.connector
 
 import play.api._
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http.HeaderCarrier
-import uk.gov.hmrc.play.http.HttpGet
 import uk.gov.hmrc.submissiontracker.config.WSHttp
 import uk.gov.hmrc.submissiontracker.domain.TrackingDataSeq
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
 
 trait TrackingConnector extends ServicesConfig {
   lazy val trackingBaseUrl = baseUrl("tracking")
@@ -32,7 +31,7 @@ trait TrackingConnector extends ServicesConfig {
 
   def trackingDataLink(id: String, idType:String): String = s"$trackingBaseUrl/tracking-data/user/$idType/$id"
 
-	def getUserTrackingData(id: String,idType:String)(implicit hc: HeaderCarrier): Future[TrackingDataSeq] = {
+	def getUserTrackingData(id: String,idType:String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TrackingDataSeq] = {
 		Logger.debug("submission-tracker: Requesting tracking data")
 		httpGet.GET[TrackingDataSeq](trackingDataLink(id,idType))
 	}
