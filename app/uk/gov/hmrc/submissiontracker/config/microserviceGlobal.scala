@@ -17,27 +17,24 @@
 package uk.gov.hmrc.submissiontracker.config
 
 import akka.stream.Materializer
-import play.api.{Application, Configuration, Play}
-import uk.gov.hmrc.api.controllers.{ErrorGenericBadRequest, ErrorInternalServerError, ErrorUnauthorized}
-import uk.gov.hmrc.submissiontracker.controllers.ErrorNinoInvalid
-import uk.gov.hmrc.play.filters.{MicroserviceFilterSupport, NoCacheFilter}
-import play.api.Play.current
 import com.typesafe.config.Config
 import net.ceedubs.ficus.Ficus._
+import play.api.Play.current
 import play.api.libs.json.Json
 import play.api.mvc.Results._
 import play.api.mvc.{EssentialFilter, RequestHeader, Result}
+import play.api.{Application, Configuration, Play}
 import uk.gov.hmrc.api.config.{ServiceLocatorConfig, ServiceLocatorRegistration}
 import uk.gov.hmrc.api.connector.ServiceLocatorConnector
-import uk.gov.hmrc.api.controllers._
+import uk.gov.hmrc.api.controllers.{ErrorGenericBadRequest, ErrorInternalServerError, ErrorUnauthorized, _}
 import uk.gov.hmrc.api.filters.CacheControlFilter
-import uk.gov.hmrc.play.audit.filters.AuditFilter
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.auth.controllers.AuthParamsControllerConfig
 import uk.gov.hmrc.play.auth.microservice.filters.AuthorisationFilter
 import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode}
-import uk.gov.hmrc.play.http.HeaderCarrier
-import uk.gov.hmrc.play.http.logging.filters.LoggingFilter
 import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
+import uk.gov.hmrc.play.microservice.filters.{AuditFilter, LoggingFilter, MicroserviceFilterSupport, NoCacheFilter}
+import uk.gov.hmrc.submissiontracker.controllers.ErrorNinoInvalid
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -64,7 +61,6 @@ object MicroserviceLoggingFilter extends LoggingFilter with MicroserviceFilterSu
 object MicroserviceAuthFilter extends AuthorisationFilter with MicroserviceFilterSupport  {
   override lazy val authParamsConfig = AuthParamsControllerConfiguration
   override lazy val authConnector = MicroserviceAuthConnector
-
   override def controllerNeedsAuth(controllerName: String): Boolean = ControllerConfiguration.paramsForController(controllerName).needsAuth
 }
 

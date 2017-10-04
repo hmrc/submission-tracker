@@ -18,15 +18,16 @@ package uk.gov.hmrc.submissiontracker.controllers
 
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.submissiontracker.controllers.action.{AccountAccessControlCheckOff, AccountAccessControlWithHeaderCheck}
-import uk.gov.hmrc.submissiontracker.services.{SubmissiontrackerService, LivesubmissiontrackerService, SandboxsubmissiontrackerService}
+import uk.gov.hmrc.submissiontracker.services.{LivesubmissiontrackerService, SandboxsubmissiontrackerService, SubmissiontrackerService}
 import play.api.{Logger, mvc}
-import uk.gov.hmrc.play.http.{ForbiddenException, HeaderCarrier, NotFoundException, UnauthorizedException}
 import uk.gov.hmrc.play.microservice.controller.BaseController
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import play.api.libs.json._
 import uk.gov.hmrc.api.controllers._
+import uk.gov.hmrc.http.{ForbiddenException, HeaderCarrier, NotFoundException, UnauthorizedException}
+import uk.gov.hmrc.play.HeaderCarrierConverter
 
 trait ErrorHandling {
   self:BaseController =>
@@ -53,7 +54,7 @@ trait SubmissionTrackerController extends BaseController with HeaderValidator wi
 
   final def trackingData(id:String, idType:String, journeyId: Option[String] = None) = accessControl.validateAcceptWithAuth(acceptHeaderValidationRules, Some(Nino(id))).async {
     implicit request =>
-      implicit val hc = HeaderCarrier.fromHeadersAndSession(request.headers, None)
+      implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, None)
       errorWrapper(service.trackingData(id, idType).map(as => Ok(Json.toJson(as))))
   }
 }
