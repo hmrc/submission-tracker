@@ -16,17 +16,16 @@
 
 package uk.gov.hmrc.submissiontracker.connector
 
-import java.util.UUID
 import play.api.Play
 import play.api.libs.json.JsValue
+import uk.gov.hmrc.domain.{Nino, SaUtr}
+import uk.gov.hmrc.http.{CoreGet, HeaderCarrier}
+import uk.gov.hmrc.play.auth.microservice.connectors.ConfidenceLevel
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.submissiontracker.config.WSHttp
 import uk.gov.hmrc.submissiontracker.domain.Accounts
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.domain.{Nino, SaUtr}
-import uk.gov.hmrc.play.auth.microservice.connectors.ConfidenceLevel
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpGet }
 
 
 class FailToMatchTaxIdOnAuth(message:String) extends uk.gov.hmrc.http.HttpException(message, 401)
@@ -38,7 +37,7 @@ trait AuthConnector {
 
   val serviceUrl: String
 
-  def http: HttpGet
+  def http: CoreGet
 
   def serviceConfidenceLevel: ConfidenceLevel
 
