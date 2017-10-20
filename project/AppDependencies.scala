@@ -14,7 +14,7 @@ object AppDependencies {
   private val wireMockVersion = "2.2.2"
   private val cucumberVersion = "1.2.5"
   private val reactiveCircuitBreakerVersion = "2.1.0"
-  private val emailAdressVersion = "2.2.0"
+  private val emailAdressVersion = "2.1.0"
 
   val compile = Seq(
 
