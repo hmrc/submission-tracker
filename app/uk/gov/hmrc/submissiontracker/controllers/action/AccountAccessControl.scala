@@ -21,15 +21,13 @@ import play.api.libs.json.Json
 import play.api.mvc.{ActionBuilder, Request, Result, Results}
 import uk.gov.hmrc.api.controllers._
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.hooks.HttpHook
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.auth.microservice.connectors.ConfidenceLevel
-import uk.gov.hmrc.play.http.ws.WSGet
 import uk.gov.hmrc.submissiontracker.connector._
 import uk.gov.hmrc.submissiontracker.controllers.{ErrorNinoInvalid, ErrorUnauthorizedNoNino, ForbiddenAccess}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 case object ErrorUnauthorizedMicroService extends ErrorResponse(401, "UNAUTHORIZED", "Unauthorized to access resource")
 case object ErrorUnauthorizedWeakCredStrength extends ErrorResponse(401, "WEAK_CRED_STRENGTH", "Credential Strength on account does not allow access")
@@ -127,12 +125,10 @@ object AccountAccessControlOff extends AccountAccessControl {
 
     override def serviceConfidenceLevel: ConfidenceLevel = ConfidenceLevel.L0
 
-    override def http: HttpGet = new HttpGet {
-      override def doGet(url: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = Future.failed(sandboxMode)
+    override def http: CoreGet = new CoreGet {
+      override def GET[A](url: String)(implicit rds: HttpReads[A], hc: HeaderCarrier, ec: ExecutionContext): Future[A] = Future.failed(sandboxMode)
 
-      override def configuration = throw sandboxMode
-
-      override val hooks: Seq[HttpHook] = NoneRequired
+      override def GET[A](url: String, queryParams: Seq[(String, String)])(implicit rds: HttpReads[A], hc: HeaderCarrier, ec: ExecutionContext): Future[A] = Future.failed(sandboxMode)
 
       private def sandboxMode = new IllegalArgumentException("Sandbox mode!")
     }

@@ -22,18 +22,18 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.auth.microservice.connectors.ConfidenceLevel
-import uk.gov.hmrc.submissiontracker.connector.{FailToMatchTaxIdOnAuth, AuthConnector, TrackingConnector}
+import uk.gov.hmrc.submissiontracker.connector.{AuthConnector, FailToMatchTaxIdOnAuth, TrackingConnector}
 import uk.gov.hmrc.submissiontracker.controllers.SubmissionTrackerController
-import uk.gov.hmrc.submissiontracker.controllers.action.{AccountAccessControlCheckOff, AccountAccessControl, AccountAccessControlWithHeaderCheck}
+import uk.gov.hmrc.submissiontracker.controllers.action.{AccountAccessControl, AccountAccessControlCheckOff, AccountAccessControlWithHeaderCheck}
 import uk.gov.hmrc.submissiontracker.domain.{Accounts, Milestone, TrackingData, TrackingDataSeq}
 import uk.gov.hmrc.submissiontracker.services.{LivesubmissiontrackerService, SandboxsubmissiontrackerService, SubmissiontrackerService}
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{ ForbiddenException, HeaderCarrier, HttpGet, Upstream4xxResponse }
 
 class TestTrackingConnector(trackingDetails:TrackingDataSeq) extends TrackingConnector {
-  override def httpGet: HttpGet = throw new Exception("Should not be called")
+  override def httpGet: CoreGet = throw new Exception("Should not be called")
 
   override def getUserTrackingData(id: String,idType:String)(implicit hc: HeaderCarrier, executionContext: ExecutionContext): Future[TrackingDataSeq] = {
     Future.successful(trackingDetails)
@@ -45,7 +45,7 @@ class TestAuthConnector(nino: Option[Nino], ex:Option[Exception]=None) extends A
 
   override def serviceConfidenceLevel: ConfidenceLevel = throw new Exception("Should not be invoked!")
 
-  override def http: HttpGet = throw new Exception("Should not be invoked!")
+  override def http: CoreGet = throw new Exception("Should not be invoked!")
 
   override def accounts()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Accounts] = Future(Accounts(nino, None))
 

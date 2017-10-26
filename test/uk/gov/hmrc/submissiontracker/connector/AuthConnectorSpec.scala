@@ -19,12 +19,12 @@ package uk.gov.hmrc.submissiontracker.connector
 import org.scalatest.concurrent.ScalaFutures
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.domain.{Nino, SaUtr}
+import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.hooks.HttpHook
 import uk.gov.hmrc.play.auth.microservice.connectors.ConfidenceLevel
 import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpGet, HttpResponse, UnauthorizedException }
-import uk.gov.hmrc.http.hooks.HttpHook
 
 class AuthConnectorSpec extends UnitSpec with ScalaFutures {
 
@@ -34,7 +34,7 @@ class AuthConnectorSpec extends UnitSpec with ScalaFutures {
 
   def authConnector(response : HttpResponse, cl: ConfidenceLevel = ConfidenceLevel.L200) = new AuthConnector {
 
-    override def http: HttpGet = new HttpGet {
+    override def http: CoreGet = new HttpGet {
       override def doGet(url: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = Future.successful(response)
 
       override val hooks: Seq[HttpHook] = Seq.empty

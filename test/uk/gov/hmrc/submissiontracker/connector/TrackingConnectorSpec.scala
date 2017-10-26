@@ -19,12 +19,12 @@ package uk.gov.hmrc.submissiontracker.connector
 import org.scalatest.concurrent.ScalaFutures
 import play.api.libs.json.Json
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.hooks.HttpHook
 import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.hooks.HttpHook
 import uk.gov.hmrc.play.test.UnitSpec
 import uk.gov.hmrc.submissiontracker.domain.{Milestone, TrackingData, TrackingDataSeq}
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class TrackingConnectorSpec
@@ -48,7 +48,7 @@ class TrackingConnectorSpec
     val connector = new TrackingConnector {
       override lazy val trackingBaseUrl="someurl"
 
-      override lazy val httpGet: HttpGet = new HttpGet {
+      override lazy val httpGet: CoreGet = new HttpGet {
         override val hooks: Seq[HttpHook] = NoneRequired
         override def doGet(url: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
           response
