@@ -23,8 +23,6 @@ case object ErrorNinoInvalid extends ErrorResponse(400, "NINO_INVALID", "The pro
 
 case object ErrorUnauthorizedNoNino extends ErrorResponse(401, "UNAUTHORIZED", "NINO does not exist on account")
 
-case object ForbiddenAccess extends ErrorResponse(403, "UNAUTHORIZED", "Access denied!")
-
 class GrantAccessException(message: String) extends HttpException(message, 401)
 
 class FailToMatchTaxIdOnAuth extends GrantAccessException("Unauthorised! Failure to match URL NINO against Auth NINO")
