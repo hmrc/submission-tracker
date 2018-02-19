@@ -64,9 +64,10 @@ trait SubmissionTrackerController extends BaseController with AccessControl with
 
 @Singleton
 class SandboxSubmissionTrackerController @Inject()(override val authConnector: AuthConnector,
-                                                  @Named("controllers.confidenceLevel") override val confLevel: Int)
+                                                   @Named("controllers.confidenceLevel") override val confLevel: Int)
   extends SubmissionTrackerController {
   override val service = SandboxsubmissiontrackerService
+  override lazy val requiresAuth = false
 }
 
 @Singleton
