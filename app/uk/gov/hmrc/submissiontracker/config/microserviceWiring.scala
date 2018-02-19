@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,13 @@
 
 package uk.gov.hmrc.submissiontracker.config
 
-import uk.gov.hmrc.http.hooks.HttpHooks
+import com.google.inject.{Inject, Singleton}
+import play.api.{Configuration, Environment}
+import uk.gov.hmrc.auth.core.PlayAuthConnector
+import uk.gov.hmrc.http.hooks.{HttpHook, HttpHooks}
 import uk.gov.hmrc.http.{HttpDelete, HttpGet, HttpPost, HttpPut}
 import uk.gov.hmrc.play.audit.http.config.AuditingConfig
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.auth.microservice.connectors.AuthConnector
 import uk.gov.hmrc.play.config.{AppName, ServicesConfig}
 import uk.gov.hmrc.play.http.ws._
 import uk.gov.hmrc.play.microservice.config.LoadAuditingConfig
@@ -30,12 +32,15 @@ object MicroserviceAuditConnector extends AuditConnector {
 }
 
 trait Hooks extends HttpHooks {
-  override val hooks = NoneRequired
+  override val hooks: Seq[HttpHook] = NoneRequired
 }
 
 trait WSHttp extends HttpGet with WSGet with HttpPut with WSPut with HttpPost with WSPost with HttpDelete with WSDelete with Hooks with AppName
 object WSHttp extends WSHttp
 
-object MicroserviceAuthConnector extends AuthConnector with ServicesConfig with WSHttp {
-  override val authBaseUrl: String = baseUrl("auth")
+@Singleton
+class MicroserviceAuthConnector @Inject()(override val runModeConfiguration: Configuration, environment: Environment) extends PlayAuthConnector with ServicesConfig {
+  override lazy val serviceUrl = baseUrl("auth")
+  override def http = WSHttp
+  override protected def mode = environment.mode
 }

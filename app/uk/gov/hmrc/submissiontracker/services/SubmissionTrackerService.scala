@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,6 @@ trait SubmissiontrackerService {
 }
 
 trait LivesubmissiontrackerService extends SubmissiontrackerService {
-  def authConnector: AuthConnector
   def trackingConnector: TrackingConnector
   val inFormat = DateTimeFormat.forPattern("dd MMM yyyy")
   val outFormat = DateTimeFormat.forPattern("yyyyMMdd")
@@ -80,6 +79,5 @@ object SandboxsubmissiontrackerService extends SubmissiontrackerService with Fil
 }
 
 object LivesubmissiontrackerService extends LivesubmissiontrackerService {
-  override val authConnector: AuthConnector = AuthConnector
   override val trackingConnector = TrackingConnector
 }
