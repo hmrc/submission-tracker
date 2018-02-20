@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,22 @@
 
 package uk.gov.hmrc.submissiontracker.controllers
 
-import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.submissiontracker.controllers.action.{AccountAccessControlCheckOff, AccountAccessControlWithHeaderCheck}
-import uk.gov.hmrc.submissiontracker.services.{LivesubmissiontrackerService, SandboxsubmissiontrackerService, SubmissiontrackerService}
+import javax.inject.{Inject, Named}
+
+import com.google.inject.Singleton
+import play.api.libs.json._
 import play.api.{Logger, mvc}
+import uk.gov.hmrc.api.controllers._
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.http.{ForbiddenException, HeaderCarrier, NotFoundException, UnauthorizedException}
+import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.microservice.controller.BaseController
+import uk.gov.hmrc.submissiontracker.controllers.action.AccessControl
+import uk.gov.hmrc.submissiontracker.services.{LivesubmissiontrackerService, SandboxsubmissiontrackerService, SubmissiontrackerService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import play.api.libs.json._
-import uk.gov.hmrc.api.controllers._
-import uk.gov.hmrc.http.{ForbiddenException, HeaderCarrier, NotFoundException, UnauthorizedException}
-import uk.gov.hmrc.play.HeaderCarrierConverter
 
 trait ErrorHandling {
   self:BaseController =>
@@ -47,24 +51,28 @@ trait ErrorHandling {
   }
 }
 
-trait SubmissionTrackerController extends BaseController with HeaderValidator with ErrorHandling {
+trait SubmissionTrackerController extends BaseController with AccessControl with ErrorHandling {
 
   val service: SubmissiontrackerService
-  val accessControl:AccountAccessControlWithHeaderCheck
 
-  final def trackingData(id:String, idType:String, journeyId: Option[String] = None) = accessControl.validateAcceptWithAuth(acceptHeaderValidationRules, Some(Nino(id))).async {
+  final def trackingData(id:String, idType:String, journeyId: Option[String] = None) = validateAcceptWithAuth(acceptHeaderValidationRules, Some(Nino(id))).async {
     implicit request =>
       implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, None)
       errorWrapper(service.trackingData(id, idType).map(as => Ok(Json.toJson(as))))
   }
 }
 
-object SandboxSubmissionTrackerController extends SubmissionTrackerController {
+@Singleton
+class SandboxSubmissionTrackerController @Inject()(override val authConnector: AuthConnector,
+                                                   @Named("controllers.confidenceLevel") override val confLevel: Int)
+  extends SubmissionTrackerController {
   override val service = SandboxsubmissiontrackerService
-  override val accessControl = AccountAccessControlCheckOff
+  override lazy val requiresAuth = false
 }
 
-object LiveSubmissionTrackerController extends SubmissionTrackerController {
-  override val service = LivesubmissiontrackerService
-  override val accessControl = AccountAccessControlWithHeaderCheck
+@Singleton
+class LiveSubmissionTrackerController @Inject()(override val authConnector: AuthConnector,
+                                                @Named("controllers.confidenceLevel") override val confLevel: Int)
+  extends SubmissionTrackerController {
+  override val service: LivesubmissiontrackerService = LivesubmissiontrackerService
 }

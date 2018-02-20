@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,13 @@ import akka.stream.Materializer
 import com.typesafe.config.Config
 import net.ceedubs.ficus.Ficus._
 import play.api.Play.current
+import play.api._
 import play.api.libs.json.Json
 import play.api.mvc.Results._
-import play.api.mvc.{EssentialFilter, RequestHeader, Result}
-import play.api.{Application, Configuration, Play}
+import play.api.mvc._
 import uk.gov.hmrc.api.config.{ServiceLocatorConfig, ServiceLocatorRegistration}
 import uk.gov.hmrc.api.connector.ServiceLocatorConnector
-import uk.gov.hmrc.api.controllers.{ErrorGenericBadRequest, ErrorInternalServerError, ErrorUnauthorized, _}
+import uk.gov.hmrc.api.controllers._
 import uk.gov.hmrc.api.filters.CacheControlFilter
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.auth.controllers.AuthParamsControllerConfig
@@ -58,29 +58,19 @@ object MicroserviceLoggingFilter extends LoggingFilter with MicroserviceFilterSu
   override def controllerNeedsLogging(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsLogging
 }
 
-object MicroserviceAuthFilter extends AuthorisationFilter with MicroserviceFilterSupport  {
-  override lazy val authParamsConfig = AuthParamsControllerConfiguration
-  override lazy val authConnector = MicroserviceAuthConnector
-  override def controllerNeedsAuth(controllerName: String): Boolean = ControllerConfiguration.paramsForController(controllerName).needsAuth
-}
-
 object MicroserviceGlobal extends DefaultMicroserviceGlobal with RunMode with ServiceLocatorConfig with ServiceLocatorRegistration {
 
   override val auditConnector = MicroserviceAuditConnector
 
-  override def microserviceMetricsConfig(implicit app: Application): Option[Configuration] = app.configuration.getConfig(s"$env.microservice.metrics")
+  override def microserviceMetricsConfig(implicit app: Application): Option[Configuration] = app.configuration.getConfig(s"microservice.metrics")
 
   override val loggingFilter = MicroserviceLoggingFilter
 
   override val microserviceAuditFilter = MicroserviceAuditFilter
 
-  override val authFilter = Some(MicroserviceAuthFilter)
+  override val authFilter = None
 
   override val slConnector: ServiceLocatorConnector = ServiceLocatorConnector(WSHttp)
-
-  val cacheFilter = CacheControlFilter.fromConfig(CacheControlFilter.configKey)
-
-  override def microserviceFilters: Seq[EssentialFilter] = defaultMicroserviceFilters.filterNot( _.isInstanceOf[NoCacheFilter.type] ) :+ cacheFilter
 
   override implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -92,6 +82,12 @@ object MicroserviceGlobal extends DefaultMicroserviceGlobal with RunMode with Se
         case _ => Status(ErrorInternalServerError.httpStatusCode)(Json.toJson(ErrorInternalServerError))
       }
     })
+  }
+
+  override def microserviceFilters: Seq[EssentialFilter] = Seq.empty
+
+  override def doFilter(a: EssentialAction): EssentialAction = {
+    Filters(super.doFilter(a), defaultMicroserviceFilters.filterNot( _.isInstanceOf[NoCacheFilter.type] ) : _*)
   }
 
   override def onBadRequest(request: RequestHeader, error: String): Future[Result] = {

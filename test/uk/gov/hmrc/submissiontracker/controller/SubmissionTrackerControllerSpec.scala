@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,79 +16,90 @@
 
 package uk.gov.hmrc.submissiontracker.controller
 
-import org.scalatest.concurrent.ScalaFutures
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.when
 import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.auth.core.ConfidenceLevel._
+import uk.gov.hmrc.auth.core.syntax.retrieved._
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.submissiontracker.controllers.{LiveSubmissionTrackerController, SandboxSubmissionTrackerController}
+import uk.gov.hmrc.submissiontracker.domain.{Milestone, TrackingData, TrackingDataSeq}
+import uk.gov.hmrc.submissiontracker.stub.{TestSetup, TestSubmissionTrackingController}
 
 
-class TestSubmissionTrackingSpec extends UnitSpec with ScalaFutures with StubApplicationConfiguration {
+class TestSubmissionTrackingSpec extends TestSetup {
+
+  val milestones =  Seq(Milestone("one","open"))
+  val trackingData = TrackingDataSeq(Some(Seq(TrackingData("E4H-384D-EFZ", "Claim a tax refund", "ref1", "some-business", "20160801", "20160620", milestones))))
 
   "trackingData Live" should {
 
-    "return the tracking data successfully" in new Success {
-      val result: Result = await(controller.trackingData(nino.value, "some-id-type")(emptyRequestWithAcceptHeader))
+    "return the tracking data successfully" in new mocks {
+      stubAuthorisationGrantAccess(Some(nino) and L200)
+      when(mockLivesubmissiontrackerService.trackingData(any[String](), any[String]())(any[HeaderCarrier]()))
+        .thenReturn(trackingData)
+      val controller = new TestSubmissionTrackingController(mockAuthConnector, 200, mockLivesubmissiontrackerService)
+      val result: Result = await(controller.trackingData(nino, "some-id-type").apply(fakeRequest))
 
       status(result) shouldBe 200
       contentAsJson(result) shouldBe Json.toJson(trackingData)
-      testService.saveDetails shouldBe Map("id" -> nino.value, "idType" -> "some-id-type")
     }
 
-    "return the tracking data successfully when journeyId is supplied" in new Success {
-      val result: Result = await(controller.trackingData(nino.value, "some-id-type", journeyId)(emptyRequestWithAcceptHeader))
+    "return the tracking data successfully when journeyId is supplied" in new mocks {
+      stubAuthorisationGrantAccess(Some(nino) and L200)
+      val milestones = Seq(Milestone("one", "open"))
+      val trackingData = TrackingDataSeq(Some(Seq(TrackingData("E4H-384D-EFZ", "Claim a tax refund", "ref1", "some-business", "20160801", "20160620", milestones))))
+      when(mockLivesubmissiontrackerService.trackingData(any[String](), any[String]())(any[HeaderCarrier]()))
+        .thenReturn(trackingData)
+      val controller = new TestSubmissionTrackingController(mockAuthConnector, 200, mockLivesubmissiontrackerService)
+      val result: Result = await(controller.trackingData(nino, "some-id-type", Some("unique-journey-id")).apply(fakeRequest))
 
       status(result) shouldBe 200
       contentAsJson(result) shouldBe Json.toJson(trackingData)
-      testService.saveDetails shouldBe Map("id" -> nino.value, "idType" -> "some-id-type")
     }
 
-    "return unauthorized when authority record does not contain a NINO" in new AuthWithoutNino {
-      val result = await(controller.trackingData(nino.value, "some-id-type")(emptyRequestWithAcceptHeader))
-
-      status(result) shouldBe 401
-      testService.saveDetails shouldBe Map.empty
+    "return unauthorized when authority record does not contain a NINO" in new mocks {
+      stubAuthorisationGrantAccess(Some("") and L200)
+      val controller = new LiveSubmissionTrackerController(mockAuthConnector, 200)
+      status(await(controller.trackingData(nino, "some-id-type").apply(fakeRequest))) shouldBe 401
     }
 
-    "return 401 when the nino in the request does not match the authority nino" in new AccessCheck {
-      val result = await(controller.trackingData(nino.value, "some-id-type")(emptyRequestWithAcceptHeader))
-
-      status(result) shouldBe 401
+    "return 401 when the nino in the request does not match the authority nino" in new mocks {
+      stubAuthorisationGrantAccess(Some("") and L200)
+      val controller = new LiveSubmissionTrackerController(mockAuthConnector, 200)
+      status(await(controller.trackingData(incorrectNino.value, "some-id-type").apply(fakeRequest))) shouldBe 401
     }
 
-    "return forbidden when authority record does not have correct confidence level" in new AuthWithLowCL {
-      val result = await(controller.trackingData(nino.value, "some-id-type")(emptyRequestWithAcceptHeader))
-
-      status(result) shouldBe 403
+    "return forbidden when authority record does not have correct confidence level" in new mocks {
+      stubAuthorisationGrantAccess(Some(nino) and L100)
+      val controller = new LiveSubmissionTrackerController(mockAuthConnector, 200)
+      status(await(controller.trackingData(incorrectNino.value, "some-id-type").apply(fakeRequest))) shouldBe 401
     }
 
-    "return status code 406 when the headers are invalid" in new Success {
-      val result = await(controller.trackingData(nino.value, "some-id-type")(emptyRequest))
-
-      status(result) shouldBe 406
-
-      testService.saveDetails shouldBe Map.empty
+    "return status code 406 when the headers are invalid" in new mocks {
+      val controller = new LiveSubmissionTrackerController(mockAuthConnector, 200)
+      status(await(controller.trackingData(incorrectNino.value, "some-id-type").apply(requestInvalidHeaders))) shouldBe 406
     }
   }
 
   "trackingData Sandbox" should {
 
-    "return the summary response from a static value" in new SandboxSuccess {
-      val result = await(controller.trackingData(nino.value, "some-id-type")(emptyRequestWithAcceptHeader))
+    "return the summary response from a static value" in new mocks {
+      val controller = new SandboxSubmissionTrackerController(mockAuthConnector, 200)
+      val result = await(controller.trackingData(nino, "some-id-type")(fakeRequest))
 
       status(result) shouldBe 200
       contentAsJson(result) shouldBe Json.toJson(trackingData)
-
-      testService.saveDetails shouldBe Map.empty
     }
 
-    "return status code 406 when the Accept header is invalid" in new Success {
-      val  result = await(controller.trackingData(nino.value, "some-id-type")(emptyRequest))
+    "return status code 406 when the Accept header is invalid" in new mocks {
+      val controller = new SandboxSubmissionTrackerController(mockAuthConnector, 200)
+      val result = await(controller.trackingData(nino, "some-id-type")(requestInvalidHeaders))
 
       status(result) shouldBe 406
 
-      testService.saveDetails shouldBe Map.empty
     }
-
   }
 }
