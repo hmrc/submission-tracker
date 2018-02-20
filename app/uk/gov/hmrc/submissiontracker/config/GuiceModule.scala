@@ -45,15 +45,4 @@ class GuiceModule(environment: Environment, configuration: Configuration) extend
     bindConstant().annotatedWith(named(path))
       .to(configuration.underlying.getInt(path))
   }
-
-  private def bindConfigBoolean(path: String): Unit = {
-    bindConstant().annotatedWith(named(path)).to(configuration.underlying.getBoolean(path))
-  }
-
-  private def bindConfigStringSeq(path: String): Unit = {
-    val configValue: Seq[String] = configuration.getStringSeq(path).getOrElse(throw new RuntimeException(s"""Config property "$path" missing"""))
-    bind(new TypeLiteral[Seq[String]] {})
-      .annotatedWith(named(path))
-      .toInstance(configValue)
-  }
 }
