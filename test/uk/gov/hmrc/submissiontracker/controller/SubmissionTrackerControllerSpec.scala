@@ -31,8 +31,15 @@ import uk.gov.hmrc.submissiontracker.stub.{TestSetup, TestSubmissionTrackingCont
 
 class TestSubmissionTrackingSpec extends TestSetup {
 
-  val milestones =  Seq(Milestone("one","open"))
-  val trackingData = TrackingDataSeq(Some(Seq(TrackingData("E4H-384D-EFZ", "Claim a tax refund", "ref1", "some-business", "20160801", "20160620", milestones))))
+  val milestones =  Seq(
+    Milestone("Received","complete"),
+    Milestone("Acquired","complete"),
+    Milestone("InProgress","current"),
+    Milestone("Done","incomplete"))
+
+  val trackingData =
+    TrackingDataSeq(Some(Seq(
+      TrackingData("ref1", "Claim a tax refund", "E4H-384D-EFZ", "some-business", "20160801", "20160620", milestones))))
 
   "trackingData Live" should {
 
@@ -50,7 +57,6 @@ class TestSubmissionTrackingSpec extends TestSetup {
     "return the tracking data successfully when journeyId is supplied" in new mocks {
       stubAuthorisationGrantAccess(Some(nino) and L200)
       val milestones = Seq(Milestone("one", "open"))
-      val trackingData = TrackingDataSeq(Some(Seq(TrackingData("E4H-384D-EFZ", "Claim a tax refund", "ref1", "some-business", "20160801", "20160620", milestones))))
       when(mockLivesubmissiontrackerService.trackingData(any[String](), any[String]())(any[HeaderCarrier]()))
         .thenReturn(trackingData)
       val controller = new TestSubmissionTrackingController(mockAuthConnector, 200, mockLivesubmissiontrackerService)

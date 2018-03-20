@@ -1,16 +1,28 @@
 {
   "submissions": [
     {
-      "formId": "formId",
-      "formName": "formName",
-      "dfsSubmissionReference": "ref1",
-      "businessArea": "some-business",
-      "receivedDate": "20150801",
-      "completionDate": "20150801",
+      "formId": "R39_EN",
+      "formName": "",
+      "dfsSubmissionReference": "111-ABCD-456",
+      "businessArea": "PSA",
+      "receivedDate": "20150412",
+      "completionDate": "20150517",
       "milestones": [
         {
-          "milestone": "one",
-          "status": "open"
+          "milestone": "Received",
+          "status": "complete"
+        },
+        {
+          "milestone": "Acquired",
+          "status": "complete"
+        },
+        {
+          "milestone": "InProgress",
+          "status": "current"
+        },
+        {
+          "milestone": "Done",
+          "status": "incomplete"
         }
       ]
     }

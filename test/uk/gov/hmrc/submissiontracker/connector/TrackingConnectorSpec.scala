@@ -36,7 +36,7 @@ class TrackingConnectorSpec
     implicit lazy val hc = HeaderCarrier()
 
     val milestones =  Seq(Milestone("one","open"))
-    val trackingData = TrackingDataSeq(Some(Seq(TrackingData("formId", "formName", "ref1", "some-business", "21-12-2016", "12-14-2016", milestones))))
+    val trackingData = TrackingDataSeq(Some(Seq(TrackingData("ref1", "Claim a tax refund", "E4H-384D-EFZ", "some-business", "20160801", "20160620", milestones))))
     val nino = Nino("CS700100A")
 
     lazy val http500Response = Future.failed(new Upstream5xxResponse("Error", 500, 500))

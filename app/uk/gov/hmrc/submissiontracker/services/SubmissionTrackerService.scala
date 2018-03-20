@@ -72,8 +72,13 @@ trait LivesubmissiontrackerService extends SubmissiontrackerService {
 object SandboxsubmissiontrackerService extends SubmissiontrackerService with FileResource {
 
   def trackingData(id: String, idType:String)(implicit hc:HeaderCarrier): Future[TrackingDataSeq] = {
-    val milestones =  Seq(Milestone("one","open"))
-    val trackingData = TrackingDataSeq(Some(Seq(TrackingData("E4H-384D-EFZ", "Claim a tax refund", "ref1", "some-business", "20160801", "20160620", milestones))))
+    val milestones =  Seq(
+      Milestone("Received","complete"),
+      Milestone("Acquired","complete"),
+      Milestone("InProgress","current"),
+      Milestone("Done","incomplete"))
+    val trackingData = TrackingDataSeq(Some(Seq(
+      TrackingData("ref1", "Claim a tax refund", "E4H-384D-EFZ", "some-business", "20160801", "20160620", milestones))))
     Future.successful(trackingData)
   }
 }
