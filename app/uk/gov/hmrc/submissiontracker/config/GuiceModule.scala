@@ -16,13 +16,20 @@
 
 package uk.gov.hmrc.submissiontracker.config
 
+import javax.inject.Provider
+
+import com.google.inject.AbstractModule
+import com.google.inject.name.Names
 import com.google.inject.name.Names.named
-import com.google.inject.{AbstractModule, TypeLiteral}
 import play.api.Mode.Mode
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.api.controllers.DocumentationController
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.http.HttpGet
+import uk.gov.hmrc.play.audit.model.Audit
+import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.play.config.{AppName, ServicesConfig}
 
 class GuiceModule(environment: Environment, configuration: Configuration) extends AbstractModule with ServicesConfig {
 
@@ -31,10 +38,21 @@ class GuiceModule(environment: Environment, configuration: Configuration) extend
 
   override def configure(): Unit = {
 
-    bind(classOf[AuthConnector]).to(classOf[MicroserviceAuthConnector])
+    bind(classOf[HttpGet]).to(classOf[WSHttpImpl])
+    bind(classOf[HttpClient]).to(classOf[WSHttpImpl])
+
+    bind(classOf[Audit]).to(classOf[MicroserviceAudit])
+    bind(classOf[AuthConnector]).to(classOf[DefaultAuthConnector])
     bind(classOf[DocumentationController]).toInstance(DocumentationController)
 
     bindConfigInt("controllers.confidenceLevel")
+    bind(classOf[String]).annotatedWith(named("trackingUrl")).toInstance(baseUrl("tracking"))
+
+    bind(classOf[String]).annotatedWith(Names.named("appName")).toProvider(AppNameProvider)
+  }
+
+  private object AppNameProvider extends Provider[String] {
+    def get(): String = AppName(configuration).appName
   }
 
   /**

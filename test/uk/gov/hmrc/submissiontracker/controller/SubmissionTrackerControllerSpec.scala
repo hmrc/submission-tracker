@@ -68,24 +68,24 @@ class TestSubmissionTrackingSpec extends TestSetup {
 
     "return unauthorized when authority record does not contain a NINO" in new mocks {
       stubAuthorisationGrantAccess(Some("") and L200)
-      val controller = new LiveSubmissionTrackerController(mockAuthConnector, 200)
+      val controller = new LiveSubmissionTrackerController(mockAuthConnector, mockLivesubmissiontrackerService, 200)
       status(await(controller.trackingData(nino, "some-id-type").apply(fakeRequest))) shouldBe 401
     }
 
     "return 401 when the nino in the request does not match the authority nino" in new mocks {
       stubAuthorisationGrantAccess(Some("") and L200)
-      val controller = new LiveSubmissionTrackerController(mockAuthConnector, 200)
+      val controller = new LiveSubmissionTrackerController(mockAuthConnector, mockLivesubmissiontrackerService, 200)
       status(await(controller.trackingData(incorrectNino.value, "some-id-type").apply(fakeRequest))) shouldBe 401
     }
 
     "return forbidden when authority record does not have correct confidence level" in new mocks {
       stubAuthorisationGrantAccess(Some(nino) and L100)
-      val controller = new LiveSubmissionTrackerController(mockAuthConnector, 200)
+      val controller = new LiveSubmissionTrackerController(mockAuthConnector, mockLivesubmissiontrackerService, 200)
       status(await(controller.trackingData(incorrectNino.value, "some-id-type").apply(fakeRequest))) shouldBe 401
     }
 
     "return status code 406 when the headers are invalid" in new mocks {
-      val controller = new LiveSubmissionTrackerController(mockAuthConnector, 200)
+      val controller = new LiveSubmissionTrackerController(mockAuthConnector, mockLivesubmissiontrackerService, 200)
       status(await(controller.trackingData(incorrectNino.value, "some-id-type").apply(requestInvalidHeaders))) shouldBe 406
     }
   }

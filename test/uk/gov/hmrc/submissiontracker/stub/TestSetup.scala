@@ -27,7 +27,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import uk.gov.hmrc.submissiontracker.connector.TrackingConnector
 import uk.gov.hmrc.submissiontracker.controllers.LiveSubmissionTrackerController
-import uk.gov.hmrc.submissiontracker.services.{LivesubmissiontrackerService, SubmissiontrackerService}
+import uk.gov.hmrc.submissiontracker.services.LivesubmissiontrackerService
 
 trait TestSetup extends MockitoSugar with UnitSpec with WithFakeApplication with AuthorisationStub {
 
@@ -61,7 +61,4 @@ trait TestSetup extends MockitoSugar with UnitSpec with WithFakeApplication with
 
 class TestSubmissionTrackingController(override val authConnector: AuthConnector, override val confLevel: Int,
                                        submissionTrackerService: LivesubmissiontrackerService)
-  extends LiveSubmissionTrackerController(authConnector: AuthConnector, confLevel: Int) {
-
-  override val service = submissionTrackerService
-}
+  extends LiveSubmissionTrackerController(authConnector: AuthConnector, submissionTrackerService: LivesubmissiontrackerService, confLevel: Int)
