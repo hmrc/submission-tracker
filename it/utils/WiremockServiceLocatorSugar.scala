@@ -24,6 +24,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.api.domain.Registration
 
 trait WiremockServiceLocatorSugar {
+
   lazy val wireMockUrl = s"http://$stubHost:$stubPort"
   lazy val wireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
   val stubPort = sys.env.getOrElse("WIREMOCK_SERVICE_LOCATOR_PORT", "11112").toInt
