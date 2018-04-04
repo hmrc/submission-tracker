@@ -16,31 +16,35 @@
 
 package uk.gov.hmrc.submissiontracker.services
 
+import javax.inject.{Inject, Singleton}
+
+import com.google.inject.ImplementedBy
 import org.joda.time.format.DateTimeFormat
 import uk.gov.hmrc.api.sandbox.FileResource
-import uk.gov.hmrc.submissiontracker.config.MicroserviceAuditConnector
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.model.{Audit, DataEvent}
 import uk.gov.hmrc.submissiontracker.connector._
-import uk.gov.hmrc.play.audit.model.DataEvent
-import uk.gov.hmrc.submissiontracker.domain.{TrackingDataSeq, TrackingData, Milestone}
+import uk.gov.hmrc.submissiontracker.domain.{Milestone, TrackingData, TrackingDataSeq}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 
 trait SubmissiontrackerService {
   def trackingData(id: String, idType:String)(implicit hc:HeaderCarrier): Future[TrackingDataSeq]
 }
 
+@ImplementedBy(classOf[LivesubmissiontrackerServiceImpl])
 trait LivesubmissiontrackerService extends SubmissiontrackerService {
   def trackingConnector: TrackingConnector
   val inFormat = DateTimeFormat.forPattern("dd MMM yyyy")
   val outFormat = DateTimeFormat.forPattern("yyyyMMdd")
+  val auditing: Audit
 
 
   def audit(service:String, details:Map[String, String])(implicit hc:HeaderCarrier) = {
     def auditResponse(): Unit = {
-      MicroserviceAuditConnector.sendEvent(
+      auditing.sendDataEvent(
         DataEvent("submission-tracker", "ServiceResponseSent",
           tags = Map("transactionName" -> service),
           detail = details))
@@ -83,6 +87,5 @@ object SandboxsubmissiontrackerService extends SubmissiontrackerService with Fil
   }
 }
 
-object LivesubmissiontrackerService extends LivesubmissiontrackerService {
-  override val trackingConnector = TrackingConnector
-}
+@Singleton
+class LivesubmissiontrackerServiceImpl @Inject()(override val trackingConnector: TrackingConnector, val auditing: Audit) extends LivesubmissiontrackerService

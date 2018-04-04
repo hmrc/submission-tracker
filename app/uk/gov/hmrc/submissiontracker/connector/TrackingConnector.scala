@@ -16,18 +16,20 @@
 
 package uk.gov.hmrc.submissiontracker.connector
 
+import javax.inject.{Inject, Named, Singleton}
+
+import com.google.inject.ImplementedBy
 import play.api._
-import uk.gov.hmrc.http.{CoreGet, HeaderCarrier}
-import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.submissiontracker.config.WSHttp
+import uk.gov.hmrc.http.{HttpGet, HeaderCarrier}
 import uk.gov.hmrc.submissiontracker.domain.TrackingDataSeq
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait TrackingConnector extends ServicesConfig {
-  lazy val trackingBaseUrl = baseUrl("tracking")
+@ImplementedBy(classOf[TrackingConnectorImpl])
+trait TrackingConnector {
+  val trackingBaseUrl: String
 
-	def httpGet: CoreGet
+	val httpGet: HttpGet
 
   def trackingDataLink(id: String, idType:String): String = s"$trackingBaseUrl/tracking-data/user/$idType/$id"
 
@@ -38,6 +40,5 @@ trait TrackingConnector extends ServicesConfig {
 
 }
 
-object TrackingConnector extends TrackingConnector {
-  lazy val httpGet = WSHttp
-}
+@Singleton
+class TrackingConnectorImpl @Inject()(@Named("trackingUrl") val trackingBaseUrl: String, val httpGet: HttpGet) extends TrackingConnector

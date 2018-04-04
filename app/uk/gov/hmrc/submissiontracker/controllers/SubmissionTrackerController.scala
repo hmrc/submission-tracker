@@ -26,7 +26,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{ForbiddenException, HeaderCarrier, NotFoundException, UnauthorizedException}
 import uk.gov.hmrc.play.HeaderCarrierConverter
-import uk.gov.hmrc.play.microservice.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.BaseController
 import uk.gov.hmrc.submissiontracker.controllers.action.AccessControl
 import uk.gov.hmrc.submissiontracker.services.{LivesubmissiontrackerService, SandboxsubmissiontrackerService, SubmissiontrackerService}
 
@@ -72,7 +72,6 @@ class SandboxSubmissionTrackerController @Inject()(override val authConnector: A
 
 @Singleton
 class LiveSubmissionTrackerController @Inject()(override val authConnector: AuthConnector,
+                                                val service: LivesubmissiontrackerService,
                                                 @Named("controllers.confidenceLevel") override val confLevel: Int)
-  extends SubmissionTrackerController {
-  override val service: LivesubmissiontrackerService = LivesubmissiontrackerService
-}
+  extends SubmissionTrackerController

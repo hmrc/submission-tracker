@@ -48,7 +48,7 @@ class TrackingConnectorSpec
     val connector = new TrackingConnector {
       override lazy val trackingBaseUrl="someurl"
 
-      override lazy val httpGet: CoreGet = new HttpGet {
+      override lazy val httpGet: HttpGet = new HttpGet {
         override val hooks: Seq[HttpHook] = NoneRequired
         override def doGet(url: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
           response
