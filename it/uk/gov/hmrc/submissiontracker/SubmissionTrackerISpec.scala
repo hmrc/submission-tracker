@@ -20,6 +20,18 @@ class SubmissionTrackerISpec extends BaseISpec {
       }
     }
 
+    "override to sandbox when using sandbox user, avoiding auth call" in {
+      val nino = "CS700100A"
+      val idType = "some-id-type"
+      val response = await(wsUrl(s"/tracking/$nino/$idType")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "X-MOBILE-USER-ID" -> "404893573708")
+        .get())
+
+      withClue(response.body) {
+        response.status shouldBe 200
+      }
+    }
+
     "fail with a 401 if confidence level is low" in {
       val nino = "CS700100A"
       val idType = "some-id-type"
