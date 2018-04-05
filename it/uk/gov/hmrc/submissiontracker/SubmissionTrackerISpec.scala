@@ -2,6 +2,7 @@ package uk.gov.hmrc.submissiontracker
 
 import uk.gov.hmrc.submissiontracker.stubs.{AuthStub, TrackingStub}
 import uk.gov.hmrc.submissiontracker.support.BaseISpec
+import com.github.tomakehurst.wiremock.client.WireMock._
 
 class SubmissionTrackerISpec extends BaseISpec {
 
@@ -14,6 +15,21 @@ class SubmissionTrackerISpec extends BaseISpec {
       val response = await(wsUrl(s"/tracking/$nino/$idType")
         .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json")
         .get())
+
+      withClue(response.body) {
+        response.status shouldBe 200
+      }
+    }
+
+    "override to sandbox when using sandbox user, avoiding auth call" in {
+      val nino = "CS700100A"
+      val idType = "some-id-type"
+      val response = await(wsUrl(s"/tracking/$nino/$idType")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "X-MOBILE-USER-ID" -> "404893573708")
+        .get())
+
+      verify(0, postRequestedFor(urlEqualTo("/auth/authorise")))
+      verify(0, postRequestedFor(urlEqualTo(s"/tracking-data/user/$idType/$nino")))
 
       withClue(response.body) {
         response.status shouldBe 200
