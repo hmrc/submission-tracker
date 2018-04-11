@@ -25,7 +25,7 @@ class SubmissionTrackerISpec extends BaseISpec {
       val nino = "CS700100A"
       val idType = "some-id-type"
       val response = await(wsUrl(s"/tracking/$nino/$idType")
-        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "X-MOBILE-USER-ID" -> "404893573708")
+        .withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "X-MOBILE-USER-ID" -> "208606423740")
         .get())
 
       verify(0, postRequestedFor(urlEqualTo("/auth/authorise")))
