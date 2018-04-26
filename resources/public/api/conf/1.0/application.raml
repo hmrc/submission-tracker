@@ -24,23 +24,6 @@ uses:
 
 /submission-tracker:
   /tracking:
-    get:
-      displayName: Tracking-data
-      description: This endpoint performs a ping
-      is: [headers.acceptHeader]
-      (annotations.scope): "read:submission-tracker"
-      securedBy: [ sec.oauth_2_0: { scopes: [ "read:submission-tracker" ] } ]
-      queryParameters:
-        journeyId:
-          type: string
-          required: false
-      responses:
-        200:
-          body:
-            application/json:
-              examples:
-                example-1:
-                  value: !include examples/tracking-data-example-1.json
     /{id}:
       uriParameters:
         id:
@@ -69,5 +52,5 @@ uses:
                 application/json:
                   examples:
                     example-1:
-                      value: !include examples/tracking-data-id-example-1.json
+                      value: !include examples/tracking-data-example-1.json
 
