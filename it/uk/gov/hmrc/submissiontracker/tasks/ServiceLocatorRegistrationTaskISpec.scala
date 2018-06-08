@@ -16,7 +16,7 @@ class ServiceLocatorRegistrationTaskISpec extends BaseISpec with Eventually with
       await(task.register) shouldBe true
       verify(1,
         postRequestedFor(urlMatching("/registration")).withHeader("content-type", equalTo("application/json")).
-          withRequestBody(equalTo(regPayloadStringFor("submission-tracker", "http://submission-tracker.protected.mdtp")))
+          withRequestBody(equalTo(regPayloadStringFor("submission-tracker", "https://submission-tracker.protected.mdtp")))
       )
     }
 
