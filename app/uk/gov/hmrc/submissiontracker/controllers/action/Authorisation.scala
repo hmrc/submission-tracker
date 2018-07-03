@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.submissiontracker.controllers.action
 
-import uk.gov.hmrc.auth.core.retrieve.Retrievals.{nino, _}
+import uk.gov.hmrc.auth.core.retrieve.Retrievals._
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.{AuthorisedFunctions, Enrolment, EnrolmentIdentifier}
 import uk.gov.hmrc.domain.Nino
@@ -39,15 +39,13 @@ trait Authorisation extends AuthorisedFunctions {
   def grantAccess(requestedNino: Nino)(implicit hc: HeaderCarrier): Future[Authority] = {
     authorised(Enrolment("HMRC-NI", Seq(EnrolmentIdentifier("NINO", requestedNino.value)), "Activated", None))
       .retrieve(nino and confidenceLevel) {
-        case Some(nino) ~ confidenceLevel ⇒ {
-          if (nino.isEmpty) throw ninoNotFoundOnAccount
-          if (!nino.equals(requestedNino.nino)) throw failedToMatchNino
-          if (confLevel > confidenceLevel.level) throw lowConfidenceLevel
+        case Some(foundNino) ~ foundConfidenceLevel =>
+          if (foundNino.isEmpty) throw ninoNotFoundOnAccount
+          if (!foundNino.equals(requestedNino.nino)) throw failedToMatchNino
+          if (confLevel > foundConfidenceLevel.level) throw lowConfidenceLevel
           Future(Authority(requestedNino))
-        }
-        case None ~ _ ⇒ {
+        case None ~ _ =>
           throw ninoNotFoundOnAccount
-        }
       }
   }
 }

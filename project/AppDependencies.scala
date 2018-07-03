@@ -9,10 +9,10 @@ object AppDependencies {
   private val domainVersion = "5.1.0"
   private val playHmrcApiVersion = "2.1.0"
   private val hmrcTestVersion = "3.0.0"
-  private val wireMockVersion = "2.10.1"
-  private val cucumberVersion = "1.2.5"
+  private val wireMockVersion = "2.9.0"
   private val reactiveCircuitBreakerVersion = "3.2.0"
-  private val emailAdressVersion = "2.1.0"
+  private val emailAdressVersion = "2.2.0"
+  private val scalamockVersion = "4.0.0"
   private val mockitoVersion = "2.11.0"
   private val scalatestplusPlayVersion = "2.0.1"
 
@@ -35,8 +35,9 @@ object AppDependencies {
   object Test {
     def apply() = new TestDependencies {
       override lazy val test = Seq(
+        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
         "uk.gov.hmrc" %% "hmrctest" % hmrcTestVersion % scope,
-        "org.mockito" % "mockito-core" % mockitoVersion % scope
+        "org.scalamock" %% "scalamock" % scalamockVersion % scope
       )
     }.test
   }
@@ -47,10 +48,8 @@ object AppDependencies {
       override lazy val scope: String = "it"
 
       override lazy val test = Seq(
-        "uk.gov.hmrc" %% "hmrctest" % hmrcTestVersion % scope,
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-        "info.cukes" %% "cucumber-scala" % cucumberVersion % scope,
-        "info.cukes" % "cucumber-junit" % cucumberVersion % scope,
+        "uk.gov.hmrc" %% "hmrctest" % hmrcTestVersion % scope,
         "com.github.tomakehurst" % "wiremock" % wireMockVersion % scope,
         "org.mockito" % "mockito-core" % mockitoVersion % scope,
         "org.scalatestplus.play" %% "scalatestplus-play" % scalatestplusPlayVersion % scope

@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.submissiontracker.support
 
-import org.scalatest.{Matchers, OptionValues}
 import org.scalatestplus.play.WsScalaTestClient
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
@@ -26,7 +25,7 @@ import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.language.postfixOps
 
-class BaseISpec extends UnitSpec with Matchers with OptionValues with WsScalaTestClient with GuiceOneServerPerSuite with WireMockSupport {
+class BaseISpec extends UnitSpec with WsScalaTestClient with GuiceOneServerPerSuite with WireMockSupport {
   override implicit lazy val app: Application = appBuilder
     .build()
 
@@ -42,5 +41,10 @@ class BaseISpec extends UnitSpec with Matchers with OptionValues with WsScalaTes
       )
 
   protected implicit lazy val wsClient: WSClient = app.injector.instanceOf[WSClient]
+
+  protected val nino = "CS700100A"
+  protected val idType = "some-id-type"
+  protected val acceptJsonHeader: (String, String) = "Accept" -> "application/vnd.hmrc.1.0+json"
+  protected val mobileUserIdHeader: (String, String) = "X-MOBILE-USER-ID" -> "208606423740"
 
 }
