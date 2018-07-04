@@ -1,10 +1,9 @@
-package uk.gov.hmrc.submissiontracker
+package uk.gov.hmrc.submissiontracker.controllers
 
 import uk.gov.hmrc.submissiontracker.stubs.{AuthStub, TrackingStub}
 import uk.gov.hmrc.submissiontracker.support.BaseISpec
-import com.github.tomakehurst.wiremock.client.WireMock._
 
-class SubmissionTrackerISpec extends BaseISpec {
+class SubmissionTrackerControllerISpec extends BaseISpec {
 
   "GET /tracking/:id/:idType" should {
     "return tracking data" in {
@@ -14,17 +13,6 @@ class SubmissionTrackerISpec extends BaseISpec {
       val response = await(wsUrl(s"/tracking/$nino/$idType")
         .withHeaders(acceptJsonHeader)
         .get())
-
-      response.status shouldBe 200
-    }
-
-    "override to sandbox when using sandbox user, avoiding auth call" in {
-      val response = await(wsUrl(s"/tracking/$nino/$idType")
-        .withHeaders(acceptJsonHeader, mobileUserIdHeader)
-        .get())
-
-      verify(0, postRequestedFor(urlEqualTo("/auth/authorise")))
-      verify(0, postRequestedFor(urlEqualTo(s"/tracking-data/user/$idType/$nino")))
 
       response.status shouldBe 200
     }

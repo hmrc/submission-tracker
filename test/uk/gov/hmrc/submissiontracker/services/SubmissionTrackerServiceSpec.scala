@@ -16,8 +16,31 @@
 
 package uk.gov.hmrc.submissiontracker.services
 
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.submissiontracker.stub.TestSetup
 
-class SubmissionTrackerServiceSpec extends TestSetup {
+import scala.concurrent.{ExecutionContext, Future}
 
+class SubmissionTrackerServiceSpec extends TestSetup {
+  val service = new SubmissionTrackerService(mockTrackingConnector, mockAuditConnector, configuration)
+
+  "trackingData(id: String, idType: String)" should {
+    "return trackingDataSeq with valid date formats" in {
+      stubAuditTrackingData(nino.value, idType)
+      (mockTrackingConnector.getUserTrackingData(_: String, _: String)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(nino.value, idType, *, *).returns(Future successful trackingData)
+
+      await(service.trackingData(nino.value, idType)) shouldBe trackingDataWithCorrectDateFormat
+    }
+
+    "return an IllegalArgumentException with incorrect received date format" in {
+      stubAuditTrackingData(nino.value, idType)
+      (mockTrackingConnector.getUserTrackingData(_: String, _: String)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(nino.value, idType, *, *).returns(Future successful trackingDataWithCorrectDateFormat)
+
+      intercept[IllegalArgumentException] {
+        await(service.trackingData(nino.value, idType))
+      }
+    }
+  }
 }

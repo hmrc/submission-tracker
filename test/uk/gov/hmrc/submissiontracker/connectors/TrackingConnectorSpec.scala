@@ -25,15 +25,16 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class TrackingConnectorSpec extends TestSetup {
 
-  val connector = new TrackingConnector("someUrl", mockHttp)
+  private val trackingBaseUrl = "someUrl"
+  val connector = new TrackingConnector(trackingBaseUrl, mockHttp)
 
   def trackingGetSuccess(response: TrackingDataSeq): Unit =
     (mockHttp.GET(_: String)(_: HttpReads[TrackingDataSeq], _: HeaderCarrier, _: ExecutionContext))
-      .expects(*, *, *, *).returns(Future successful response)
+      .expects(s"$trackingBaseUrl/tracking-data/user/$idType/${nino.value}", *, *, *).returns(Future successful response)
 
   def trackingGetFailure(response: Exception): Unit =
     (mockHttp.GET(_: String)(_: HttpReads[TrackingDataSeq], _: HeaderCarrier, _: ExecutionContext))
-      .expects(*, *, *, *).returns(Future failed response)
+      .expects(s"$trackingBaseUrl/tracking-data/user/$idType/${nino.value}", *, *, *).returns(Future failed response)
 
   "trackingConnector" should {
 
@@ -41,7 +42,7 @@ class TrackingConnectorSpec extends TestSetup {
       trackingGetFailure(new BadRequestException("bad request"))
 
       intercept[BadRequestException] {
-        await(connector.getUserTrackingData(nino.value, "some-id-type"))
+        await(connector.getUserTrackingData(nino.value, idType))
       }
     }
 
@@ -49,14 +50,14 @@ class TrackingConnectorSpec extends TestSetup {
       trackingGetFailure(Upstream5xxResponse("Error", 500, 500))
 
       intercept[Upstream5xxResponse] {
-        await(connector.getUserTrackingData(nino.value, "some-id-type"))
+        await(connector.getUserTrackingData(nino.value, idType))
       }
     }
 
     "return a valid response when a 200 response is received" in {
       trackingGetSuccess(trackingData)
 
-      await(connector.getUserTrackingData(nino.value, "some-id-type")) shouldBe trackingData
+      await(connector.getUserTrackingData(nino.value, idType)) shouldBe trackingData
     }
   }
 }

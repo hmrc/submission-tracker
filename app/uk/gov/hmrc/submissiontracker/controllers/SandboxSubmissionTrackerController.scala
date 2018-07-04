@@ -18,28 +18,27 @@ package uk.gov.hmrc.submissiontracker.controllers
 
 import com.google.inject.Singleton
 import javax.inject.Inject
-import play.api.libs.json.Json._
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.api.controllers._
+import uk.gov.hmrc.api.sandbox.FileResource
 import uk.gov.hmrc.play.bootstrap.controller.BaseController
-import uk.gov.hmrc.submissiontracker.domain.{Milestone, TrackingData, TrackingDataSeq}
 
 import scala.concurrent.Future
 
 @Singleton
-class SandboxSubmissionTrackerController @Inject()() extends BaseController with HeaderValidator {
+class SandboxSubmissionTrackerController @Inject()() extends BaseController with HeaderValidator with FileResource {
 
   def trackingData(id: String, idType: String, journeyId: Option[String] = None): Action[AnyContent] =
     validateAccept(acceptHeaderValidationRules).async {
       implicit request =>
-        val milestones = Seq(
-          Milestone("Received", "complete"),
-          Milestone("Acquired", "complete"),
-          Milestone("InProgress", "current"),
-          Milestone("Done", "incomplete"))
-        val trackingData = TrackingDataSeq(Some(Seq(
-          TrackingData("ref1", "Claim a tax refund", "E4H-384D-EFZ", "some-business", "20160801", "20160620", milestones))))
-
-        Future successful Ok(toJson(trackingData))
+        Future successful (request.headers.get("SANDBOX-CONTROL") match {
+          case Some("ERROR-401") => Unauthorized
+          case Some("ERROR-403") => Forbidden
+          case Some("ERROR-500") => InternalServerError
+          case _ =>
+            val resource: String = findResource(s"/resources/SandboxTrackingData.json")
+              .getOrElse(throw new IllegalArgumentException("Resource not found!"))
+            Ok(resource)
+        })
     }
 }

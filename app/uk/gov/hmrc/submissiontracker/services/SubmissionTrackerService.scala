@@ -18,9 +18,10 @@ package uk.gov.hmrc.submissiontracker.services
 
 import javax.inject.{Inject, Singleton}
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
+import play.api.Configuration
+import uk.gov.hmrc.api.service.Auditor
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.model.{Audit, DataEvent}
-import uk.gov.hmrc.submissiontracker.connectors._
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.submissiontracker.connectors.TrackingConnector
 import uk.gov.hmrc.submissiontracker.domain.TrackingDataSeq
 
@@ -29,23 +30,10 @@ import scala.concurrent.Future
 
 @Singleton
 class SubmissionTrackerService @Inject()(val trackingConnector: TrackingConnector,
-                                         val auditing: Audit) {
+                                         val auditConnector: AuditConnector,
+                                         val appNameConfiguration: Configuration) extends Auditor {
   val inFormat: DateTimeFormatter = DateTimeFormat.forPattern("dd MMM yyyy")
   val outFormat: DateTimeFormatter = DateTimeFormat.forPattern("yyyyMMdd")
-
-  private def audit(service: String, details: Map[String, String])(implicit hc: HeaderCarrier): Unit = {
-    def auditResponse(): Unit = {
-      auditing.sendDataEvent(
-        DataEvent("submission-tracker", "ServiceResponseSent",
-          tags = Map("transactionName" -> service),
-          detail = details))
-    }
-  }
-
-  private def withAudit[T](service: String, details: Map[String, String])(func: Future[T])(implicit hc: HeaderCarrier): Future[T] = {
-    audit(service, details) // No need to wait!
-    func
-  }
 
   private def convert(in: String): String = outFormat.print(inFormat.parseDateTime(in))
 
