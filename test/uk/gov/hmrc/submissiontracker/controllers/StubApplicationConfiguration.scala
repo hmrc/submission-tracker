@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.submissiontracker.controller
+package uk.gov.hmrc.submissiontracker.controllers
 
 trait StubApplicationConfiguration {
 
-  val config = Map[String, Any](
+  val config: Map[String, Any] = Map[String, Any](
     "auditing.enabled" -> false,
     "microservice.services.datastream.host" -> "host",
     "microservice.services.datastream.port" -> "1234",
@@ -31,6 +31,5 @@ trait StubApplicationConfiguration {
     "microservice.services.auth.port" -> "3456",
     "microservice.services.tracking.host" -> "host",
     "microservice.services.tracking.port" -> "4567"
-
   )
 }

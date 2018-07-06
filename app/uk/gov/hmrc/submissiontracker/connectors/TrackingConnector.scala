@@ -14,31 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.submissiontracker.connector
+package uk.gov.hmrc.submissiontracker.connectors
 
 import javax.inject.{Inject, Named, Singleton}
-
-import com.google.inject.ImplementedBy
 import play.api._
-import uk.gov.hmrc.http.{HttpGet, HeaderCarrier}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
 import uk.gov.hmrc.submissiontracker.domain.TrackingDataSeq
 
 import scala.concurrent.{ExecutionContext, Future}
 
-@ImplementedBy(classOf[TrackingConnectorImpl])
-trait TrackingConnector {
-  val trackingBaseUrl: String
+@Singleton
+class TrackingConnector @Inject()(@Named("trackingUrl") val trackingBaseUrl: String, val httpGet: HttpGet) {
 
-	val httpGet: HttpGet
+  def trackingDataLink(id: String, idType: String): String = s"$trackingBaseUrl/tracking-data/user/$idType/$id"
 
-  def trackingDataLink(id: String, idType:String): String = s"$trackingBaseUrl/tracking-data/user/$idType/$id"
-
-	def getUserTrackingData(id: String,idType:String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TrackingDataSeq] = {
-		Logger.debug("submission-tracker: Requesting tracking data")
-		httpGet.GET[TrackingDataSeq](trackingDataLink(id,idType))
-	}
+  def getUserTrackingData(id: String, idType: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TrackingDataSeq] = {
+    Logger.debug("submission-tracker: Requesting tracking data")
+    httpGet.GET[TrackingDataSeq](trackingDataLink(id, idType))
+  }
 
 }
-
-@Singleton
-class TrackingConnectorImpl @Inject()(@Named("trackingUrl") val trackingBaseUrl: String, val httpGet: HttpGet) extends TrackingConnector

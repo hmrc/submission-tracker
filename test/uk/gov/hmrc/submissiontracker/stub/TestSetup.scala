@@ -16,49 +16,51 @@
 
 package uk.gov.hmrc.submissiontracker.stub
 
-import org.scalatest.mockito.MockitoSugar
-import play.api.libs.json.Json
+import org.scalamock.scalatest.MockFactory
+import play.api.Configuration
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
-import uk.gov.hmrc.submissiontracker.connector.TrackingConnector
-import uk.gov.hmrc.submissiontracker.controllers.LiveSubmissionTrackerController
-import uk.gov.hmrc.submissiontracker.services.LivesubmissiontrackerService
+import uk.gov.hmrc.submissiontracker.connectors.TrackingConnector
+import uk.gov.hmrc.submissiontracker.domain.{Milestone, TrackingData, TrackingDataSeq}
+import uk.gov.hmrc.submissiontracker.services.SubmissionTrackerService
 
-trait TestSetup extends MockitoSugar with UnitSpec with WithFakeApplication with AuthorisationStub {
+trait TestSetup extends MockFactory with UnitSpec with WithFakeApplication with AuthorisationStub with AuditStub {
 
-  trait mocks {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    implicit val mockAuthConnector: AuthConnector = mock[AuthConnector]
-    implicit val mockAuditConnector: AuditConnector = mock[AuditConnector]
-    implicit val mockLivesubmissiontrackerService: LivesubmissiontrackerService = mock[LivesubmissiontrackerService]
-    implicit val mockTrackingConnector: TrackingConnector = mock[TrackingConnector]
-  }
+  implicit val hc: HeaderCarrier = HeaderCarrier()
+  implicit val mockAuthConnector: AuthConnector = mock[AuthConnector]
+  implicit val mockAuditConnector: AuditConnector = mock[AuditConnector]
+  implicit val mockSubmissionTrackerService: SubmissionTrackerService = mock[SubmissionTrackerService]
+  implicit val mockTrackingConnector: TrackingConnector = mock[TrackingConnector]
+  implicit val mockHttp: HttpGet = mock[HttpGet]
 
-  val noNinoFoundOnAccount = Json.parse("""{"code":"UNAUTHORIZED","message":"NINO does not exist on account"}""")
-  val lowConfidenceLevelError = Json.parse("""{"code":"LOW_CONFIDENCE_LEVEL","message":"Confidence Level on account does not allow access"}""")
+  val configuration: Configuration = fakeApplication.injector.instanceOf[Configuration]
 
-  val nino = "CS700100A"
+  lazy val requestWithAcceptHeader: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders(acceptHeader)
+  lazy val requestWithoutAcceptHeader: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+
+  val noNinoFoundOnAccount: JsValue = Json.parse("""{"code":"UNAUTHORIZED","message":"NINO does not exist on account"}""")
+  val lowConfidenceLevelError: JsValue = Json.parse("""{"code":"LOW_CONFIDENCE_LEVEL","message":"Confidence Level on account does not allow access"}""")
+
+  val nino = Nino("CS700100A")
   val incorrectNino = Nino("SC100700A")
-  val acceptHeader = "Accept" -> "application/vnd.hmrc.1.0+json"
+  val acceptHeader: (String, String) = "Accept" -> "application/vnd.hmrc.1.0+json"
+  val idType = "NINO"
 
-  lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withSession(
-    "AuthToken" -> "Some Header"
-  ).withHeaders(
-    acceptHeader,
-    "Authorization" -> "Some Header"
-  )
-  lazy val requestInvalidHeaders: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withSession(
-    "AuthToken" -> "Some Header"
-  ).withHeaders(
-    "Authorization" -> "Some Header"
-  )
+  val milestones = Seq(
+    Milestone("Received", "complete"),
+    Milestone("Acquired", "complete"),
+    Milestone("InProgress", "current"),
+    Milestone("Done", "incomplete"))
+
+  val trackingData = TrackingDataSeq(Some(Seq(TrackingData("R39_EN", "Claim a tax refund", "111-ABCD-456", "PSA", "12 Apr 2015", "17 May 2015", milestones))))
+
+  val trackingDataWithCorrectDateFormat = TrackingDataSeq(Some(Seq(
+    TrackingData("R39_EN", "Claim a tax refund", "111-ABCD-456", "PSA", "20150412", "20150517", milestones))))
+
 }
-
-class TestSubmissionTrackingController(override val authConnector: AuthConnector, override val confLevel: Int,
-                                       submissionTrackerService: LivesubmissiontrackerService)
-  extends LiveSubmissionTrackerController(authConnector: AuthConnector, submissionTrackerService: LivesubmissiontrackerService, confLevel: Int)

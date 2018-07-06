@@ -15,7 +15,6 @@ API
 
 | *Task* | *Supported Methods* | *Description* |
 |--------|----|----|
-| ```/tracking``` | GET | Ping check - Returns 200 if the service is running. |
 | ```/tracking/:id/:idType``` | GET | Retrieve the tracking data for the 'id' and 'idType'. The Id is the tax identifier and the 'idType' is the type of tax identifier. [More...](docs/tracking.md)|
 
 
@@ -24,6 +23,18 @@ All the above endpoints are accessible on sandbox with `/sandbox` prefix on each
 ```
     GET /sandbox/tracking/:id/:idType
 ```
+
+To trigger the sandbox endpoints locally, use the "X-MOBILE-USER-ID" header with one of the following values:
+208606423740 or 167927702220
+
+To test different scenarios, add a header "SANDBOX-CONTROL" with one of the following values:
+
+| *Value* | *Description* |
+|--------|----|
+| "ERROR-401" | Unhappy path, trigger a 401 Unauthorized response |
+| "ERROR-403" | Unhappy path, trigger a 403 Forbidden response |
+| "ERROR-500" | Unhappy path, trigger a 500 Internal Server Error response |
+| Not set or any other value | Happy path, receive tracking data |
 
 # Definition
 API definition for the service will be available under `/api/definition` endpoint.

@@ -16,10 +16,15 @@
 
 package uk.gov.hmrc.submissiontracker.controllers
 
-import uk.gov.hmrc.api.controllers.ErrorResponse
-import uk.gov.hmrc.http.HttpException
+import play.api.libs.json.Json.toJson
+import play.api.{Logger, mvc}
+import play.api.mvc.Result
+import uk.gov.hmrc.api.controllers.{ErrorInternalServerError, ErrorNotFound, ErrorResponse, ErrorUnauthorizedLowCL}
+import uk.gov.hmrc.http._
+import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import scala.concurrent.ExecutionContext.Implicits.global
 
-case object ErrorNinoInvalid extends ErrorResponse(400, "NINO_INVALID", "The provided NINO is invalid")
+import scala.concurrent.Future
 
 case object ErrorUnauthorizedNoNino extends ErrorResponse(401, "UNAUTHORIZED", "NINO does not exist on account")
 
@@ -32,3 +37,21 @@ class NinoNotFoundOnAccount extends GrantAccessException("Unauthorised! NINO not
 class AccountWithLowCL extends GrantAccessException("Unauthorised! Account with low CL!")
 
 class AccountWithWeakCredStrength(message:String) extends uk.gov.hmrc.http.HttpException(message, 401)
+
+trait ErrorHandling {
+  self: BaseController =>
+
+  def errorWrapper(func: => Future[mvc.Result])(implicit hc: HeaderCarrier): Future[Result] = {
+    func.recover {
+      case _: NotFoundException => Status(ErrorNotFound.httpStatusCode)(toJson(ErrorNotFound))
+
+      case _: UnauthorizedException => Unauthorized(toJson(ErrorUnauthorizedNoNino))
+
+      case _: ForbiddenException => Unauthorized(toJson(ErrorUnauthorizedLowCL))
+
+      case e: Throwable =>
+        Logger.error(s"Internal server error: ${e.getMessage}", e)
+        Status(ErrorInternalServerError.httpStatusCode)(toJson(ErrorInternalServerError))
+    }
+  }
+}

@@ -16,62 +16,30 @@
 
 package uk.gov.hmrc.submissiontracker.controllers
 
-import javax.inject.{Inject, Named}
-
 import com.google.inject.Singleton
-import play.api.libs.json._
-import play.api.{Logger, mvc}
-import uk.gov.hmrc.api.controllers._
+import javax.inject.{Inject, Named}
+import play.api.libs.json.Json._
+import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.{ForbiddenException, HeaderCarrier, NotFoundException, UnauthorizedException}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.bootstrap.controller.BaseController
 import uk.gov.hmrc.submissiontracker.controllers.action.AccessControl
-import uk.gov.hmrc.submissiontracker.services.{LivesubmissiontrackerService, SandboxsubmissiontrackerService, SubmissiontrackerService}
+import uk.gov.hmrc.submissiontracker.services.SubmissionTrackerService
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
-trait ErrorHandling {
-  self:BaseController =>
+@Singleton
+class SubmissionTrackerController @Inject()(override val authConnector: AuthConnector,
+                                            val service: SubmissionTrackerService,
+                                            @Named("controllers.confidenceLevel") override val confLevel: Int)
+  extends BaseController with AccessControl with ErrorHandling {
 
-  def errorWrapper(func: => Future[mvc.Result])(implicit hc:HeaderCarrier) = {
-    func.recover {
-      case ex:NotFoundException => Status(ErrorNotFound.httpStatusCode)(Json.toJson(ErrorNotFound))
-
-      case ex:UnauthorizedException => Unauthorized(Json.toJson(ErrorUnauthorizedNoNino))
-
-      case ex:ForbiddenException => Unauthorized(Json.toJson(ErrorUnauthorizedLowCL))
-
-      case e: Throwable =>
-        Logger.error(s"Internal server error: ${e.getMessage}", e)
-        Status(ErrorInternalServerError.httpStatusCode)(Json.toJson(ErrorInternalServerError))
+  def trackingData(id: String, idType: String, journeyId: Option[String] = None): Action[AnyContent] =
+    validateAcceptWithAuth(acceptHeaderValidationRules, Some(Nino(id))).async {
+      implicit request =>
+        implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, None)
+        errorWrapper(service.trackingData(id, idType).map(as => Ok(toJson(as))))
     }
-  }
 }
-
-trait SubmissionTrackerController extends BaseController with AccessControl with ErrorHandling {
-
-  val service: SubmissiontrackerService
-
-  final def trackingData(id:String, idType:String, journeyId: Option[String] = None) = validateAcceptWithAuth(acceptHeaderValidationRules, Some(Nino(id))).async {
-    implicit request =>
-      implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, None)
-      errorWrapper(service.trackingData(id, idType).map(as => Ok(Json.toJson(as))))
-  }
-}
-
-@Singleton
-class SandboxSubmissionTrackerController @Inject()(override val authConnector: AuthConnector,
-                                                   @Named("controllers.confidenceLevel") override val confLevel: Int)
-  extends SubmissionTrackerController {
-  override val service = SandboxsubmissiontrackerService
-  override lazy val requiresAuth = false
-}
-
-@Singleton
-class LiveSubmissionTrackerController @Inject()(override val authConnector: AuthConnector,
-                                                val service: LivesubmissiontrackerService,
-                                                @Named("controllers.confidenceLevel") override val confLevel: Int)
-  extends SubmissionTrackerController

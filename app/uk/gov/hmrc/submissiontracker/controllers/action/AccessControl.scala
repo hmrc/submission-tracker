@@ -21,64 +21,59 @@ import play.api.libs.json.Json
 import play.api.mvc.{ActionBuilder, Request, Result, Results}
 import uk.gov.hmrc.api.controllers._
 import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
-import uk.gov.hmrc.submissiontracker.controllers.{ErrorUnauthorizedNoNino, _}
+import uk.gov.hmrc.submissiontracker.controllers._
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 case object ErrorUnauthorizedMicroService extends ErrorResponse(401, "UNAUTHORIZED", "Unauthorized to access resource")
+
 case object ErrorUnauthorizedWeakCredStrength extends ErrorResponse(401, "WEAK_CRED_STRENGTH", "Credential Strength on account does not allow access")
 
+case object ErrorUnauthorized extends ErrorResponse(401, "UNAUTHORIZED", "Invalid request")
 
-trait AccountAccessControl extends Results with Authorisation {
-
-  import scala.concurrent.ExecutionContext.Implicits.global
-
-  case object ErrorUnauthorized extends ErrorResponse(401, "UNAUTHORIZED", "Invalid request")
+trait AccessControl extends HeaderValidator with Results with Authorisation {
 
   lazy val requiresAuth: Boolean = true
 
-  def invokeAuthBlock[A](request: Request[A], block: (Request[A]) => Future[Result], taxId:Option[Nino]) = {
-    implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, None)
+  def validateAcceptWithAuth(rules: Option[String] ⇒ Boolean, taxId: Option[Nino]): ActionBuilder[Request] = new ActionBuilder[Request] {
 
-
-    grantAccess(taxId.getOrElse(Nino(""))).flatMap { access ⇒
-      block(request)
-    }.recover {
-      case ex: uk.gov.hmrc.http.Upstream4xxResponse ⇒
-        Logger.info("Unauthorized! Failed to grant access since 4xx response!")
-        Unauthorized(Json.toJson(ErrorUnauthorizedMicroService))
-
-      case ex: NinoNotFoundOnAccount ⇒
-        Logger.info("Unauthorized! NINO not found on account!")
-        Unauthorized(Json.toJson(ErrorUnauthorizedNoNino))
-
-      case ex: FailToMatchTaxIdOnAuth ⇒
-        Logger.info("Unauthorized! Failure to match URL NINO against Auth NINO")
-        Status(ErrorUnauthorized.httpStatusCode)(Json.toJson(ErrorUnauthorized))
-
-      case ex: AccountWithLowCL ⇒
-        Logger.info("Unauthorized! Account with low CL!")
-        Unauthorized(Json.toJson(ErrorUnauthorizedLowCL))
-
-      case ex: AccountWithWeakCredStrength ⇒
-        Logger.info("Unauthorized! Account with weak cred strength!")
-        Unauthorized(Json.toJson(ErrorUnauthorizedWeakCredStrength))
-    }
-  }
-
-}
-
-trait AccessControl extends HeaderValidator with AccountAccessControl {
-
-  def validateAcceptWithAuth(rules: Option[String] ⇒ Boolean, taxId: Option[Nino]) = new ActionBuilder[Request] {
-
-    def invokeBlock[A](request: Request[A], block: (Request[A]) ⇒ Future[Result]) = {
+    def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] = {
       if (rules(request.headers.get("Accept"))) {
-        if(requiresAuth) invokeAuthBlock(request, block, taxId)
+        if (requiresAuth) invokeAuthBlock(request, block, taxId)
         else block(request)
       }
       else Future.successful(Status(ErrorAcceptHeaderInvalid.httpStatusCode)(Json.toJson(ErrorAcceptHeaderInvalid)))
+    }
+  }
+
+  def invokeAuthBlock[A](request: Request[A], block: Request[A] => Future[Result], taxId: Option[Nino]): Future[Result] = {
+    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, None)
+
+    grantAccess(taxId.getOrElse(Nino(""))).flatMap { access =>
+      block(request)
+    }.recover {
+      case ex: uk.gov.hmrc.http.Upstream4xxResponse =>
+        Logger.info("Unauthorized! Failed to grant access since 4xx response!")
+        Unauthorized(Json.toJson(ErrorUnauthorizedMicroService))
+
+      case ex: NinoNotFoundOnAccount =>
+        Logger.info("Unauthorized! NINO not found on account!")
+        Unauthorized(Json.toJson(ErrorUnauthorizedNoNino))
+
+      case ex: FailToMatchTaxIdOnAuth =>
+        Logger.info("Unauthorized! Failure to match URL NINO against Auth NINO")
+        Status(ErrorUnauthorized.httpStatusCode)(Json.toJson(ErrorUnauthorized))
+
+      case ex: AccountWithLowCL =>
+        Logger.info("Unauthorized! Account with low CL!")
+        Unauthorized(Json.toJson(ErrorUnauthorizedLowCL))
+
+      case ex: AccountWithWeakCredStrength =>
+        Logger.info("Unauthorized! Account with weak cred strength!")
+        Unauthorized(Json.toJson(ErrorUnauthorizedWeakCredStrength))
     }
   }
 }

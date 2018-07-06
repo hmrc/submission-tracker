@@ -58,11 +58,11 @@ class PlatformIntegrationSpec extends BaseISpec with Eventually with WiremockSer
   }
 
   trait Setup {
-    val documentationController = DocumentationController
+    val documentationController: DocumentationController.type = DocumentationController
     val request = FakeRequest()
 
-    implicit val system = ActorSystem()
-    implicit val materializer = ActorMaterializer()
+    implicit val system: ActorSystem = ActorSystem()
+    implicit val materializer: ActorMaterializer = ActorMaterializer()
   }
 
   override protected def appBuilder: GuiceApplicationBuilder = super.appBuilder.configure(
@@ -86,7 +86,7 @@ class PlatformIntegrationSpec extends BaseISpec with Eventually with WiremockSer
 
     "provide definition endpoint and documentation endpoints for each api" in new Setup {
       running(app) {
-        () ⇒ {
+        () => {
 
           def verifyDocumentationPresent(version: String, endpointName: String) {
             withClue(s"Getting documentation version '$version' of endpoint '$endpointName'") {
@@ -115,7 +115,7 @@ class PlatformIntegrationSpec extends BaseISpec with Eventually with WiremockSer
 
     "provide RAML conf endpoint" in new Setup {
       running(app) {
-        () ⇒ {
+        () => {
           val result = documentationController.conf("1.0", "application.raml")(request)
           status(result) shouldBe 200
         }
@@ -136,8 +136,8 @@ class TestApiServiceLocatorConnector(override val runModeConfiguration: Configur
 
   override val appUrl: String = "test"
   override val serviceUrl: String = "test"
-  override val handlerOK: () ⇒ Unit = () ⇒ ()
-  override val handlerError: Throwable ⇒ Unit = e ⇒ ()
+  override val handlerOK: () => Unit = () => ()
+  override val handlerError: Throwable ⇒ Unit = _ => ()
   override val metadata: Option[Map[String, String]] = None
   override val http: CorePost = wsHttp
 
@@ -145,4 +145,3 @@ class TestApiServiceLocatorConnector(override val runModeConfiguration: Configur
 
   override protected def mode: Mode = Dev
 }
-
