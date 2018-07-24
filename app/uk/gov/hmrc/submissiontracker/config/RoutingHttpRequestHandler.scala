@@ -30,14 +30,14 @@ import scala.util.matching.Regex
 class RoutingHttpRequestHandler @Inject()(router: Router, errorHandler: HttpErrorHandler, configuration: HttpConfiguration, filters: HttpFilters, environment: Environment, runConfiguration: Configuration )
   extends RequestHandler(router: Router, errorHandler: HttpErrorHandler, configuration: HttpConfiguration, filters: HttpFilters) {
 
-  lazy val header = runConfiguration.getString(s"router.header")
-  lazy val regex = runConfiguration.getString(s"router.regex")
-  lazy val prefix = runConfiguration.getString(s"router.prefix")
+  lazy val header: Option[String] = runConfiguration.getString(s"router.header")
+  lazy val regex: Option[String] = runConfiguration.getString(s"router.regex")
+  lazy val prefix: Option[String] = runConfiguration.getString(s"router.prefix")
 
   lazy val routing: Option[(String, String, String)] = {
     (header, regex, prefix) match {
-      case (Some(a:String), Some(b:String), Some(c:String)) ⇒ Some((a, b, c))
-      case _ ⇒ None
+      case (Some(a:String), Some(b:String), Some(c:String)) => Some((a, b, c))
+      case _ => None
     }
   }
 
@@ -46,18 +46,17 @@ class RoutingHttpRequestHandler @Inject()(router: Router, errorHandler: HttpErro
   }
 
   def overrideRouting(request: RequestHeader) : RequestHeader = {
-    routing.fold(request) { routing ⇒
+    routing.fold(request) { routing =>
       request.headers.get(routing._1) match {
-        case Some(value) ⇒ {
+        case Some(value) =>
           val found = new Regex(routing._2) findFirstIn value
           found.fold(request) {
-            _ ⇒ {
+            _ => {
               Logger.info(s"Overriding request due to $routing")
               request.copy(path = routing._3 + request.path)
             }
           }
-        }
-        case _ ⇒ request
+        case _ => request
       }
     }
   }

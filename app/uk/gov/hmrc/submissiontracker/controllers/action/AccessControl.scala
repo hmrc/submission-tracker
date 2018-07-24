@@ -52,26 +52,26 @@ trait AccessControl extends HeaderValidator with Results with Authorisation {
   def invokeAuthBlock[A](request: Request[A], block: Request[A] => Future[Result], taxId: Option[Nino]): Future[Result] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, None)
 
-    grantAccess(taxId.getOrElse(Nino(""))).flatMap { access =>
+    grantAccess(taxId.getOrElse(Nino(""))).flatMap { _ =>
       block(request)
     }.recover {
-      case ex: uk.gov.hmrc.http.Upstream4xxResponse =>
+      case _: uk.gov.hmrc.http.Upstream4xxResponse =>
         Logger.info("Unauthorized! Failed to grant access since 4xx response!")
         Unauthorized(Json.toJson(ErrorUnauthorizedMicroService))
 
-      case ex: NinoNotFoundOnAccount =>
+      case _: NinoNotFoundOnAccount =>
         Logger.info("Unauthorized! NINO not found on account!")
         Unauthorized(Json.toJson(ErrorUnauthorizedNoNino))
 
-      case ex: FailToMatchTaxIdOnAuth =>
+      case _: FailToMatchTaxIdOnAuth =>
         Logger.info("Unauthorized! Failure to match URL NINO against Auth NINO")
         Status(ErrorUnauthorized.httpStatusCode)(Json.toJson(ErrorUnauthorized))
 
-      case ex: AccountWithLowCL =>
+      case _: AccountWithLowCL =>
         Logger.info("Unauthorized! Account with low CL!")
         Unauthorized(Json.toJson(ErrorUnauthorizedLowCL))
 
-      case ex: AccountWithWeakCredStrength =>
+      case _: AccountWithWeakCredStrength =>
         Logger.info("Unauthorized! Account with weak cred strength!")
         Unauthorized(Json.toJson(ErrorUnauthorizedWeakCredStrength))
     }
