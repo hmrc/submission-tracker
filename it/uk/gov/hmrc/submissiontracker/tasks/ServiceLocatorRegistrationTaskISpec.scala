@@ -1,7 +1,7 @@
 package uk.gov.hmrc.submissiontracker.tasks
 
 import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, postRequestedFor, urlMatching, verify}
-import it.utils.WiremockServiceLocatorSugar
+import utils.WiremockServiceLocatorSugar
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import play.api.test.PlayRunners
 import uk.gov.hmrc.submissiontracker.stubs.ServiceLocatorStub._

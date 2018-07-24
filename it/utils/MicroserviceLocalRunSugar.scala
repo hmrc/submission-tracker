@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package it.utils
+package utils
 
 import play.api.Play
 import play.api.test.FakeApplication
 
 trait MicroserviceLocalRunSugar {
   val additionalConfiguration: Map[String, Any]
+  val port: Int = sys.env.getOrElse("MICROSERVICE_PORT", "9001").toInt
   val localMicroserviceUrl = s"http://localhost:$port"
-  val port = sys.env.getOrElse("MICROSERVICE_PORT", "9001").toInt
   lazy val fakeApplication = FakeApplication(additionalConfiguration = additionalConfiguration)
 
-  def run(block: () => Unit) = {
-    val app = Play.start(fakeApplication)
+  def run(block: () => Unit): Unit = {
+    Play.start(fakeApplication)
     block()
     Play.stop(fakeApplication)
   }
