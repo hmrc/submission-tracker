@@ -1,58 +1,30 @@
-import TestPhases.oneForkedJvmPerTest
-import play.sbt.routes.RoutesKeys._
-import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, _}
-import uk.gov.hmrc.SbtGitInfo.gitInfo
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
+import play.sbt.PlayImport.PlayKeys.playDefaultPort
+import sbt.Tests.{Group, SubProcess}
+import uk.gov.hmrc.SbtArtifactory
+import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
+import uk.gov.hmrc.versioning.SbtGitVersioning
 
-name := "submission-tracker"
+val appName: String = "submission-tracker"
 
-lazy val root = (project in file("."))
-  .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
+lazy val microservice = Project(appName, file("."))
+  .enablePlugins(Seq(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory): _*)
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
+  .settings(publishingSettings: _*)
+  .settings(routesImport ++= Seq("uk.gov.hmrc.domain._", "uk.gov.hmrc.submissiontracker.binder.Binders._"))
+  .settings(routesGenerator := StaticRoutesGenerator)
+  .settings(
+    majorVersion := 1,
+    playDefaultPort := 8232,
+    libraryDependencies ++= AppDependencies(),
+    evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
+    resolvers += Resolver.jcenterRepo,
+    unmanagedResourceDirectories in Compile += baseDirectory.value / "resources",
+    unmanagedSourceDirectories in IntegrationTest := (baseDirectory in IntegrationTest) (base => Seq(base / "it")).value,
+    testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value)
+  )
 
-routesImport ++= Seq("uk.gov.hmrc.domain._", "uk.gov.hmrc.submissiontracker.binder.Binders._")
-publishingSettings
-unmanagedResourceDirectories in Compile += baseDirectory.value / "resources"
-defaultSettings()
-
-scalaVersion := "2.11.11"
-crossScalaVersions := Seq("2.11.11")
-
-PlayKeys.playDefaultPort := 8232
-
-libraryDependencies ++= AppDependencies()
-retrieveManaged := true
-evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false)
-routesGenerator := StaticRoutesGenerator
-
-Keys.fork in IntegrationTest := false
-unmanagedSourceDirectories in IntegrationTest := (baseDirectory in IntegrationTest)(base => Seq(base / "it")).value
-addTestReportOption(IntegrationTest, "int-test-reports")
-testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value)
-parallelExecution in IntegrationTest := false
-
-resolvers ++= Seq(
-      Resolver.bintrayRepo("hmrc", "releases"),
-      Resolver.jcenterRepo
-)
-
-resourceGenerators in Compile += Def.task {
-  val commitMfFile = target.value / "metadata.mf"
-  val gitMetaData = gitInfo.map{s => {
-    val value = if (s._1 == "Git-Describe") s._2.substring(1) else s._2
-    val key = s._1.replaceAll("-", "_")
-
-    s"$key='$value'\n"
-  }}.mkString
-  IO.write(commitMfFile, gitMetaData)
-  Seq(commitMfFile)
-}
-
-val metadataMfTask = taskKey[File]("metadata-mf")
-metadataMfTask := target.value / "metadata.mf"
-artifact in (Compile, metadataMfTask) ~= { art:Artifact =>
-  art.copy("metadata", "mf", "mf")
-}
-addArtifact(artifact in (Compile, metadataMfTask), metadataMfTask in Compile)
-
+def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] =
+  tests map {
+    test => Group(test.name, Seq(test), SubProcess(ForkOptions(runJVMOptions = Seq("-Dtest.name=" + test.name))))
+  }
