@@ -7,7 +7,7 @@ object AppDependencies {
   private val bootstrapPlayVersion = "1.7.0"
   private val authClientVersion = "2.6.0"
   private val domainVersion = "5.2.0"
-  private val playHmrcApiVersion = "2.1.0"
+  private val playHmrcApiVersion = "3.2.0"
   private val hmrcTestVersion = "3.0.0"
   private val wireMockVersion = "2.9.0"
   private val reactiveCircuitBreakerVersion = "3.2.0"
