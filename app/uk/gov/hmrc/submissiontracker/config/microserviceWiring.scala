@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,10 @@
 
 package uk.gov.hmrc.submissiontracker.config
 
+import akka.actor.ActorSystem
+import com.typesafe.config.Config
 import javax.inject.{Inject, Named}
-
-import play.api.Mode.Mode
-import play.api.{Configuration, Environment, Logger}
-import uk.gov.hmrc.api.config.ServiceLocatorConfig
-import uk.gov.hmrc.api.connector.ServiceLocatorConnector
-import uk.gov.hmrc.http.CorePost
+import play.api.Configuration
 import uk.gov.hmrc.http.hooks.HttpHooks
 import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -42,12 +39,16 @@ trait WSHttp extends HttpClient with WSGet
   with WSPatch
   with Hooks with AppName
 
-class WSHttpImpl @Inject()(@Named("appName") val appName: String, val auditConnector: AuditConnector) extends HttpClient with WSGet
+class WSHttpImpl @Inject()(@Named("appName") val appName: String, val auditConnector: AuditConnector, val actorSystem: ActorSystem, config: Configuration) extends HttpClient with WSGet
   with WSPut
   with WSPost
   with WSDelete
   with WSPatch
-  with Hooks
+  with Hooks {
+  override val configuration: Option[Config] = Option(config.underlying)
+}
 
-class MicroserviceAudit @Inject()(@Named("appName") val applicationName: String,
-                                  val auditConnector: AuditConnector) extends Audit(applicationName, auditConnector)
+class MicroserviceAudit @Inject()(
+  @Named("appName") val applicationName: String,
+  val auditConnector: AuditConnector
+) extends Audit(applicationName, auditConnector)
