@@ -15,6 +15,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(routesGenerator := StaticRoutesGenerator)
   .settings(
     majorVersion := 1,
+    scalaVersion := "2.11.12",
     playDefaultPort := 8232,
     libraryDependencies ++= AppDependencies(),
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
