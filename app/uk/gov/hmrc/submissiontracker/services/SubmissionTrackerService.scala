@@ -16,12 +16,12 @@
 
 package uk.gov.hmrc.submissiontracker.services
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.{Inject, Named, Singleton}
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import play.api.Configuration
-import uk.gov.hmrc.api.service.Auditor
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.service.Auditor
 import uk.gov.hmrc.submissiontracker.connectors.TrackingConnector
 import uk.gov.hmrc.submissiontracker.domain.TrackingDataSeq
 
@@ -29,25 +29,26 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class SubmissionTrackerService @Inject()(val trackingConnector: TrackingConnector,
-                                         val auditConnector: AuditConnector,
-                                         val appNameConfiguration: Configuration) extends Auditor {
-  val inFormat: DateTimeFormatter = DateTimeFormat.forPattern("dd MMM yyyy")
+class SubmissionTrackerService @Inject()(
+  val trackingConnector:         TrackingConnector,
+  val auditConnector:            AuditConnector,
+  val configuration:             Configuration,
+  @Named("appName") val appName: String
+) extends Auditor {
+  val inFormat:  DateTimeFormatter = DateTimeFormat.forPattern("dd MMM yyyy")
   val outFormat: DateTimeFormatter = DateTimeFormat.forPattern("yyyyMMdd")
 
   private def convert(in: String): String = outFormat.print(inFormat.parseDateTime(in))
 
-  private def convertData(data: TrackingDataSeq): TrackingDataSeq = {
+  private def convertData(data: TrackingDataSeq): TrackingDataSeq =
     data.submissions.fold(data) { found =>
       TrackingDataSeq(Some(found.map(item => {
         item.copy(completionDate = convert(item.completionDate), receivedDate = convert(item.receivedDate))
       })))
     }
-  }
 
-  def trackingData(id: String, idType: String)(implicit hc: HeaderCarrier): Future[TrackingDataSeq] = {
+  def trackingData(id: String, idType: String)(implicit hc: HeaderCarrier): Future[TrackingDataSeq] =
     withAudit("trackingData", Map("id" -> id, "idType" -> idType)) {
       trackingConnector.getUserTrackingData(id, idType).map(data => convertData(data))
     }
-  }
 }

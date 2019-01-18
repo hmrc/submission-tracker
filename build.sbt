@@ -12,12 +12,12 @@ lazy val microservice = Project(appName, file("."))
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
   .settings(publishingSettings: _*)
   .settings(routesImport ++= Seq("uk.gov.hmrc.domain._", "uk.gov.hmrc.submissiontracker.binder.Binders._"))
-  .settings(routesGenerator := StaticRoutesGenerator)
   .settings(
     majorVersion := 1,
     scalaVersion := "2.11.12",
     playDefaultPort := 8232,
     libraryDependencies ++= AppDependencies(),
+    dependencyOverrides ++= AppDependencies.overrides,
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
     resolvers += Resolver.jcenterRepo,
     unmanagedResourceDirectories in Compile += baseDirectory.value / "resources",

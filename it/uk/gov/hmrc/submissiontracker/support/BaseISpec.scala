@@ -16,35 +16,35 @@
 
 package uk.gov.hmrc.submissiontracker.support
 
+import org.scalatest.{Matchers, WordSpecLike}
 import org.scalatestplus.play.WsScalaTestClient
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
-import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.language.postfixOps
 
-class BaseISpec extends UnitSpec with WsScalaTestClient with GuiceOneServerPerSuite with WireMockSupport {
+class BaseISpec extends WordSpecLike with Matchers with WsScalaTestClient with GuiceOneServerPerSuite with WireMockSupport {
   override implicit lazy val app: Application = appBuilder
     .build()
 
   def config: Map[String, Any] = Map(
-    "auditing.enabled" -> false,
+    "auditing.enabled"                              -> false,
     "microservice.services.service-locator.enabled" -> false,
-    "microservice.services.service-locator.port" -> wireMockPort,
-    "microservice.services.auth.port" -> wireMockPort,
-    "microservice.services.tracking.port" -> wireMockPort,
-    "microservice.services.datastream.port" -> wireMockPort
+    "microservice.services.service-locator.port"    -> wireMockPort,
+    "microservice.services.auth.port"               -> wireMockPort,
+    "microservice.services.tracking.port"           -> wireMockPort,
+    "microservice.services.datastream.port"         -> wireMockPort
   )
 
   protected def appBuilder: GuiceApplicationBuilder = new GuiceApplicationBuilder().configure(config)
 
   protected implicit lazy val wsClient: WSClient = app.injector.instanceOf[WSClient]
 
-  protected val nino = "CS700100A"
+  protected val nino   = "CS700100A"
   protected val idType = "some-id-type"
-  protected val acceptJsonHeader: (String, String) = "Accept" -> "application/vnd.hmrc.1.0+json"
+  protected val acceptJsonHeader:   (String, String) = "Accept"           -> "application/vnd.hmrc.1.0+json"
   protected val mobileUserIdHeader: (String, String) = "X-MOBILE-USER-ID" -> "208606423740"
 
 }

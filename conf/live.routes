@@ -1,3 +1,3 @@
 # microservice specific routes
 
-GET         /tracking/:id/:idType       @uk.gov.hmrc.submissiontracker.controllers.SubmissionTrackerController.trackingData(id:String, idType:String, journeyId: Option[String])
+GET         /tracking/:id/:idType       uk.gov.hmrc.submissiontracker.controllers.SubmissionTrackerController.trackingData(id:String, idType:String, journeyId: Option[String])
