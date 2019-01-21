@@ -24,69 +24,73 @@ import uk.gov.hmrc.auth.core.syntax.retrieved._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.submissiontracker.stub.TestSetup
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class SubmissionTrackerControllerSpec extends TestSetup {
 
   "trackingData Live" should {
-    val controller = new SubmissionTrackerController(mockAuthConnector, mockSubmissionTrackerService, L200.level)
+    val controller = new SubmissionTrackerController(mockAuthConnector, mockSubmissionTrackerService, L200.level, stubControllerComponents())
 
     "return the tracking data successfully" in {
       stubAuthorisationGrantAccess(Some(nino.value) and L200)
-      (mockSubmissionTrackerService.trackingData(_: String, _: String)(_: HeaderCarrier))
-        .expects(nino.value, idType, *).returns(Future successful trackingData)
+      (mockSubmissionTrackerService
+        .trackingData(_: String, _: String)(_: HeaderCarrier))
+        .expects(nino.value, idType, *)
+        .returns(Future successful trackingData)
 
-      val result: Result = await(controller.trackingData(nino.value, idType)(requestWithAcceptHeader))
+      val result = controller.trackingData(nino.value, idType)(requestWithAcceptHeader)
 
-      status(result) shouldBe 200
+      status(result)        shouldBe 200
       contentAsJson(result) shouldBe Json.toJson(trackingData)
     }
 
     "return the tracking data successfully when journeyId is supplied" in {
       stubAuthorisationGrantAccess(Some(nino.value) and L200)
-      (mockSubmissionTrackerService.trackingData(_: String, _: String)(_: HeaderCarrier))
-        .expects(nino.value, idType, *).returns(Future successful trackingData)
+      (mockSubmissionTrackerService
+        .trackingData(_: String, _: String)(_: HeaderCarrier))
+        .expects(nino.value, idType, *)
+        .returns(Future successful trackingData)
 
+      val result = controller.trackingData(nino.value, idType, Some("unique-journey-id"))(requestWithAcceptHeader)
 
-      val result: Result = await(controller.trackingData(nino.value, idType, Some("unique-journey-id"))(requestWithAcceptHeader))
-
-      status(result) shouldBe 200
+      status(result)        shouldBe 200
       contentAsJson(result) shouldBe Json.toJson(trackingData)
     }
 
     "return unauthorized when authority record does not contain a NINO" in {
       stubAuthorisationGrantAccess(Some("") and L200)
-      status(await(controller.trackingData(nino.value, idType)(requestWithAcceptHeader))) shouldBe 401
+      status(controller.trackingData(nino.value, idType)(requestWithAcceptHeader)) shouldBe 401
     }
 
     "return 401 when the nino in the request does not match the authority nino" in {
       stubAuthorisationGrantAccess(Some("") and L200)
-      status(await(controller.trackingData(incorrectNino.value, idType)(requestWithAcceptHeader))) shouldBe 401
+      status(controller.trackingData(incorrectNino.value, idType)(requestWithAcceptHeader)) shouldBe 401
     }
 
     "return forbidden when authority record does not have correct confidence level" in {
       stubAuthorisationGrantAccess(Some(nino.value) and L100)
-      status(await(controller.trackingData(incorrectNino.value, idType)(requestWithAcceptHeader))) shouldBe 401
+      status(controller.trackingData(incorrectNino.value, idType)(requestWithAcceptHeader)) shouldBe 401
     }
 
     "return status code 406 when the accept header is missing" in {
-      status(await(controller.trackingData(incorrectNino.value, idType)(requestWithoutAcceptHeader))) shouldBe 406
+      status(controller.trackingData(incorrectNino.value, idType)(requestWithoutAcceptHeader)) shouldBe 406
     }
   }
 
   "trackingData Sandbox" should {
 
-    val controller = new SandboxSubmissionTrackerController
+    val controller = new SandboxSubmissionTrackerController(stubControllerComponents())
 
     "return the summary response from a static value" in {
-      val result = await(controller.trackingData(nino.value, idType)(requestWithAcceptHeader))
+      val result = controller.trackingData(nino.value, idType)(requestWithAcceptHeader)
 
-      status(result) shouldBe 200
+      status(result)        shouldBe 200
       contentAsJson(result) shouldBe Json.toJson(trackingDataWithCorrectDateFormat)
     }
 
     "return status code 406 when the Accept header is missing" in {
-      val result = await(controller.trackingData(nino.value, idType)(requestWithoutAcceptHeader))
+      val result = controller.trackingData(nino.value, idType)(requestWithoutAcceptHeader)
 
       status(result) shouldBe 406
 

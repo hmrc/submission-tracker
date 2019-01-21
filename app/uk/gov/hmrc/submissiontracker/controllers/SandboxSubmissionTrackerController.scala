@@ -18,27 +18,30 @@ package uk.gov.hmrc.submissiontracker.controllers
 
 import com.google.inject.Singleton
 import javax.inject.Inject
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
 import uk.gov.hmrc.api.controllers._
 import uk.gov.hmrc.api.sandbox.FileResource
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.BackendController
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SandboxSubmissionTrackerController @Inject()() extends BaseController with HeaderValidator with FileResource {
+class SandboxSubmissionTrackerController @Inject()(cc: ControllerComponents)(implicit val executionContext: ExecutionContext)
+    extends BackendController(cc)
+    with HeaderValidator
+    with FileResource {
 
   def trackingData(id: String, idType: String, journeyId: Option[String] = None): Action[AnyContent] =
-    validateAccept(acceptHeaderValidationRules).async {
-      implicit request =>
-        Future successful (request.headers.get("SANDBOX-CONTROL") match {
-          case Some("ERROR-401") => Unauthorized
-          case Some("ERROR-403") => Forbidden
-          case Some("ERROR-500") => InternalServerError
-          case _ =>
-            val resource: String = findResource(s"/resources/SandboxTrackingData.json")
-              .getOrElse(throw new IllegalArgumentException("Resource not found!"))
-            Ok(resource)
-        })
+    validateAccept(acceptHeaderValidationRules).async { implicit request =>
+      Future successful (request.headers.get("SANDBOX-CONTROL") match {
+        case Some("ERROR-401") => Unauthorized
+        case Some("ERROR-403") => Forbidden
+        case Some("ERROR-500") => InternalServerError
+        case _ =>
+          val resource: String = findResource(s"/resources/SandboxTrackingData.json")
+            .getOrElse(throw new IllegalArgumentException("Resource not found!"))
+          Ok(resource)
+      })
     }
+  override def parser: BodyParser[AnyContent] = cc.parsers.anyContent
 }

@@ -19,29 +19,34 @@ package uk.gov.hmrc.submissiontracker.config
 import com.google.inject.AbstractModule
 import com.google.inject.name.Names
 import com.google.inject.name.Names.named
-import javax.inject.Provider
-import play.api.Mode.Mode
 import play.api.{Configuration, Environment}
-import uk.gov.hmrc.api.connector.{ApiServiceLocatorConnector, ServiceLocatorConnector}
+import uk.gov.hmrc.api.connector.{
+  ApiServiceLocatorConnector,
+  ServiceLocatorConnector
+}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.{CorePost, HttpGet}
 import uk.gov.hmrc.play.audit.model.Audit
 import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
+import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import uk.gov.hmrc.play.config.{AppName, ServicesConfig}
 import uk.gov.hmrc.submissiontracker.controllers.api.ApiAccess
 import uk.gov.hmrc.submissiontracker.tasks.ServiceLocatorRegistrationTask
 
 import scala.collection.JavaConverters._
 
-class GuiceModule(environment: Environment, configuration: Configuration) extends AbstractModule with ServicesConfig {
+class GuiceModule(environment: Environment, configuration: Configuration)
+    extends AbstractModule {
 
-  override protected lazy val mode: Mode = environment.mode
-  override protected lazy val runModeConfiguration: Configuration = configuration
+  val servicesConfig = new ServicesConfig(
+    configuration,
+    new RunMode(configuration, environment.mode)
+  )
 
   override def configure(): Unit = {
 
-    bind(classOf[ServiceLocatorConnector]).to(classOf[ApiServiceLocatorConnector])
+    bind(classOf[ServiceLocatorConnector])
+      .to(classOf[ApiServiceLocatorConnector])
     bind(classOf[HttpGet]).to(classOf[WSHttpImpl])
     bind(classOf[CorePost]).to(classOf[WSHttpImpl])
     bind(classOf[HttpClient]).to(classOf[WSHttpImpl])
@@ -51,16 +56,18 @@ class GuiceModule(environment: Environment, configuration: Configuration) extend
     bind(classOf[AuthConnector]).to(classOf[DefaultAuthConnector])
 
     bind(classOf[ApiAccess]).toInstance(
-      ApiAccess("PRIVATE", configuration.underlying.getStringList("api.access.white-list.applicationIds").asScala))
+      ApiAccess(
+        "PRIVATE",
+        configuration.underlying
+          .getStringList("api.access.white-list.applicationIds")
+          .asScala
+      )
+    )
 
     bindConfigInt("controllers.confidenceLevel")
-    bind(classOf[String]).annotatedWith(named("trackingUrl")).toInstance(baseUrl("tracking"))
-
-    bind(classOf[String]).annotatedWith(Names.named("appName")).toProvider(AppNameProvider)
-  }
-
-  private object AppNameProvider extends Provider[String] {
-    def get(): String = AppName(configuration).appName
+    bind(classOf[String])
+      .annotatedWith(named("trackingUrl"))
+      .toInstance(servicesConfig.baseUrl("tracking"))
   }
 
   /**
@@ -68,7 +75,8 @@ class GuiceModule(environment: Environment, configuration: Configuration) extend
     * Throws an exception if the configuration value does not exist or cannot be read as an Int.
     */
   private def bindConfigInt(path: String): Unit = {
-    bindConstant().annotatedWith(named(path))
+    bindConstant()
+      .annotatedWith(named(path))
       .to(configuration.underlying.getInt(path))
   }
 }
