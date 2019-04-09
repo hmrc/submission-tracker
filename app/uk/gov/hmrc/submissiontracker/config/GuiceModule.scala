@@ -17,13 +17,8 @@
 package uk.gov.hmrc.submissiontracker.config
 
 import com.google.inject.AbstractModule
-import com.google.inject.name.Names
 import com.google.inject.name.Names.named
 import play.api.{Configuration, Environment}
-import uk.gov.hmrc.api.connector.{
-  ApiServiceLocatorConnector,
-  ServiceLocatorConnector
-}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.{CorePost, HttpGet}
 import uk.gov.hmrc.play.audit.model.Audit
@@ -31,7 +26,6 @@ import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.submissiontracker.controllers.api.ApiAccess
-import uk.gov.hmrc.submissiontracker.tasks.ServiceLocatorRegistrationTask
 
 import scala.collection.JavaConverters._
 
@@ -45,13 +39,9 @@ class GuiceModule(environment: Environment, configuration: Configuration)
 
   override def configure(): Unit = {
 
-    bind(classOf[ServiceLocatorConnector])
-      .to(classOf[ApiServiceLocatorConnector])
     bind(classOf[HttpGet]).to(classOf[WSHttpImpl])
     bind(classOf[CorePost]).to(classOf[WSHttpImpl])
     bind(classOf[HttpClient]).to(classOf[WSHttpImpl])
-    bind(classOf[ServiceLocatorRegistrationTask]).asEagerSingleton()
-
     bind(classOf[Audit]).to(classOf[MicroserviceAudit])
     bind(classOf[AuthConnector]).to(classOf[DefaultAuthConnector])
 
