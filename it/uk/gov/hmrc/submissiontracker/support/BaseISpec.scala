@@ -31,8 +31,6 @@ class BaseISpec extends WordSpecLike with Matchers with WsScalaTestClient with G
 
   def config: Map[String, Any] = Map(
     "auditing.enabled"                              -> false,
-    "microservice.services.service-locator.enabled" -> false,
-    "microservice.services.service-locator.port"    -> wireMockPort,
     "microservice.services.auth.port"               -> wireMockPort,
     "microservice.services.tracking.port"           -> wireMockPort,
     "microservice.services.datastream.port"         -> wireMockPort
