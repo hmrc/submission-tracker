@@ -29,7 +29,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.submissiontracker.connectors.TrackingConnector
 import uk.gov.hmrc.submissiontracker.domain.{Milestone, TrackingData, TrackingDataSeq}
-import uk.gov.hmrc.submissiontracker.services.SubmissionTrackerService
+import uk.gov.hmrc.submissiontracker.services.{FormNameService, SubmissionTrackerService}
 
 trait TestSetup extends MockFactory with WordSpecLike with Matchers with AuthorisationStub with AuditStub with ScalaFutures with FutureAwaits with DefaultAwaitTimeout {
 
@@ -38,6 +38,7 @@ trait TestSetup extends MockFactory with WordSpecLike with Matchers with Authori
   implicit val mockAuditConnector:           AuditConnector           = mock[AuditConnector]
   implicit val mockSubmissionTrackerService: SubmissionTrackerService = mock[SubmissionTrackerService]
   implicit val mockTrackingConnector:        TrackingConnector        = mock[TrackingConnector]
+  implicit val mockFormNameService:          FormNameService          = mock[FormNameService]
   implicit val mockHttp:                     HttpGet                  = mock[HttpGet]
 
   val configuration: Configuration = mock[Configuration]
