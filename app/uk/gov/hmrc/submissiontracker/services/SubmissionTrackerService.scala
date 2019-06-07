@@ -32,6 +32,7 @@ import scala.concurrent.Future
 class SubmissionTrackerService @Inject()(
   val trackingConnector:         TrackingConnector,
   val auditConnector:            AuditConnector,
+  val formNameService:           FormNameService,
   val configuration:             Configuration,
   @Named("appName") val appName: String
 ) extends Auditor {
@@ -43,7 +44,10 @@ class SubmissionTrackerService @Inject()(
   private def convertData(data: TrackingDataSeq): TrackingDataSeq =
     data.submissions.fold(data) { found =>
       TrackingDataSeq(Some(found.map(item => {
-        item.copy(completionDate = convert(item.completionDate), receivedDate = convert(item.receivedDate))
+        item.copy(
+          formName       = formNameService.getFormName(item.formId),
+          completionDate = convert(item.completionDate),
+          receivedDate   = convert(item.receivedDate))
       })))
     }
 
