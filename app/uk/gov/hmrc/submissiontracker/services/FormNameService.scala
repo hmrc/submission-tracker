@@ -66,6 +66,6 @@ class FormNameService {
     )
   }
 
-  def getFormName(formId: String): String = FormNames.getOrElse(formId, "INVALID")
+  def getFormName(formId: String): String = FormNames.getOrElse(formId, formId)
 
 }
