@@ -26,8 +26,8 @@ class FormNameServiceSpec extends TestSetup {
       service.getFormName("R39_EN") shouldBe "Claim a tax refund"
     }
 
-    "return INVALID when provided with an INVALID formId" in {
-      service.getFormName("INVALID") shouldBe "INVALID"
+    "return the formId as the name when provided with a formId that has no mapping" in {
+      service.getFormName("ABC_123") shouldBe "ABC_123"
     }
   }
 }
