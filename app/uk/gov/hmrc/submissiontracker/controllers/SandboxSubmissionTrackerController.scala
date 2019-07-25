@@ -31,7 +31,7 @@ class SandboxSubmissionTrackerController @Inject()(cc: ControllerComponents)(imp
     with HeaderValidator
     with FileResource {
 
-  def trackingData(id: String, idType: String, journeyId: Option[String] = None): Action[AnyContent] =
+  def trackingData(id: String, idType: String, journeyId: String): Action[AnyContent] =
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
       Future successful (request.headers.get("SANDBOX-CONTROL") match {
         case Some("ERROR-401") => Unauthorized

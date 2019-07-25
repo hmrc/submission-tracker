@@ -44,5 +44,6 @@ class BaseISpec extends WordSpecLike with Matchers with WsScalaTestClient with G
   protected val idType = "some-id-type"
   protected val acceptJsonHeader:   (String, String) = "Accept"           -> "application/vnd.hmrc.1.0+json"
   protected val mobileUserIdHeader: (String, String) = "X-MOBILE-USER-ID" -> "208606423740"
+  protected val journeyIdUrlVar = "?journeyId=journeyId"
 
 }
