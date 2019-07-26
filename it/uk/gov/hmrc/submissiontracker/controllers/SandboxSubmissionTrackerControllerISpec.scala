@@ -13,19 +13,19 @@ class SandboxSubmissionTrackerControllerISpec extends BaseISpec with FileResourc
   "GET /sandbox/tracking/:id/:idType" should {
 
     "return valid tracking data from sandbox with accept header" in {
-      val response = await(wsUrl(s"/tracking/$nino/$idType/$journeyIdUrlVar")
+      val response = await(wsUrl(s"/tracking/$nino/$idType$journeyIdUrlVar")
         .addHttpHeaders(acceptJsonHeader, mobileUserIdHeader)
         .get())
 
       verify(0, postRequestedFor(urlEqualTo("/auth/authorise")))
-      verify(0, postRequestedFor(urlEqualTo(s"/tracking-data/user/$idType/$nino/$journeyIdUrlVar")))
+      verify(0, postRequestedFor(urlEqualTo(s"/tracking-data/user/$idType/$nino$journeyIdUrlVar")))
 
       response.status shouldBe 200
       response.body shouldBe resource
     }
 
     "return 406 when missing accept header" in {
-      val response = await(wsUrl(s"/tracking/$nino/$idType/$journeyIdUrlVar")
+      val response = await(wsUrl(s"/tracking/$nino/$idType$journeyIdUrlVar")
         .addHttpHeaders(mobileUserIdHeader)
         .get())
 
@@ -33,19 +33,19 @@ class SandboxSubmissionTrackerControllerISpec extends BaseISpec with FileResourc
     }
 
     "return 401 if unauthenticated where SANDBOX-CONTROL is ERROR-401" in {
-      await(wsUrl(s"/tracking/$nino/$idType/$journeyIdUrlVar")
+      await(wsUrl(s"/tracking/$nino/$idType$journeyIdUrlVar")
         .addHttpHeaders(acceptJsonHeader, mobileUserIdHeader, "SANDBOX-CONTROL" -> "ERROR-401")
         .get()).status shouldBe 401
     }
 
     "return 401 if unauthenticated where SANDBOX-CONTROL is ERROR-403" in {
-      await(wsUrl(s"/tracking/$nino/$idType/$journeyIdUrlVar")
+      await(wsUrl(s"/tracking/$nino/$idType$journeyIdUrlVar")
         .addHttpHeaders(acceptJsonHeader, mobileUserIdHeader, "SANDBOX-CONTROL" -> "ERROR-403")
         .get()).status shouldBe 403
     }
 
     "return 401 if unauthenticated where SANDBOX-CONTROL is ERROR-500" in {
-      await(wsUrl(s"/tracking/$nino/$idType/$journeyIdUrlVar")
+      await(wsUrl(s"/tracking/$nino/$idType$journeyIdUrlVar")
         .addHttpHeaders(acceptJsonHeader, mobileUserIdHeader, "SANDBOX-CONTROL" -> "ERROR-500")
         .get()).status shouldBe 500
     }
