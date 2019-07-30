@@ -41,7 +41,7 @@ class SubmissionTrackerController @Inject()(
     with AccessControl
     with ErrorHandling {
 
-  def trackingData(id: String, idType: String, journeyId: Option[String] = None): Action[AnyContent] =
+  def trackingData(id: String, idType: String, journeyId: String): Action[AnyContent] =
     validateAcceptWithAuth(acceptHeaderValidationRules, Some(Nino(id))).async { implicit request =>
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, None)
       errorWrapper(service.trackingData(id, idType).map(as => Ok(toJson(as))))

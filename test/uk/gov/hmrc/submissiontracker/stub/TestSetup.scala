@@ -53,7 +53,8 @@ trait TestSetup extends MockFactory with WordSpecLike with Matchers with Authori
   val nino          = Nino("CS700100A")
   val incorrectNino = Nino("SC100700A")
   val acceptHeader: (String, String) = "Accept" -> "application/vnd.hmrc.1.0+json"
-  val idType = "NINO"
+  val idType        = "NINO"
+  val journeyId     = "journeyId"
 
   val milestones =
     Seq(Milestone("Received", "complete"), Milestone("Acquired", "complete"), Milestone("InProgress", "current"), Milestone("Done", "incomplete"))

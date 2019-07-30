@@ -12,7 +12,7 @@ class SubmissionTrackerControllerISpec extends BaseISpec with FutureAwaits with 
       TrackingStub.getUserTrackingData(idType, nino)
 
       val response = await(
-        wsUrl(s"/tracking/$nino/$idType")
+        wsUrl(s"/tracking/$nino/$idType/$journeyIdUrlVar")
           .addHttpHeaders(acceptJsonHeader)
           .get())
 
@@ -23,7 +23,7 @@ class SubmissionTrackerControllerISpec extends BaseISpec with FutureAwaits with 
       AuthStub.grantAccess(nino, nino, 100)
 
       val response = await(
-        wsUrl(s"/tracking/$nino/$idType")
+        wsUrl(s"/tracking/$nino/$idType/$journeyIdUrlVar")
           .addHttpHeaders(acceptJsonHeader)
           .get())
 
@@ -34,7 +34,7 @@ class SubmissionTrackerControllerISpec extends BaseISpec with FutureAwaits with 
       AuthStub.grantAccess(nino, "")
 
       val response = await(
-        wsUrl(s"/tracking/$nino/$idType")
+        wsUrl(s"/tracking/$nino/$idType/$journeyIdUrlVar")
           .addHttpHeaders(acceptJsonHeader)
           .get())
 
