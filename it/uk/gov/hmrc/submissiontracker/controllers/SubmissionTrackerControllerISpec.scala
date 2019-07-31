@@ -40,6 +40,18 @@ class SubmissionTrackerControllerISpec extends BaseISpec with FutureAwaits with 
 
       response.status shouldBe 401
     }
+
+    "fail with a 400 if no journeyId is supplied" in {
+      AuthStub.grantAccess(nino, nino)
+      TrackingStub.getUserTrackingData(idType, nino)
+
+      val response = await(
+        wsUrl(s"/tracking/$nino/$idType")
+          .addHttpHeaders(acceptJsonHeader)
+          .get())
+
+      response.status shouldBe 400
+    }
   }
 
 }

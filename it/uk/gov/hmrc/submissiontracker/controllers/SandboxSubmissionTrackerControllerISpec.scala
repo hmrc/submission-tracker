@@ -49,5 +49,13 @@ class SandboxSubmissionTrackerControllerISpec extends BaseISpec with FileResourc
         .addHttpHeaders(acceptJsonHeader, mobileUserIdHeader, "SANDBOX-CONTROL" -> "ERROR-500")
         .get()).status shouldBe 500
     }
+
+    "return 400 if no joruneyId is supplied" in {
+      val response = await(wsUrl(s"/tracking/$nino/$idType")
+        .addHttpHeaders(acceptJsonHeader, mobileUserIdHeader)
+        .get())
+
+      response.status shouldBe 400
+    }
   }
 }
