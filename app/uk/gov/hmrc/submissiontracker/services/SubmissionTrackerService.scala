@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.service.Auditor
 import uk.gov.hmrc.submissiontracker.connectors.TrackingConnector
-import uk.gov.hmrc.submissiontracker.domain.TrackingDataSeq
+import uk.gov.hmrc.submissiontracker.domain.{Milestone, TrackingDataResponse, TrackingDataSeq, TrackingDataSeqResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -39,20 +39,31 @@ class SubmissionTrackerService @Inject()(
   val inFormat:  DateTimeFormatter = DateTimeFormat.forPattern("dd MMM yyyy")
   val outFormat: DateTimeFormatter = DateTimeFormat.forPattern("yyyyMMdd")
 
-  private def convert(in: String): String = outFormat.print(inFormat.parseDateTime(in))
-
-  private def convertData(data: TrackingDataSeq): TrackingDataSeq =
-    data.submissions.fold(data) { found =>
-      TrackingDataSeq(Some(found.map(item => {
-        item.copy(
-          formName       = formNameService.getFormName(item.formId),
-          completionDate = convert(item.completionDate),
-          receivedDate   = convert(item.receivedDate))
-      })))
-    }
-
-  def trackingData(id: String, idType: String)(implicit hc: HeaderCarrier): Future[TrackingDataSeq] =
+  def trackingData(id: String, idType: String)(implicit hc: HeaderCarrier): Future[TrackingDataSeqResponse] =
     withAudit("trackingData", Map("id" -> id, "idType" -> idType)) {
       trackingConnector.getUserTrackingData(id, idType).map(data => convertData(data))
+    }
+
+  private def convert(in: String): String = outFormat.print(inFormat.parseDateTime(in))
+
+  private def getCurrentMilestone(milestones: Seq[Milestone]): String =
+    milestones.find(milestone => milestone.status.toLowerCase == ("current")) match {
+      case Some(currentMilestone) => currentMilestone.milestone
+      case None                   => throw new IllegalStateException("No Milestone with a status of current returned from Tracking")
+    }
+
+  private def convertData(data: TrackingDataSeq): TrackingDataSeqResponse =
+    data.submissions.fold(TrackingDataSeqResponse.noSumbissions) { found =>
+      TrackingDataSeqResponse(Some(found.map(item => {
+        TrackingDataResponse(
+          formId                 = item.formId,
+          formName               = formNameService.getFormName(item.formId),
+          dfsSubmissionReference = item.dfsSubmissionReference,
+          receivedDate           = convert(item.receivedDate),
+          completionDate         = convert(item.completionDate),
+          milestone              = getCurrentMilestone(item.milestones),
+          milestones             = item.milestones
+        )
+      })))
     }
 }

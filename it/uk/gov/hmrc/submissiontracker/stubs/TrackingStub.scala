@@ -30,7 +30,7 @@ object TrackingStub {
                        |    "completionDate" : "20 Jun 2016",
                        |    "milestones" : [ {
                        |      "milestone" : "one",
-                       |      "status" : "open"
+                       |      "status" : "current"
                        |    } ]
                        |  } ]
                        |}""".stripMargin

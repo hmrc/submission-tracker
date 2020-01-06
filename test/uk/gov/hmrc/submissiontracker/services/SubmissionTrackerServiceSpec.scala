@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ class SubmissionTrackerServiceSpec extends TestSetup {
         .expects(*)
         .returns("Claim a tax refund")
 
-      await(service.trackingData(nino.value, idType)) shouldBe trackingDataWithCorrectDateFormat
+      await(service.trackingData(nino.value, idType)) shouldBe trackingDataResponseWithCorrectDateFormat
     }
 
     "return an IllegalArgumentException with incorrect received date format" in {
