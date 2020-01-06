@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,12 +37,12 @@ class SubmissionTrackerControllerSpec extends TestSetup {
       (mockSubmissionTrackerService
         .trackingData(_: String, _: String)(_: HeaderCarrier))
         .expects(nino.value, idType, *)
-        .returns(Future successful trackingData)
+        .returns(Future successful trackingDataResponse)
 
       val result = controller.trackingData(nino.value, idType, journeyId)(requestWithAcceptHeader)
 
       status(result)        shouldBe 200
-      contentAsJson(result) shouldBe Json.toJson(trackingData)
+      contentAsJson(result) shouldBe Json.toJson(trackingDataResponse)
     }
 
     "return the tracking data successfully when journeyId is supplied" in {
@@ -50,12 +50,12 @@ class SubmissionTrackerControllerSpec extends TestSetup {
       (mockSubmissionTrackerService
         .trackingData(_: String, _: String)(_: HeaderCarrier))
         .expects(nino.value, idType, *)
-        .returns(Future successful trackingData)
+        .returns(Future successful trackingDataResponse)
 
       val result = controller.trackingData(nino.value, idType, journeyId)(requestWithAcceptHeader)
 
       status(result)        shouldBe 200
-      contentAsJson(result) shouldBe Json.toJson(trackingData)
+      contentAsJson(result) shouldBe Json.toJson(trackingDataResponse)
     }
 
     "return unauthorized when authority record does not contain a NINO" in {
@@ -86,7 +86,7 @@ class SubmissionTrackerControllerSpec extends TestSetup {
       val result = controller.trackingData(nino.value, idType, journeyId)(requestWithAcceptHeader)
 
       status(result)        shouldBe 200
-      contentAsJson(result) shouldBe Json.toJson(trackingDataWithCorrectDateFormat)
+      contentAsJson(result) shouldBe Json.toJson(trackingDataResponseWithCorrectDateFormat)
     }
 
     "return status code 406 when the Accept header is missing" in {

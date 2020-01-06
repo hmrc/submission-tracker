@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.submissiontracker.connectors.TrackingConnector
-import uk.gov.hmrc.submissiontracker.domain.{Milestone, TrackingData, TrackingDataSeq}
+import uk.gov.hmrc.submissiontracker.domain.{Milestone, TrackingData, TrackingDataResponse, TrackingDataSeq, TrackingDataSeqResponse}
 import uk.gov.hmrc.submissiontracker.services.{FormNameService, SubmissionTrackerService}
 
 trait TestSetup extends MockFactory with WordSpecLike with Matchers with AuthorisationStub with AuditStub with ScalaFutures with FutureAwaits with DefaultAwaitTimeout {
@@ -64,5 +64,11 @@ trait TestSetup extends MockFactory with WordSpecLike with Matchers with Authori
 
   val trackingDataWithCorrectDateFormat = TrackingDataSeq(
     Some(Seq(TrackingData("R39_EN", "Claim a tax refund", "111-ABCD-456", "PSA", "20150412", "20150517", milestones))))
+
+  val trackingDataResponse = TrackingDataSeqResponse(
+    Some(Seq(TrackingDataResponse("R39_EN", "Claim a tax refund", "111-ABCD-456", "12 Apr 2015", "17 May 2015", "InProgress", milestones))))
+
+  val trackingDataResponseWithCorrectDateFormat = TrackingDataSeqResponse(
+    Some(Seq(TrackingDataResponse("R39_EN", "Claim a tax refund", "111-ABCD-456", "20150412", "20150517", "InProgress", milestones))))
 
 }

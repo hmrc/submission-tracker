@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,34 +16,56 @@
 
 package uk.gov.hmrc.submissiontracker.domain
 
-import play.api.libs.json.{Json, Format}
+import play.api.libs.json.{Format, Json}
 
-case class Milestone (milestone: String, status: String)
+case class Milestone(milestone: String, status: String)
 
 object Milestone {
   implicit val milestoneFormat: Format[Milestone] = Json.format[Milestone]
 }
 
-case class TrackingData ( formId: String,
-                          formName: String,
-                          dfsSubmissionReference: String,
-                          businessArea: String,
-                          receivedDate: String,
-                          completionDate: String,
-                          milestones: Seq[Milestone])
+case class TrackingData(
+  formId:                 String,
+  formName:               String,
+  dfsSubmissionReference: String,
+  businessArea:           String,
+  receivedDate:           String,
+  completionDate:         String,
+  milestones:             Seq[Milestone])
 
 object TrackingData {
   implicit val trackingDataFormat: Format[TrackingData] = Json.format[TrackingData]
 }
 
-case class TrackingDataPresenter(trackingData: TrackingData, latestMilestone:String)
+case class TrackingDataPresenter(trackingData: TrackingData, latestMilestone: String)
 
-object TrackingDataPresenter{
+object TrackingDataPresenter {
   implicit val trackingDataPresenterFormat: Format[TrackingDataPresenter] = Json.format[TrackingDataPresenter]
 }
 
-case class TrackingDataSeq (submissions: Option[Seq[TrackingData]])
+case class TrackingDataSeq(submissions: Option[Seq[TrackingData]])
 
 object TrackingDataSeq {
   implicit val trackingDataSeqFormat: Format[TrackingDataSeq] = Json.format[TrackingDataSeq]
+}
+
+case class TrackingDataResponse(
+  formId:                 String,
+  formName:               String,
+  dfsSubmissionReference: String,
+  receivedDate:           String,
+  completionDate:         String,
+  milestone:              String,
+  milestones:             Seq[Milestone])
+
+object TrackingDataResponse {
+  implicit val trackingDataFormat: Format[TrackingDataResponse] = Json.format[TrackingDataResponse]
+}
+
+case class TrackingDataSeqResponse(submissions: Option[Seq[TrackingDataResponse]])
+
+object TrackingDataSeqResponse {
+  implicit val trackingDataSeqFormat: Format[TrackingDataSeqResponse] = Json.format[TrackingDataSeqResponse]
+
+  val noSumbissions = apply(None)
 }
