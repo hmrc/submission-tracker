@@ -16,7 +16,9 @@ class SubmissionTrackerControllerISpec extends BaseISpec with FutureAwaits with 
           .addHttpHeaders(acceptJsonHeader)
           .get())
 
-      response.status shouldBe 200
+      response.status                          shouldBe 200
+      ((response.json \ "submissions").head \ "milestone").as[String] shouldBe "Received"
+      ((response.json \ "submissions").head \ "businessArea").isEmpty
     }
 
     "fail with a 401 if confidence level is low" in {

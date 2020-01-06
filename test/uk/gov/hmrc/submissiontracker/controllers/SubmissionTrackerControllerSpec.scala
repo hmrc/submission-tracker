@@ -86,7 +86,7 @@ class SubmissionTrackerControllerSpec extends TestSetup {
       val result = controller.trackingData(nino.value, idType, journeyId)(requestWithAcceptHeader)
 
       status(result)        shouldBe 200
-      contentAsJson(result) shouldBe Json.toJson(trackingDataWithCorrectDateFormat)
+      contentAsJson(result) shouldBe Json.toJson(trackingDataResponseWithCorrectDateFormat)
     }
 
     "return status code 406 when the Accept header is missing" in {
