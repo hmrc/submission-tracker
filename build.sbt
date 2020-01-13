@@ -11,7 +11,12 @@ lazy val microservice = Project(appName, file("."))
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
   .settings(publishingSettings: _*)
-  .settings(routesImport ++= Seq("uk.gov.hmrc.domain._", "uk.gov.hmrc.submissiontracker.binder.Binders._"))
+  .settings(routesImport ++= Seq(
+    "uk.gov.hmrc.domain._",
+    "uk.gov.hmrc.submissiontracker.binder.Binders._",
+    "uk.gov.hmrc.submissiontracker.domain.types._",
+    "uk.gov.hmrc.submissiontracker.domain.types.ModelTypes._"
+  ))
   .settings(
     majorVersion := 1,
     scalaVersion := "2.11.12",
@@ -30,6 +35,6 @@ lazy val microservice = Project(appName, file("."))
   )
 
 def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] =
-  tests map {
-    test => Group(test.name, Seq(test), SubProcess(ForkOptions(runJVMOptions = Seq("-Dtest.name=" + test.name))))
+  tests map { test =>
+    Group(test.name, Seq(test), SubProcess(ForkOptions(runJVMOptions = Seq("-Dtest.name=" + test.name))))
   }

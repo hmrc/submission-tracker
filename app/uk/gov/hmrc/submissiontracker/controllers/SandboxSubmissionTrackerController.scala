@@ -22,6 +22,7 @@ import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
 import uk.gov.hmrc.api.controllers._
 import uk.gov.hmrc.api.sandbox.FileResource
 import uk.gov.hmrc.play.bootstrap.controller.BackendController
+import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.{IdType, JourneyId}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -31,7 +32,7 @@ class SandboxSubmissionTrackerController @Inject()(cc: ControllerComponents)(imp
     with HeaderValidator
     with FileResource {
 
-  def trackingData(id: String, idType: String, journeyId: String): Action[AnyContent] =
+  def trackingData(id: String, idType: IdType, journeyId: JourneyId): Action[AnyContent] =
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
       Future successful (request.headers.get("SANDBOX-CONTROL") match {
         case Some("ERROR-401") => Unauthorized

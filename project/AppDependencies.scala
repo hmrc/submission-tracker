@@ -12,13 +12,15 @@ object AppDependencies {
   private val scalamockVersion         = "4.1.0"
   private val mockitoVersion           = "2.20.0"
   private val scalatestplusPlayVersion = "3.1.2"
+  private val refinedVersion = "0.9.4"
 
   val compile = Seq(
     ws,
     "uk.gov.hmrc" %% "bootstrap-play-26" % bootstrapPlayVersion,
-    "uk.gov.hmrc" %% "play-hmrc-api"     % playHmrcApiVersion,
-    "uk.gov.hmrc" %% "domain"            % domainVersion,
-    "uk.gov.hmrc" %% "emailaddress"      % emailAdressVersion
+    "uk.gov.hmrc" %% "play-hmrc-api" % playHmrcApiVersion,
+    "uk.gov.hmrc" %% "domain" % domainVersion,
+    "uk.gov.hmrc" %% "emailaddress" % emailAdressVersion,
+    "eu.timepit" %% "refined" % refinedVersion
   )
 
   trait TestDependencies {

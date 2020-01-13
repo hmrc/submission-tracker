@@ -20,6 +20,7 @@ import javax.inject.{Inject, Named, Singleton}
 import play.api._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
 import uk.gov.hmrc.submissiontracker.domain.TrackingDataSeq
+import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.IdType
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -28,9 +29,9 @@ class TrackingConnector @Inject()(@Named("trackingUrl") val trackingBaseUrl: Str
 
   def trackingDataLink(id: String, idType: String): String = s"$trackingBaseUrl/tracking-data/user/$idType/$id"
 
-  def getUserTrackingData(id: String, idType: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TrackingDataSeq] = {
+  def getUserTrackingData(id: String, idType: IdType)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TrackingDataSeq] = {
     Logger.debug("submission-tracker: Requesting tracking data")
-    httpGet.GET[TrackingDataSeq](trackingDataLink(id, idType))
+    httpGet.GET[TrackingDataSeq](trackingDataLink(id, idType.value))
   }
 
 }

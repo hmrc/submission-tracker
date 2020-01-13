@@ -23,6 +23,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.service.Auditor
 import uk.gov.hmrc.submissiontracker.connectors.TrackingConnector
+import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.IdType
 import uk.gov.hmrc.submissiontracker.domain.{Milestone, TrackingDataResponse, TrackingDataSeq, TrackingDataSeqResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -36,11 +37,11 @@ class SubmissionTrackerService @Inject()(
   val configuration:             Configuration,
   @Named("appName") val appName: String
 ) extends Auditor {
-  val inFormat:  DateTimeFormatter = DateTimeFormat.forPattern("dd MMM yyyy")
+  val inFormat: DateTimeFormatter = DateTimeFormat.forPattern("dd MMM yyyy")
   val outFormat: DateTimeFormatter = DateTimeFormat.forPattern("yyyyMMdd")
 
-  def trackingData(id: String, idType: String)(implicit hc: HeaderCarrier): Future[TrackingDataSeqResponse] =
-    withAudit("trackingData", Map("id" -> id, "idType" -> idType)) {
+  def trackingData(id: String, idType: IdType)(implicit hc: HeaderCarrier): Future[TrackingDataSeqResponse] =
+    withAudit("trackingData", Map("id" -> id, "idType" -> idType.value)) {
       trackingConnector.getUserTrackingData(id, idType).map(data => convertData(data))
     }
 
@@ -49,7 +50,7 @@ class SubmissionTrackerService @Inject()(
   private def getCurrentMilestone(milestones: Seq[Milestone]): String =
     milestones.find(milestone => milestone.status.toLowerCase == ("current")) match {
       case Some(currentMilestone) => currentMilestone.milestone
-      case None                   => throw new IllegalStateException("No Milestone with a status of current returned from Tracking")
+      case None => throw new IllegalStateException("No Milestone with a status of current returned from Tracking")
     }
 
   private def convertData(data: TrackingDataSeq): TrackingDataSeqResponse =

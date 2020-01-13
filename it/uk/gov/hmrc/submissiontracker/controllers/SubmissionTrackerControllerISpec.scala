@@ -54,6 +54,28 @@ class SubmissionTrackerControllerISpec extends BaseISpec with FutureAwaits with 
 
       response.status shouldBe 400
     }
+
+    "return 400 when invalid journeyId is supplied" in {
+      AuthStub.grantAccess(nino, nino)
+
+      val response = await(
+        wsUrl(s"/tracking/$nino/$idType/?journeyId=ThisIsAnInvalidJourneyId")
+          .addHttpHeaders(acceptJsonHeader)
+          .get())
+
+      response.status shouldBe 400
+    }
+
+    "return 400 when invalid idType is supplied" in {
+      AuthStub.grantAccess(nino, nino)
+
+      val response = await(
+        wsUrl(s"/tracking/$nino/invalidType/$journeyIdUrlVar")
+          .addHttpHeaders(acceptJsonHeader)
+          .get())
+
+      response.status shouldBe 400
+    }
   }
 
 }

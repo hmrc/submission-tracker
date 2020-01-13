@@ -17,11 +17,11 @@
 package uk.gov.hmrc.submissiontracker.controllers
 
 import play.api.libs.json.Json
-import play.api.mvc.Result
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.ConfidenceLevel._
 import uk.gov.hmrc.auth.core.syntax.retrieved._
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.IdType
 import uk.gov.hmrc.submissiontracker.stub.TestSetup
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -35,7 +35,7 @@ class SubmissionTrackerControllerSpec extends TestSetup {
     "return the tracking data successfully" in {
       stubAuthorisationGrantAccess(Some(nino.value) and L200)
       (mockSubmissionTrackerService
-        .trackingData(_: String, _: String)(_: HeaderCarrier))
+        .trackingData(_: String, _: IdType)(_: HeaderCarrier))
         .expects(nino.value, idType, *)
         .returns(Future successful trackingDataResponse)
 
@@ -48,7 +48,7 @@ class SubmissionTrackerControllerSpec extends TestSetup {
     "return the tracking data successfully when journeyId is supplied" in {
       stubAuthorisationGrantAccess(Some(nino.value) and L200)
       (mockSubmissionTrackerService
-        .trackingData(_: String, _: String)(_: HeaderCarrier))
+        .trackingData(_: String, _: IdType)(_: HeaderCarrier))
         .expects(nino.value, idType, *)
         .returns(Future successful trackingDataResponse)
 
@@ -93,7 +93,6 @@ class SubmissionTrackerControllerSpec extends TestSetup {
       val result = controller.trackingData(nino.value, idType, journeyId)(requestWithoutAcceptHeader)
 
       status(result) shouldBe 406
-
     }
   }
 }
