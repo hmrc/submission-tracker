@@ -4,9 +4,9 @@
       "formId": "R39_EN",
       "formName": "Claim a tax refund",
       "dfsSubmissionReference": "111-ABCD-456",
-      "businessArea": "PSA",
       "receivedDate": "20150412",
       "completionDate": "20150517",
+      "milestone": "InProgress",
       "milestones": [
         {
           "milestone": "Received",

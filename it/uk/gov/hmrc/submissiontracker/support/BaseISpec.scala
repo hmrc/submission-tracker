@@ -40,10 +40,10 @@ class BaseISpec extends WordSpecLike with Matchers with WsScalaTestClient with G
 
   protected implicit lazy val wsClient: WSClient = app.injector.instanceOf[WSClient]
 
-  protected val nino   = "CS700100A"
-  protected val idType = "some-id-type"
-  protected val acceptJsonHeader:   (String, String) = "Accept"           -> "application/vnd.hmrc.1.0+json"
+  protected val nino = "CS700100A"
+  protected val idType = "nino"
+  protected val acceptJsonHeader: (String, String) = "Accept" -> "application/vnd.hmrc.1.0+json"
   protected val mobileUserIdHeader: (String, String) = "X-MOBILE-USER-ID" -> "208606423740"
-  protected val journeyIdUrlVar = "?journeyId=journeyId"
+  protected val journeyIdUrlVar = "?journeyId=decf6382-0c09-4ea8-8225-d59d188db41f"
 
 }

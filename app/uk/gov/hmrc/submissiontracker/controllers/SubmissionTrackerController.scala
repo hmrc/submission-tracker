@@ -26,6 +26,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.bootstrap.controller.BackendController
 import uk.gov.hmrc.submissiontracker.controllers.action.AccessControl
+import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.{IdType, JourneyId}
 import uk.gov.hmrc.submissiontracker.services.SubmissionTrackerService
 
 import scala.concurrent.ExecutionContext
@@ -41,7 +42,7 @@ class SubmissionTrackerController @Inject()(
     with AccessControl
     with ErrorHandling {
 
-  def trackingData(id: String, idType: String, journeyId: String): Action[AnyContent] =
+  def trackingData(id: String, idType: IdType, journeyId: JourneyId): Action[AnyContent] =
     validateAcceptWithAuth(acceptHeaderValidationRules, Some(Nino(id))).async { implicit request =>
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, None)
       errorWrapper(service.trackingData(id, idType).map(as => Ok(toJson(as))))

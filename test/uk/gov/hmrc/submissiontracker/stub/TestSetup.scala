@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.submissiontracker.stub
 
+import eu.timepit.refined.auto._
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, WordSpecLike}
@@ -28,33 +29,42 @@ import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.submissiontracker.connectors.TrackingConnector
-import uk.gov.hmrc.submissiontracker.domain.{Milestone, TrackingData, TrackingDataResponse, TrackingDataSeq, TrackingDataSeqResponse}
+import uk.gov.hmrc.submissiontracker.domain._
+import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.{IdType, JourneyId}
 import uk.gov.hmrc.submissiontracker.services.{FormNameService, SubmissionTrackerService}
 
-trait TestSetup extends MockFactory with WordSpecLike with Matchers with AuthorisationStub with AuditStub with ScalaFutures with FutureAwaits with DefaultAwaitTimeout {
+trait TestSetup
+  extends MockFactory
+    with WordSpecLike
+    with Matchers
+    with AuthorisationStub
+    with AuditStub
+    with ScalaFutures
+    with FutureAwaits
+    with DefaultAwaitTimeout {
 
-  implicit val hc:                           HeaderCarrier            = HeaderCarrier()
-  implicit val mockAuthConnector:            AuthConnector            = mock[AuthConnector]
-  implicit val mockAuditConnector:           AuditConnector           = mock[AuditConnector]
+  implicit val hc: HeaderCarrier = HeaderCarrier()
+  implicit val mockAuthConnector: AuthConnector = mock[AuthConnector]
+  implicit val mockAuditConnector: AuditConnector = mock[AuditConnector]
   implicit val mockSubmissionTrackerService: SubmissionTrackerService = mock[SubmissionTrackerService]
-  implicit val mockTrackingConnector:        TrackingConnector        = mock[TrackingConnector]
-  implicit val mockFormNameService:          FormNameService          = mock[FormNameService]
-  implicit val mockHttp:                     HttpGet                  = mock[HttpGet]
+  implicit val mockTrackingConnector: TrackingConnector = mock[TrackingConnector]
+  implicit val mockFormNameService: FormNameService = mock[FormNameService]
+  implicit val mockHttp: HttpGet = mock[HttpGet]
 
   val configuration: Configuration = mock[Configuration]
 
-  lazy val requestWithAcceptHeader:    FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders(acceptHeader)
+  lazy val requestWithAcceptHeader: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders(acceptHeader)
   lazy val requestWithoutAcceptHeader: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   val noNinoFoundOnAccount: JsValue = Json.parse("""{"code":"UNAUTHORIZED","message":"NINO does not exist on account"}""")
   val lowConfidenceLevelError: JsValue =
     Json.parse("""{"code":"LOW_CONFIDENCE_LEVEL","message":"Confidence Level on account does not allow access"}""")
 
-  val nino          = Nino("CS700100A")
+  val nino = Nino("CS700100A")
   val incorrectNino = Nino("SC100700A")
   val acceptHeader: (String, String) = "Accept" -> "application/vnd.hmrc.1.0+json"
-  val idType        = "NINO"
-  val journeyId     = "journeyId"
+  val idType: IdType = "nino"
+  val journeyId: JourneyId = "decf6382-0c09-4ea8-8225-d59d188db41f"
 
   val milestones =
     Seq(Milestone("Received", "complete"), Milestone("Acquired", "complete"), Milestone("InProgress", "current"), Milestone("Done", "incomplete"))

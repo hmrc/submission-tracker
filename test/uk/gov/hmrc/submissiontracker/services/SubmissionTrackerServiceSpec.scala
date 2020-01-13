@@ -17,6 +17,7 @@
 package uk.gov.hmrc.submissiontracker.services
 
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.IdType
 import uk.gov.hmrc.submissiontracker.stub.TestSetup
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -26,9 +27,9 @@ class SubmissionTrackerServiceSpec extends TestSetup {
 
   "trackingData(id: String, idType: String)" should {
     "return trackingDataSeq with valid date formats" in {
-      stubAuditTrackingData(nino.value, idType)
+      stubAuditTrackingData(nino.value, idType.value)
       (mockTrackingConnector
-        .getUserTrackingData(_: String, _: String)(_: HeaderCarrier, _: ExecutionContext))
+        .getUserTrackingData(_: String, _: IdType)(_: HeaderCarrier, _: ExecutionContext))
         .expects(nino.value, idType, *, *)
         .returns(Future successful trackingData)
 
@@ -41,9 +42,9 @@ class SubmissionTrackerServiceSpec extends TestSetup {
     }
 
     "return an IllegalArgumentException with incorrect received date format" in {
-      stubAuditTrackingData(nino.value, idType)
+      stubAuditTrackingData(nino.value, idType.value)
       (mockTrackingConnector
-        .getUserTrackingData(_: String, _: String)(_: HeaderCarrier, _: ExecutionContext))
+        .getUserTrackingData(_: String, _: IdType)(_: HeaderCarrier, _: ExecutionContext))
         .expects(nino.value, idType, *, *)
         .returns(Future successful trackingDataWithCorrectDateFormat)
 
