@@ -32,20 +32,14 @@ trait Hooks extends HttpHooks with HttpAuditing {
   val hooks = Seq(AuditingHook)
 }
 
-trait WSHttp
-    extends HttpClient
-    with WSGet
-    with WSPut
-    with WSPost
-    with WSDelete
-    with WSPatch
-    with Hooks
+trait WSHttp extends HttpClient with WSGet with WSPut with WSPost with WSDelete with WSPatch with Hooks
 
-class WSHttpImpl @Inject()(override val wsClient: WSClient,
-                           @Named("appName") val appName: String,
-                           val auditConnector: AuditConnector,
-                           val actorSystem: ActorSystem,
-                           config: Configuration)
+class WSHttpImpl @Inject() (
+  override val wsClient:         WSClient,
+  @Named("appName") val appName: String,
+  val auditConnector:            AuditConnector,
+  val actorSystem:               ActorSystem,
+  config:                        Configuration)
     extends HttpClient
     with WSGet
     with WSPut
@@ -56,6 +50,7 @@ class WSHttpImpl @Inject()(override val wsClient: WSClient,
   override val configuration: Option[Config] = Option(config.underlying)
 }
 
-class MicroserviceAudit @Inject()(@Named("appName") val applicationName: String,
-                                  val auditConnector: AuditConnector)
+class MicroserviceAudit @Inject() (
+  @Named("appName") val applicationName: String,
+  val auditConnector:                    AuditConnector)
     extends Audit(applicationName, auditConnector)

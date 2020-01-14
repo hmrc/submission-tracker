@@ -25,6 +25,7 @@ import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.bootstrap.controller.BackendController
+import uk.gov.hmrc.submissiontracker.connectors.ShutteringConnector
 import uk.gov.hmrc.submissiontracker.controllers.action.AccessControl
 import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.{IdType, JourneyId}
 import uk.gov.hmrc.submissiontracker.services.SubmissionTrackerService
@@ -33,19 +34,32 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class SubmissionTrackerController @Inject()(
+class SubmissionTrackerController @Inject() (
   override val authConnector:                                   AuthConnector,
   val service:                                                  SubmissionTrackerService,
   @Named("controllers.confidenceLevel") override val confLevel: Int,
-  cc:                                                           ControllerComponents)(implicit val executionContext: ExecutionContext)
+  cc:                                                           ControllerComponents,
+  shutteringConnector:                                          ShutteringConnector
+)(implicit val executionContext:                                ExecutionContext)
     extends BackendController(cc)
     with AccessControl
-    with ErrorHandling {
+    with ErrorHandling
+    with ControllerChecks {
 
-  def trackingData(id: String, idType: IdType, journeyId: JourneyId): Action[AnyContent] =
+  def trackingData(
+    id:        String,
+    idType:    IdType,
+    journeyId: JourneyId
+  ): Action[AnyContent] =
     validateAcceptWithAuth(acceptHeaderValidationRules, Some(Nino(id))).async { implicit request =>
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, None)
-      errorWrapper(service.trackingData(id, idType).map(as => Ok(toJson(as))))
+      shutteringConnector.getShutteringStatus(journeyId).flatMap { shuttered =>
+        withShuttering(shuttered) {
+          errorWrapper {
+            service.trackingData(id, idType).map(as => Ok(toJson(as)))
+          }
+        }
+      }
     }
   override val parser: BodyParser[AnyContent] = cc.parsers.anyContent
 }

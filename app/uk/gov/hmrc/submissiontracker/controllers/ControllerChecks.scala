@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.submissiontracker.domain.types
+package uk.gov.hmrc.submissiontracker.controllers
 
-import eu.timepit.refined._
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.string.MatchesRegex
+import play.api.libs.json.Json
+import play.api.mvc.{Result, Results}
+import uk.gov.hmrc.submissiontracker.domain.Shuttering
 
-package object ModelTypes {
+import scala.concurrent.Future
 
-  type JourneyId = String Refined ValidJourneyId
-  type IdType    = String Refined ValidIdType
+trait ControllerChecks extends Results {
 
-  private type ValidJourneyId =
-    MatchesRegex[W.`"""[A-Fa-f0-9]{8}\\-[A-Fa-f0-9]{4}\\-[A-Fa-f0-9]{4}\\-[A-Fa-f0-9]{4}\\-[A-Fa-f0-9]{12}"""`.T]
+  private final val WebServerIsDown = new Status(521)
 
-  private type ValidIdType = MatchesRegex[W.`"(nino)|(utr)"`.T]
+  def withShuttering(shuttering: Shuttering)(fn: => Future[Result]): Future[Result] =
+    if (shuttering.shuttered) Future.successful(WebServerIsDown(Json.toJson(shuttering))) else fn
 
 }

@@ -16,21 +16,23 @@
 
 package uk.gov.hmrc.submissiontracker.stub
 
+import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
-import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
-import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.submissiontracker.connectors.ShutteringConnector
+import uk.gov.hmrc.submissiontracker.domain.Shuttering
+import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.JourneyId
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait AuthorisationStub extends MockFactory {
+trait ShutteringStub extends MockFactory {
 
-  type GrantAccess = Option[String] ~ ConfidenceLevel
-
-  def stubAuthorisationGrantAccess(response: GrantAccess)(implicit authConnector: AuthConnector): Unit =
-    (authConnector
-      .authorise(_: Predicate, _: Retrieval[GrantAccess])(_: HeaderCarrier, _: ExecutionContext))
-      .expects(*, *, *, *)
+  def stubShutteringResponse(
+    response:                     Shuttering
+  )(implicit shutteringConnector: ShutteringConnector
+  ): CallHandler[Future[Shuttering]] =
+    (shutteringConnector
+      .getShutteringStatus(_: JourneyId)(_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *)
       .returning(Future successful response)
 }

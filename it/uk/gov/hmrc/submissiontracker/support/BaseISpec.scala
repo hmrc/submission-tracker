@@ -25,24 +25,31 @@ import play.api.libs.ws.WSClient
 
 import scala.language.postfixOps
 
-class BaseISpec extends WordSpecLike with Matchers with WsScalaTestClient with GuiceOneServerPerSuite with WireMockSupport {
+class BaseISpec
+    extends WordSpecLike
+    with Matchers
+    with WsScalaTestClient
+    with GuiceOneServerPerSuite
+    with WireMockSupport {
+
   override implicit lazy val app: Application = appBuilder
     .build()
 
   def config: Map[String, Any] = Map(
-    "auditing.enabled"                              -> false,
-    "microservice.services.auth.port"               -> wireMockPort,
-    "microservice.services.tracking.port"           -> wireMockPort,
-    "microservice.services.datastream.port"         -> wireMockPort
+    "auditing.enabled"                             -> false,
+    "microservice.services.auth.port"              -> wireMockPort,
+    "microservice.services.tracking.port"          -> wireMockPort,
+    "microservice.services.datastream.port"        -> wireMockPort,
+    "microservice.services.mobile-shuttering.port" -> wireMockPort
   )
 
   protected def appBuilder: GuiceApplicationBuilder = new GuiceApplicationBuilder().configure(config)
 
   protected implicit lazy val wsClient: WSClient = app.injector.instanceOf[WSClient]
 
-  protected val nino = "CS700100A"
+  protected val nino   = "CS700100A"
   protected val idType = "nino"
-  protected val acceptJsonHeader: (String, String) = "Accept" -> "application/vnd.hmrc.1.0+json"
+  protected val acceptJsonHeader:   (String, String) = "Accept"           -> "application/vnd.hmrc.1.0+json"
   protected val mobileUserIdHeader: (String, String) = "X-MOBILE-USER-ID" -> "208606423740"
   protected val journeyIdUrlVar = "?journeyId=decf6382-0c09-4ea8-8225-d59d188db41f"
 

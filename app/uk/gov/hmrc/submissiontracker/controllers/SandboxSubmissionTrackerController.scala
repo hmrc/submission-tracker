@@ -27,12 +27,18 @@ import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.{IdType, JourneyId}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SandboxSubmissionTrackerController @Inject()(cc: ControllerComponents)(implicit val executionContext: ExecutionContext)
+class SandboxSubmissionTrackerController @Inject() (
+  cc:                            ControllerComponents
+)(implicit val executionContext: ExecutionContext)
     extends BackendController(cc)
     with HeaderValidator
     with FileResource {
 
-  def trackingData(id: String, idType: IdType, journeyId: JourneyId): Action[AnyContent] =
+  def trackingData(
+    id:        String,
+    idType:    IdType,
+    journeyId: JourneyId
+  ): Action[AnyContent] =
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
       Future successful (request.headers.get("SANDBOX-CONTROL") match {
         case Some("ERROR-401") => Unauthorized

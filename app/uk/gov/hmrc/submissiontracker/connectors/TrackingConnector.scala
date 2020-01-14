@@ -25,11 +25,21 @@ import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.IdType
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class TrackingConnector @Inject()(@Named("trackingUrl") val trackingBaseUrl: String, val httpGet: HttpGet) {
+class TrackingConnector @Inject() (
+  @Named("trackingUrl") val trackingBaseUrl: String,
+  val httpGet:                               HttpGet) {
 
-  def trackingDataLink(id: String, idType: String): String = s"$trackingBaseUrl/tracking-data/user/$idType/$id"
+  def trackingDataLink(
+    id:     String,
+    idType: String
+  ): String = s"$trackingBaseUrl/tracking-data/user/$idType/$id"
 
-  def getUserTrackingData(id: String, idType: IdType)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TrackingDataSeq] = {
+  def getUserTrackingData(
+    id:          String,
+    idType:      IdType
+  )(implicit hc: HeaderCarrier,
+    ec:          ExecutionContext
+  ): Future[TrackingDataSeq] = {
     Logger.debug("submission-tracker: Requesting tracking data")
     httpGet.GET[TrackingDataSeq](trackingDataLink(id, idType.value))
   }

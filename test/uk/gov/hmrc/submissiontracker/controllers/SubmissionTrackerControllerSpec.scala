@@ -30,7 +30,11 @@ import scala.concurrent.Future
 class SubmissionTrackerControllerSpec extends TestSetup {
 
   "trackingData Live" should {
-    val controller = new SubmissionTrackerController(mockAuthConnector, mockSubmissionTrackerService, L200.level, stubControllerComponents())
+    val controller = new SubmissionTrackerController(mockAuthConnector,
+                                                     mockSubmissionTrackerService,
+                                                     L200.level,
+                                                     stubControllerComponents(),
+                                                     mockShutteringConnector)
 
     "return the tracking data successfully" in {
       stubAuthorisationGrantAccess(Some(nino.value) and L200)
@@ -38,6 +42,7 @@ class SubmissionTrackerControllerSpec extends TestSetup {
         .trackingData(_: String, _: IdType)(_: HeaderCarrier))
         .expects(nino.value, idType, *)
         .returns(Future successful trackingDataResponse)
+      stubShutteringResponse(notShuttered)
 
       val result = controller.trackingData(nino.value, idType, journeyId)(requestWithAcceptHeader)
 
@@ -51,6 +56,7 @@ class SubmissionTrackerControllerSpec extends TestSetup {
         .trackingData(_: String, _: IdType)(_: HeaderCarrier))
         .expects(nino.value, idType, *)
         .returns(Future successful trackingDataResponse)
+      stubShutteringResponse(notShuttered)
 
       val result = controller.trackingData(nino.value, idType, journeyId)(requestWithAcceptHeader)
 
@@ -75,6 +81,18 @@ class SubmissionTrackerControllerSpec extends TestSetup {
 
     "return status code 406 when the accept header is missing" in {
       status(controller.trackingData(incorrectNino.value, idType, journeyId)(requestWithoutAcceptHeader)) shouldBe 406
+    }
+
+    "return 521 when shuttered" in {
+      stubShutteringResponse(shuttered)
+      stubAuthorisationGrantAccess(Some(nino.value) and L200)
+      val result = controller.trackingData(nino.value, idType, journeyId)(requestWithAcceptHeader)
+
+      status(result) shouldBe 521
+      val jsonBody = contentAsJson(result)
+      (jsonBody \ "shuttered").as[Boolean] shouldBe true
+      (jsonBody \ "title").as[String]      shouldBe "Shuttered"
+      (jsonBody \ "message").as[String]    shouldBe "Form Tracker is currently not available"
     }
   }
 

@@ -26,15 +26,19 @@ import scala.concurrent.{ExecutionContext, Future}
 class TrackingConnectorSpec extends TestSetup {
 
   private val trackingBaseUrl = "someUrl"
-  val connector = new TrackingConnector(trackingBaseUrl, mockHttp)
+  val connector               = new TrackingConnector(trackingBaseUrl, mockHttp)
 
   def trackingGetSuccess(response: TrackingDataSeq): Unit =
-    (mockHttp.GET(_: String)(_: HttpReads[TrackingDataSeq], _: HeaderCarrier, _: ExecutionContext))
-      .expects(s"$trackingBaseUrl/tracking-data/user/$idType/${nino.value}", *, *, *).returns(Future successful response)
+    (mockHttp
+      .GET(_: String)(_: HttpReads[TrackingDataSeq], _: HeaderCarrier, _: ExecutionContext))
+      .expects(s"$trackingBaseUrl/tracking-data/user/$idType/${nino.value}", *, *, *)
+      .returns(Future successful response)
 
   def trackingGetFailure(response: Exception): Unit =
-    (mockHttp.GET(_: String)(_: HttpReads[TrackingDataSeq], _: HeaderCarrier, _: ExecutionContext))
-      .expects(s"$trackingBaseUrl/tracking-data/user/$idType/${nino.value}", *, *, *).returns(Future failed response)
+    (mockHttp
+      .GET(_: String)(_: HttpReads[TrackingDataSeq], _: HeaderCarrier, _: ExecutionContext))
+      .expects(s"$trackingBaseUrl/tracking-data/user/$idType/${nino.value}", *, *, *)
+      .returns(Future failed response)
 
   "trackingConnector" should {
 

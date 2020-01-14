@@ -29,7 +29,9 @@ import uk.gov.hmrc.submissiontracker.controllers.api.ApiAccess
 
 import scala.collection.JavaConverters._
 
-class GuiceModule(environment: Environment, configuration: Configuration)
+class GuiceModule(
+  environment:   Environment,
+  configuration: Configuration)
     extends AbstractModule {
 
   val servicesConfig = new ServicesConfig(
@@ -58,15 +60,18 @@ class GuiceModule(environment: Environment, configuration: Configuration)
     bind(classOf[String])
       .annotatedWith(named("trackingUrl"))
       .toInstance(servicesConfig.baseUrl("tracking"))
+
+    bind(classOf[String])
+      .annotatedWith(named("mobile-shuttering"))
+      .toInstance(servicesConfig.baseUrl("mobile-shuttering"))
   }
 
   /**
     * Binds a configuration value using the `path` as the name for the binding.
     * Throws an exception if the configuration value does not exist or cannot be read as an Int.
     */
-  private def bindConfigInt(path: String): Unit = {
+  private def bindConfigInt(path: String): Unit =
     bindConstant()
       .annotatedWith(named(path))
       .to(configuration.underlying.getInt(path))
-  }
 }

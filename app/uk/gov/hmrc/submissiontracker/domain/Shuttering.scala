@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.submissiontracker.domain.types
+package uk.gov.hmrc.submissiontracker.domain
 
-import eu.timepit.refined._
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.string.MatchesRegex
+import play.api.libs.json.{Json, OFormat}
 
-package object ModelTypes {
+case class Shuttering(
+  shuttered: Boolean,
+  title:     Option[String] = None,
+  message:   Option[String] = None)
 
-  type JourneyId = String Refined ValidJourneyId
-  type IdType    = String Refined ValidIdType
+case object Shuttering {
+  implicit val format: OFormat[Shuttering] = Json.format[Shuttering]
 
-  private type ValidJourneyId =
-    MatchesRegex[W.`"""[A-Fa-f0-9]{8}\\-[A-Fa-f0-9]{4}\\-[A-Fa-f0-9]{4}\\-[A-Fa-f0-9]{4}\\-[A-Fa-f0-9]{12}"""`.T]
-
-  private type ValidIdType = MatchesRegex[W.`"(nino)|(utr)"`.T]
+  def shutteringDisabled = this.apply(false)
 
 }

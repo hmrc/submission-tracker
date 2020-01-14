@@ -17,11 +17,10 @@
 package uk.gov.hmrc.submissiontracker.controllers
 
 import play.api.libs.json.Json.toJson
-import play.api.mvc.Result
+import play.api.mvc.{BaseController, Result}
 import play.api.{Logger, mvc}
 import uk.gov.hmrc.api.controllers.{ErrorInternalServerError, ErrorNotFound, ErrorResponse, ErrorUnauthorizedLowCL}
 import uk.gov.hmrc.http._
-import play.api.mvc.BaseController
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

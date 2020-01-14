@@ -20,40 +20,49 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 
 object AuthStub {
 
-  def grantAccess(requestNino: String, responseNino: String, confidenceLevel: Int = 200): Unit = {
-    stubFor(post(urlEqualTo("/auth/authorise"))
-      .atPriority(0)
-      .withRequestBody(equalToJson(
-        s"""
-           |{
-           |  "authorise": [
-           |    {
-           |      "enrolment": "HMRC-NI",
-           |      "identifiers": [
-           |        {
-           |          "key": "NINO",
-           |          "value": "$requestNino"
-           |        }
-           |      ],
-           |      "state": "Activated"
-           |    }
-           |  ],
-           |  "retrieve": [
-           |    "nino",
-           |    "confidenceLevel"
-           |  ]
-           |}
+  def grantAccess(
+    requestNino:     String,
+    responseNino:    String,
+    confidenceLevel: Int = 200
+  ): Unit =
+    stubFor(
+      post(urlEqualTo("/auth/authorise"))
+        .atPriority(0)
+        .withRequestBody(
+          equalToJson(
+            s"""
+               |{
+               |  "authorise": [
+               |    {
+               |      "enrolment": "HMRC-NI",
+               |      "identifiers": [
+               |        {
+               |          "key": "NINO",
+               |          "value": "$requestNino"
+               |        }
+               |      ],
+               |      "state": "Activated"
+               |    }
+               |  ],
+               |  "retrieve": [
+               |    "nino",
+               |    "confidenceLevel"
+               |  ]
+               |}
           """.stripMargin,
-        true,
-        false))
-      .willReturn(aResponse()
-        .withStatus(200)
-        .withBody(
-          s"""
-             |{
-             |  "nino": "$responseNino",
-             |  "confidenceLevel": $confidenceLevel
-             |}
-          """.stripMargin)))
-  }
+            true,
+            false
+          )
+        )
+        .willReturn(
+          aResponse()
+            .withStatus(200)
+            .withBody(s"""
+                         |{
+                         |  "nino": "$responseNino",
+                         |  "confidenceLevel": $confidenceLevel
+                         |}
+          """.stripMargin)
+        )
+    )
 }

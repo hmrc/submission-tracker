@@ -7,16 +7,25 @@ import uk.gov.hmrc.versioning.SbtGitVersioning
 val appName: String = "submission-tracker"
 
 lazy val microservice = Project(appName, file("."))
-  .enablePlugins(Seq(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory, ScoverageSbtPlugin): _*)
+  .enablePlugins(
+    Seq(play.sbt.PlayScala,
+        SbtAutoBuildPlugin,
+        SbtGitVersioning,
+        SbtDistributablesPlugin,
+        SbtArtifactory,
+        ScoverageSbtPlugin): _*
+  )
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
   .settings(publishingSettings: _*)
-  .settings(routesImport ++= Seq(
-    "uk.gov.hmrc.domain._",
-    "uk.gov.hmrc.submissiontracker.binder.Binders._",
-    "uk.gov.hmrc.submissiontracker.domain.types._",
-    "uk.gov.hmrc.submissiontracker.domain.types.ModelTypes._"
-  ))
+  .settings(
+    routesImport ++= Seq(
+      "uk.gov.hmrc.domain._",
+      "uk.gov.hmrc.submissiontracker.binder.Binders._",
+      "uk.gov.hmrc.submissiontracker.domain.types._",
+      "uk.gov.hmrc.submissiontracker.domain.types.ModelTypes._"
+    )
+  )
   .settings(
     majorVersion := 1,
     scalaVersion := "2.11.12",
@@ -26,7 +35,7 @@ lazy val microservice = Project(appName, file("."))
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
     resolvers += Resolver.jcenterRepo,
     unmanagedResourceDirectories in Compile += baseDirectory.value / "resources",
-    unmanagedSourceDirectories in IntegrationTest := (baseDirectory in IntegrationTest) (base => Seq(base / "it")).value,
+    unmanagedSourceDirectories in IntegrationTest := (baseDirectory in IntegrationTest)(base => Seq(base / "it")).value,
     testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
     coverageMinimum := 80,
     coverageFailOnMinimum := true,
