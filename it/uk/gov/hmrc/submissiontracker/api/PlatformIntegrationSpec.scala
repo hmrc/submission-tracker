@@ -17,11 +17,11 @@ import uk.gov.hmrc.submissiontracker.support.BaseISpec
   * See: confluence ApiPlatform/API+Platform+Architecture+with+Flows
   */
 class PlatformIntegrationSpec
-  extends BaseISpec
-    with Eventually
-    with PlayRunners
-    with FutureAwaits
-    with DefaultAwaitTimeout {
+    extends BaseISpec
+      with Eventually
+      with PlayRunners
+      with FutureAwaits
+      with DefaultAwaitTimeout {
 
   private val appId1: String = "00010002-0003-0004-0005-000600070008"
   private val appId2: String = "00090002-0003-0004-0005-000600070008"

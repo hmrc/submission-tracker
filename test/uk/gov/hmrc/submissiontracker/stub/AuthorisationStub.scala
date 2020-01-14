@@ -29,6 +29,8 @@ trait AuthorisationStub extends MockFactory {
   type GrantAccess = Option[String] ~ ConfidenceLevel
 
   def stubAuthorisationGrantAccess(response: GrantAccess)(implicit authConnector: AuthConnector): Unit =
-    (authConnector.authorise(_: Predicate, _: Retrieval[GrantAccess])(_: HeaderCarrier, _: ExecutionContext))
-      .expects(*, *, *, *).returning(Future successful response)
+    (authConnector
+      .authorise(_: Predicate, _: Retrieval[GrantAccess])(_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *, *)
+      .returning(Future successful response)
 }

@@ -6,10 +6,10 @@ import uk.gov.hmrc.api.sandbox.FileResource
 import uk.gov.hmrc.submissiontracker.support.BaseISpec
 
 class SandboxSubmissionTrackerControllerISpec
-  extends BaseISpec
-    with FileResource
-    with FutureAwaits
-    with DefaultAwaitTimeout {
+    extends BaseISpec
+      with FileResource
+      with FutureAwaits
+      with DefaultAwaitTimeout {
 
   val resource: String = findResource(s"/resources/SandboxTrackingData.json")
     .getOrElse(throw new IllegalArgumentException("Resource not found!"))

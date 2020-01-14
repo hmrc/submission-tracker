@@ -26,11 +26,11 @@ import play.api.libs.ws.WSClient
 import scala.language.postfixOps
 
 class BaseISpec
-  extends WordSpecLike
-    with Matchers
-    with WsScalaTestClient
-    with GuiceOneServerPerSuite
-    with WireMockSupport {
+    extends WordSpecLike
+      with Matchers
+      with WsScalaTestClient
+      with GuiceOneServerPerSuite
+      with WireMockSupport {
 
   override implicit lazy val app: Application = appBuilder
     .build()

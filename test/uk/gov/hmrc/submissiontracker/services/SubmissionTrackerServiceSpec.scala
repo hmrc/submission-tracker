@@ -23,7 +23,9 @@ import uk.gov.hmrc.submissiontracker.stub.TestSetup
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubmissionTrackerServiceSpec extends TestSetup {
-  val service = new SubmissionTrackerService(mockTrackingConnector, mockAuditConnector, mockFormNameService, configuration, appName)
+
+  val service =
+    new SubmissionTrackerService(mockTrackingConnector, mockAuditConnector, mockFormNameService, configuration, appName)
 
   "trackingData(id: String, idType: String)" should {
     "return trackingDataSeq with valid date formats" in {
@@ -52,7 +54,7 @@ class SubmissionTrackerServiceSpec extends TestSetup {
         .getFormName(_: String))
         .expects(*)
         .returns("Claim a tax refund")
-      
+
       intercept[IllegalArgumentException] {
         await(service.trackingData(nino.value, idType))
       }

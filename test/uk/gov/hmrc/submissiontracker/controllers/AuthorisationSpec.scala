@@ -24,13 +24,12 @@ import uk.gov.hmrc.submissiontracker.stub.TestSetup
 
 class AuthorisationSpec extends TestSetup {
 
-  def authorisation(implicit mockAuthConnector: AuthConnector): Authorisation = {
+  def authorisation(implicit mockAuthConnector: AuthConnector): Authorisation =
     new Authorisation {
       override val confLevel: Int = 200
 
       override def authConnector: AuthConnector = mockAuthConnector
     }
-  }
 
   "Authorisation grantAccess" should {
 

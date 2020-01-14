@@ -30,7 +30,11 @@ import scala.concurrent.Future
 class SubmissionTrackerControllerSpec extends TestSetup {
 
   "trackingData Live" should {
-    val controller = new SubmissionTrackerController(mockAuthConnector, mockSubmissionTrackerService, L200.level, stubControllerComponents(), mockShutteringConnector)
+    val controller = new SubmissionTrackerController(mockAuthConnector,
+      mockSubmissionTrackerService,
+      L200.level,
+      stubControllerComponents(),
+      mockShutteringConnector)
 
     "return the tracking data successfully" in {
       stubAuthorisationGrantAccess(Some(nino.value) and L200)

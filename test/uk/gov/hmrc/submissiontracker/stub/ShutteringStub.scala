@@ -29,8 +29,7 @@ trait ShutteringStub extends MockFactory {
 
   def stubShutteringResponse(
                               response: Shuttering
-                            )(
-                              implicit shutteringConnector: ShutteringConnector
+                            )(implicit shutteringConnector: ShutteringConnector
                             ): CallHandler[Future[Shuttering]] =
     (shutteringConnector
       .getShutteringStatus(_: JourneyId)(_: HeaderCarrier, _: ExecutionContext))

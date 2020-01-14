@@ -34,15 +34,15 @@ import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.{IdType, JourneyId}
 import uk.gov.hmrc.submissiontracker.services.{FormNameService, SubmissionTrackerService}
 
 trait TestSetup
-  extends MockFactory
-    with WordSpecLike
-    with Matchers
-    with AuthorisationStub
-    with AuditStub
-    with ScalaFutures
-    with FutureAwaits
-    with DefaultAwaitTimeout
-    with ShutteringStub {
+    extends MockFactory
+      with WordSpecLike
+      with Matchers
+      with AuthorisationStub
+      with AuditStub
+      with ScalaFutures
+      with FutureAwaits
+      with DefaultAwaitTimeout
+      with ShutteringStub {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
   implicit val mockAuthConnector: AuthConnector = mock[AuthConnector]
@@ -64,6 +64,7 @@ trait TestSetup
 
   val noNinoFoundOnAccount: JsValue =
     Json.parse("""{"code":"UNAUTHORIZED","message":"NINO does not exist on account"}""")
+
   val lowConfidenceLevelError: JsValue =
     Json.parse("""{"code":"LOW_CONFIDENCE_LEVEL","message":"Confidence Level on account does not allow access"}""")
 
