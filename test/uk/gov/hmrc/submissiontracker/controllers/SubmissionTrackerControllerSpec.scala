@@ -31,10 +31,10 @@ class SubmissionTrackerControllerSpec extends TestSetup {
 
   "trackingData Live" should {
     val controller = new SubmissionTrackerController(mockAuthConnector,
-      mockSubmissionTrackerService,
-      L200.level,
-      stubControllerComponents(),
-      mockShutteringConnector)
+                                                     mockSubmissionTrackerService,
+                                                     L200.level,
+                                                     stubControllerComponents(),
+                                                     mockShutteringConnector)
 
     "return the tracking data successfully" in {
       stubAuthorisationGrantAccess(Some(nino.value) and L200)
@@ -91,8 +91,8 @@ class SubmissionTrackerControllerSpec extends TestSetup {
       status(result) shouldBe 521
       val jsonBody = contentAsJson(result)
       (jsonBody \ "shuttered").as[Boolean] shouldBe true
-      (jsonBody \ "title").as[String] shouldBe "Shuttered"
-      (jsonBody \ "message").as[String] shouldBe "Form Tracker is currently not available"
+      (jsonBody \ "title").as[String]      shouldBe "Shuttered"
+      (jsonBody \ "message").as[String]    shouldBe "Form Tracker is currently not available"
     }
   }
 

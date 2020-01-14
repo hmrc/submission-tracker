@@ -30,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 case object ErrorUnauthorizedMicroService extends ErrorResponse(401, "UNAUTHORIZED", "Unauthorized to access resource")
 
 case object ErrorUnauthorizedWeakCredStrength
-  extends ErrorResponse(401, "WEAK_CRED_STRENGTH", "Credential Strength on account does not allow access")
+    extends ErrorResponse(401, "WEAK_CRED_STRENGTH", "Credential Strength on account does not allow access")
 
 case object ErrorUnauthorized extends ErrorResponse(401, "UNAUTHORIZED", "Invalid request")
 
@@ -38,20 +38,20 @@ trait AccessControl extends HeaderValidator with Results with Authorisation {
   outer =>
 
   implicit val executionContext: ExecutionContext
-  val parser: BodyParser[AnyContent]
+  val parser:                    BodyParser[AnyContent]
 
   lazy val requiresAuth: Boolean = true
 
   def validateAcceptWithAuth(
-                              rules: Option[String] ⇒ Boolean,
-                              taxId: Option[Nino]
-                            ): ActionBuilder[Request, AnyContent] =
+    rules: Option[String] ⇒ Boolean,
+    taxId: Option[Nino]
+  ): ActionBuilder[Request, AnyContent] =
     new ActionBuilder[Request, AnyContent] {
 
       def invokeBlock[A](
-                          request: Request[A],
-                          block: Request[A] => Future[Result]
-                        ): Future[Result] =
+        request: Request[A],
+        block:   Request[A] => Future[Result]
+      ): Future[Result] =
         if (rules(request.headers.get("Accept"))) {
           if (requiresAuth) invokeAuthBlock(request, block, taxId)
           else block(request)
@@ -63,10 +63,10 @@ trait AccessControl extends HeaderValidator with Results with Authorisation {
     }
 
   def invokeAuthBlock[A](
-                          request: Request[A],
-                          block: Request[A] => Future[Result],
-                          taxId: Option[Nino]
-                        ): Future[Result] = {
+    request: Request[A],
+    block:   Request[A] => Future[Result],
+    taxId:   Option[Nino]
+  ): Future[Result] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, None)
 
     grantAccess(taxId.getOrElse(Nino("")))

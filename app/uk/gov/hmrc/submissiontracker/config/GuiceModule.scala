@@ -30,9 +30,9 @@ import uk.gov.hmrc.submissiontracker.controllers.api.ApiAccess
 import scala.collection.JavaConverters._
 
 class GuiceModule(
-                   environment: Environment,
-                   configuration: Configuration)
-  extends AbstractModule {
+  environment:   Environment,
+  configuration: Configuration)
+    extends AbstractModule {
 
   val servicesConfig = new ServicesConfig(
     configuration,

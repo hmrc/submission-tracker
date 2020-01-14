@@ -19,14 +19,14 @@ package uk.gov.hmrc.submissiontracker.controllers
 trait StubApplicationConfiguration {
 
   val config: Map[String, Any] = Map[String, Any](
-    "auditing.enabled" -> false,
-    "microservice.services.datastream.host" -> "host",
-    "microservice.services.datastream.port" -> "1234",
+    "auditing.enabled"                         -> false,
+    "microservice.services.datastream.host"    -> "host",
+    "microservice.services.datastream.port"    -> "1234",
     "microservice.services.datastream.enabled" -> false,
-    "appName" -> "submission-tracking",
-    "microservice.services.auth.host" -> "host",
-    "microservice.services.auth.port" -> "3456",
-    "microservice.services.tracking.host" -> "host",
-    "microservice.services.tracking.port" -> "4567"
+    "appName"                                  -> "submission-tracking",
+    "microservice.services.auth.host"          -> "host",
+    "microservice.services.auth.port"          -> "3456",
+    "microservice.services.tracking.host"      -> "host",
+    "microservice.services.tracking.port"      -> "4567"
   )
 }

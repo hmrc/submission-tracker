@@ -49,9 +49,9 @@ object TrackingStub {
                                |}""".stripMargin
 
   def getUserTrackingData(
-                           idType: String,
-                           id: String
-                         ): Unit =
+    idType: String,
+    id:     String
+  ): Unit =
     stubFor(
       get(urlEqualTo(s"/tracking-data/user/$idType/$id"))
         .willReturn(

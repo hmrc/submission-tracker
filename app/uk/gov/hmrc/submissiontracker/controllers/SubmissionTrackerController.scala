@@ -34,23 +34,23 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class SubmissionTrackerController @Inject()(
-                                             override val authConnector: AuthConnector,
-                                             val service: SubmissionTrackerService,
-                                             @Named("controllers.confidenceLevel") override val confLevel: Int,
-                                             cc: ControllerComponents,
-                                             shutteringConnector: ShutteringConnector
-                                           )(implicit val executionContext: ExecutionContext)
-  extends BackendController(cc)
+class SubmissionTrackerController @Inject() (
+  override val authConnector:                                   AuthConnector,
+  val service:                                                  SubmissionTrackerService,
+  @Named("controllers.confidenceLevel") override val confLevel: Int,
+  cc:                                                           ControllerComponents,
+  shutteringConnector:                                          ShutteringConnector
+)(implicit val executionContext:                                ExecutionContext)
+    extends BackendController(cc)
     with AccessControl
     with ErrorHandling
     with ControllerChecks {
 
   def trackingData(
-                    id: String,
-                    idType: IdType,
-                    journeyId: JourneyId
-                  ): Action[AnyContent] =
+    id:        String,
+    idType:    IdType,
+    journeyId: JourneyId
+  ): Action[AnyContent] =
     validateAcceptWithAuth(acceptHeaderValidationRules, Some(Nino(id))).async { implicit request =>
       implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, None)
       shutteringConnector.getShutteringStatus(journeyId).flatMap { shuttered =>

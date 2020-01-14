@@ -21,10 +21,10 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 object AuthStub {
 
   def grantAccess(
-                   requestNino: String,
-                   responseNino: String,
-                   confidenceLevel: Int = 200
-                 ): Unit =
+    requestNino:     String,
+    responseNino:    String,
+    confidenceLevel: Int = 200
+  ): Unit =
     stubFor(
       post(urlEqualTo("/auth/authorise"))
         .atPriority(0)
@@ -57,12 +57,11 @@ object AuthStub {
         .willReturn(
           aResponse()
             .withStatus(200)
-            .withBody(
-              s"""
-                 |{
-                 |  "nino": "$responseNino",
-                 |  "confidenceLevel": $confidenceLevel
-                 |}
+            .withBody(s"""
+                         |{
+                         |  "nino": "$responseNino",
+                         |  "confidenceLevel": $confidenceLevel
+                         |}
           """.stripMargin)
         )
     )

@@ -20,7 +20,7 @@ class SubmissionTrackerControllerISpec extends BaseISpec with FutureAwaits with 
           .get()
       )
 
-      response.status shouldBe 200
+      response.status                                                 shouldBe 200
       ((response.json \ "submissions").head \ "milestone").as[String] shouldBe "Received"
       ((response.json \ "submissions").head \ "businessArea").isEmpty
     }
@@ -99,8 +99,8 @@ class SubmissionTrackerControllerISpec extends BaseISpec with FutureAwaits with 
       response.status shouldBe 521
       val shuttering: Shuttering = Json.parse(response.body).as[Shuttering]
       shuttering.shuttered shouldBe true
-      shuttering.title shouldBe Some("Shuttered")
-      shuttering.message shouldBe Some("Form Tracker is currently not available")
+      shuttering.title     shouldBe Some("Shuttered")
+      shuttering.message   shouldBe Some("Form Tracker is currently not available")
     }
   }
 }

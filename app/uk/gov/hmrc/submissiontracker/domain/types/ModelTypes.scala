@@ -23,7 +23,7 @@ import eu.timepit.refined.string.MatchesRegex
 package object ModelTypes {
 
   type JourneyId = String Refined ValidJourneyId
-  type IdType = String Refined ValidIdType
+  type IdType    = String Refined ValidIdType
 
   private type ValidJourneyId =
     MatchesRegex[W.`"""[A-Fa-f0-9]{8}\\-[A-Fa-f0-9]{4}\\-[A-Fa-f0-9]{4}\\-[A-Fa-f0-9]{4}\\-[A-Fa-f0-9]{12}"""`.T]

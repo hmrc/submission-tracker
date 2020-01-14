@@ -7,9 +7,9 @@ import uk.gov.hmrc.submissiontracker.support.BaseISpec
 
 class SandboxSubmissionTrackerControllerISpec
     extends BaseISpec
-      with FileResource
-      with FutureAwaits
-      with DefaultAwaitTimeout {
+    with FileResource
+    with FutureAwaits
+    with DefaultAwaitTimeout {
 
   val resource: String = findResource(s"/resources/SandboxTrackingData.json")
     .getOrElse(throw new IllegalArgumentException("Resource not found!"))
@@ -27,7 +27,7 @@ class SandboxSubmissionTrackerControllerISpec
       verify(0, postRequestedFor(urlEqualTo(s"/tracking-data/user/$idType/$nino$journeyIdUrlVar")))
 
       response.status shouldBe 200
-      response.body shouldBe resource
+      response.body   shouldBe resource
     }
 
     "return 406 when missing accept header" in {

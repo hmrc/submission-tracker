@@ -14,13 +14,12 @@ object ShutteringStub {
       ).willReturn(
         aResponse()
           .withStatus(200)
-          .withBody(
-            s"""
-               |{
-               |  "shuttered": false,
-               |  "title":     "",
-               |  "message":    ""
-               |}
+          .withBody(s"""
+                       |{
+                       |  "shuttered": false,
+                       |  "title":     "",
+                       |  "message":    ""
+                       |}
           """.stripMargin)
       )
     )
@@ -34,13 +33,12 @@ object ShutteringStub {
       ).willReturn(
         aResponse()
           .withStatus(200)
-          .withBody(
-            s"""
-               |{
-               |  "shuttered": true,
-               |  "title":     "Shuttered",
-               |  "message":   "Form Tracker is currently not available"
-               |}
+          .withBody(s"""
+                       |{
+                       |  "shuttered": true,
+                       |  "title":     "Shuttered",
+                       |  "message":   "Form Tracker is currently not available"
+                       |}
           """.stripMargin)
       )
     )

@@ -26,7 +26,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class TrackingConnectorSpec extends TestSetup {
 
   private val trackingBaseUrl = "someUrl"
-  val connector = new TrackingConnector(trackingBaseUrl, mockHttp)
+  val connector               = new TrackingConnector(trackingBaseUrl, mockHttp)
 
   def trackingGetSuccess(response: TrackingDataSeq): Unit =
     (mockHttp

@@ -35,23 +35,23 @@ import uk.gov.hmrc.submissiontracker.services.{FormNameService, SubmissionTracke
 
 trait TestSetup
     extends MockFactory
-      with WordSpecLike
-      with Matchers
-      with AuthorisationStub
-      with AuditStub
-      with ScalaFutures
-      with FutureAwaits
-      with DefaultAwaitTimeout
-      with ShutteringStub {
+    with WordSpecLike
+    with Matchers
+    with AuthorisationStub
+    with AuditStub
+    with ScalaFutures
+    with FutureAwaits
+    with DefaultAwaitTimeout
+    with ShutteringStub {
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
-  implicit val mockAuthConnector: AuthConnector = mock[AuthConnector]
-  implicit val mockAuditConnector: AuditConnector = mock[AuditConnector]
+  implicit val hc:                           HeaderCarrier            = HeaderCarrier()
+  implicit val mockAuthConnector:            AuthConnector            = mock[AuthConnector]
+  implicit val mockAuditConnector:           AuditConnector           = mock[AuditConnector]
   implicit val mockSubmissionTrackerService: SubmissionTrackerService = mock[SubmissionTrackerService]
-  implicit val mockTrackingConnector: TrackingConnector = mock[TrackingConnector]
-  implicit val mockFormNameService: FormNameService = mock[FormNameService]
-  implicit val mockHttp: HttpGet = mock[HttpGet]
-  implicit val mockShutteringConnector: ShutteringConnector = mock[ShutteringConnector]
+  implicit val mockTrackingConnector:        TrackingConnector        = mock[TrackingConnector]
+  implicit val mockFormNameService:          FormNameService          = mock[FormNameService]
+  implicit val mockHttp:                     HttpGet                  = mock[HttpGet]
+  implicit val mockShutteringConnector:      ShutteringConnector      = mock[ShutteringConnector]
 
   val shuttered =
     Shuttering(shuttered = true, Some("Shuttered"), Some("Form Tracker is currently not available"))
@@ -59,7 +59,7 @@ trait TestSetup
 
   val configuration: Configuration = mock[Configuration]
 
-  lazy val requestWithAcceptHeader: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders(acceptHeader)
+  lazy val requestWithAcceptHeader:    FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders(acceptHeader)
   lazy val requestWithoutAcceptHeader: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   val noNinoFoundOnAccount: JsValue =
@@ -68,11 +68,11 @@ trait TestSetup
   val lowConfidenceLevelError: JsValue =
     Json.parse("""{"code":"LOW_CONFIDENCE_LEVEL","message":"Confidence Level on account does not allow access"}""")
 
-  val nino = Nino("CS700100A")
+  val nino          = Nino("CS700100A")
   val incorrectNino = Nino("SC100700A")
   val acceptHeader: (String, String) = "Accept" -> "application/vnd.hmrc.1.0+json"
-  val idType: IdType = "nino"
-  val journeyId: JourneyId = "decf6382-0c09-4ea8-8225-d59d188db41f"
+  val idType:       IdType           = "nino"
+  val journeyId:    JourneyId        = "decf6382-0c09-4ea8-8225-d59d188db41f"
 
   val milestones =
     Seq(

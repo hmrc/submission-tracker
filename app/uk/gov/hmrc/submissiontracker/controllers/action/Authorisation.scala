@@ -33,8 +33,8 @@ trait Authorisation extends AuthorisedFunctions {
   val confLevel: Int
 
   lazy val ninoNotFoundOnAccount = new NinoNotFoundOnAccount
-  lazy val failedToMatchNino = new FailToMatchTaxIdOnAuth
-  lazy val lowConfidenceLevel = new AccountWithLowCL
+  lazy val failedToMatchNino     = new FailToMatchTaxIdOnAuth
+  lazy val lowConfidenceLevel    = new AccountWithLowCL
 
   def grantAccess(requestedNino: Nino)(implicit hc: HeaderCarrier): Future[Authority] =
     authorised(Enrolment("HMRC-NI", Seq(EnrolmentIdentifier("NINO", requestedNino.value)), "Activated", None))
