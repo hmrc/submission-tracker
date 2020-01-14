@@ -31,16 +31,20 @@ import scala.concurrent.Future
 
 @Singleton
 class SubmissionTrackerService @Inject()(
-  val trackingConnector:         TrackingConnector,
-  val auditConnector:            AuditConnector,
-  val formNameService:           FormNameService,
-  val configuration:             Configuration,
-  @Named("appName") val appName: String
-) extends Auditor {
+                                          val trackingConnector: TrackingConnector,
+                                          val auditConnector: AuditConnector,
+                                          val formNameService: FormNameService,
+                                          val configuration: Configuration,
+                                          @Named("appName") val appName: String)
+  extends Auditor {
   val inFormat: DateTimeFormatter = DateTimeFormat.forPattern("dd MMM yyyy")
   val outFormat: DateTimeFormatter = DateTimeFormat.forPattern("yyyyMMdd")
 
-  def trackingData(id: String, idType: IdType)(implicit hc: HeaderCarrier): Future[TrackingDataSeqResponse] =
+  def trackingData(
+                    id: String,
+                    idType: IdType
+                  )(implicit hc: HeaderCarrier
+                  ): Future[TrackingDataSeqResponse] =
     withAudit("trackingData", Map("id" -> id, "idType" -> idType.value)) {
       trackingConnector.getUserTrackingData(id, idType).map(data => convertData(data))
     }
@@ -55,16 +59,16 @@ class SubmissionTrackerService @Inject()(
 
   private def convertData(data: TrackingDataSeq): TrackingDataSeqResponse =
     data.submissions.fold(TrackingDataSeqResponse.noSumbissions) { found =>
-      TrackingDataSeqResponse(Some(found.map(item => {
+      TrackingDataSeqResponse(Some(found.map { item =>
         TrackingDataResponse(
-          formId                 = item.formId,
-          formName               = formNameService.getFormName(item.formId),
+          formId = item.formId,
+          formName = formNameService.getFormName(item.formId),
           dfsSubmissionReference = item.dfsSubmissionReference,
-          receivedDate           = convert(item.receivedDate),
-          completionDate         = convert(item.completionDate),
-          milestone              = getCurrentMilestone(item.milestones),
-          milestones             = item.milestones
+          receivedDate = convert(item.receivedDate),
+          completionDate = convert(item.completionDate),
+          milestone = getCurrentMilestone(item.milestones),
+          milestones = item.milestones
         )
-      })))
+      }))
     }
 }

@@ -25,15 +25,22 @@ import play.api.libs.ws.WSClient
 
 import scala.language.postfixOps
 
-class BaseISpec extends WordSpecLike with Matchers with WsScalaTestClient with GuiceOneServerPerSuite with WireMockSupport {
+class BaseISpec
+  extends WordSpecLike
+    with Matchers
+    with WsScalaTestClient
+    with GuiceOneServerPerSuite
+    with WireMockSupport {
+
   override implicit lazy val app: Application = appBuilder
     .build()
 
   def config: Map[String, Any] = Map(
-    "auditing.enabled"                              -> false,
-    "microservice.services.auth.port"               -> wireMockPort,
-    "microservice.services.tracking.port"           -> wireMockPort,
-    "microservice.services.datastream.port"         -> wireMockPort
+    "auditing.enabled" -> false,
+    "microservice.services.auth.port" -> wireMockPort,
+    "microservice.services.tracking.port" -> wireMockPort,
+    "microservice.services.datastream.port" -> wireMockPort,
+    "microservice.services.mobile-shuttering.port" -> wireMockPort
   )
 
   protected def appBuilder: GuiceApplicationBuilder = new GuiceApplicationBuilder().configure(config)

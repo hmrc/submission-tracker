@@ -22,8 +22,7 @@ import play.api.mvc.{PathBindable, QueryStringBindable}
 package object types {
 
   implicit def refinedQueryStringBindable[R[_, _], T, P](
-                                                          implicit
-                                                          baseTypeBinder: QueryStringBindable[T],
+                                                          implicit baseTypeBinder: QueryStringBindable[T],
                                                           refType: RefType[R],
                                                           validate: Validate[T, P]
                                                         ): QueryStringBindable[R[T, P]] = new QueryStringBindable[R[T, P]] {
@@ -46,18 +45,23 @@ package object types {
   }
 
   implicit def refinedPathBindable[R[_, _], T, P](
-                                                   implicit
-                                                   baseTypeBinder: PathBindable[T],
+                                                   implicit baseTypeBinder: PathBindable[T],
                                                    refType: RefType[R],
                                                    validate: Validate[T, P]
                                                  ): PathBindable[R[T, P]] = new PathBindable[R[T, P]] {
 
-    override def bind(key: String, value: String): Either[String, R[T, P]] =
+    override def bind(
+                       key: String,
+                       value: String
+                     ): Either[String, R[T, P]] =
       baseTypeBinder.bind(key, value).right.flatMap { baseValue =>
         refType.refine[P](baseValue)
       }
 
-    override def unbind(key: String, value: R[T, P]): String =
+    override def unbind(
+                         key: String,
+                         value: R[T, P]
+                       ): String =
       baseTypeBinder.unbind(key, refType.unwrap(value))
   }
 }

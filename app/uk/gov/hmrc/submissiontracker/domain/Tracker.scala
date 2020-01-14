@@ -18,7 +18,9 @@ package uk.gov.hmrc.submissiontracker.domain
 
 import play.api.libs.json.{Format, Json}
 
-case class Milestone(milestone: String, status: String)
+case class Milestone(
+                      milestone: String,
+                      status: String)
 
 object Milestone {
   implicit val milestoneFormat: Format[Milestone] = Json.format[Milestone]
@@ -37,7 +39,9 @@ object TrackingData {
   implicit val trackingDataFormat: Format[TrackingData] = Json.format[TrackingData]
 }
 
-case class TrackingDataPresenter(trackingData: TrackingData, latestMilestone: String)
+case class TrackingDataPresenter(
+                                  trackingData: TrackingData,
+                                  latestMilestone: String)
 
 object TrackingDataPresenter {
   implicit val trackingDataPresenterFormat: Format[TrackingDataPresenter] = Json.format[TrackingDataPresenter]

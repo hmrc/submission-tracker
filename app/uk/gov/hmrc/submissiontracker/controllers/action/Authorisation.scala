@@ -36,7 +36,7 @@ trait Authorisation extends AuthorisedFunctions {
   lazy val failedToMatchNino = new FailToMatchTaxIdOnAuth
   lazy val lowConfidenceLevel = new AccountWithLowCL
 
-  def grantAccess(requestedNino: Nino)(implicit hc: HeaderCarrier): Future[Authority] = {
+  def grantAccess(requestedNino: Nino)(implicit hc: HeaderCarrier): Future[Authority] =
     authorised(Enrolment("HMRC-NI", Seq(EnrolmentIdentifier("NINO", requestedNino.value)), "Activated", None))
       .retrieve(nino and confidenceLevel) {
         case Some(foundNino) ~ foundConfidenceLevel =>
@@ -47,5 +47,4 @@ trait Authorisation extends AuthorisedFunctions {
         case None ~ _ =>
           throw ninoNotFoundOnAccount
       }
-  }
 }
