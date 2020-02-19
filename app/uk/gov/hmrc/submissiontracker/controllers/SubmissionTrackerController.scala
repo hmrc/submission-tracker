@@ -31,7 +31,6 @@ import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.{IdType, JourneyId}
 import uk.gov.hmrc.submissiontracker.services.SubmissionTrackerService
 
 import scala.concurrent.ExecutionContext
-import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class SubmissionTrackerController @Inject() (

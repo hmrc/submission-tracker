@@ -4,23 +4,23 @@ object AppDependencies {
   import play.core.PlayVersion
   import play.sbt.PlayImport._
 
-  private val bootstrapPlayVersion     = "0.35.0"
+  private val bootstrapPlayVersion     = "1.3.0"
   private val domainVersion            = "5.6.0-play-26"
-  private val playHmrcApiVersion       = "3.4.0-play-26"
-  private val wireMockVersion          = "2.20.0"
-  private val emailAdressVersion       = "2.2.0"
+  private val playHmrcApiVersion       = "4.1.0-play-26"
+  private val wireMockVersion          = "2.21.0"
+  private val emailAdressVersion       = "3.4.0"
   private val scalamockVersion         = "4.1.0"
-  private val mockitoVersion           = "2.20.0"
+  private val mockitoVersion           = "3.2.4"
   private val scalatestplusPlayVersion = "3.1.2"
-  private val refinedVersion = "0.9.4"
+  private val refinedVersion           = "0.9.4"
 
   val compile = Seq(
     ws,
     "uk.gov.hmrc" %% "bootstrap-play-26" % bootstrapPlayVersion,
-    "uk.gov.hmrc" %% "play-hmrc-api" % playHmrcApiVersion,
-    "uk.gov.hmrc" %% "domain" % domainVersion,
-    "uk.gov.hmrc" %% "emailaddress" % emailAdressVersion,
-    "eu.timepit" %% "refined" % refinedVersion
+    "uk.gov.hmrc" %% "play-hmrc-api"     % playHmrcApiVersion,
+    "uk.gov.hmrc" %% "domain"            % domainVersion,
+    "uk.gov.hmrc" %% "emailaddress"      % emailAdressVersion,
+    "eu.timepit"  %% "refined"           % refinedVersion
   )
 
   trait TestDependencies {
@@ -29,8 +29,10 @@ object AppDependencies {
   }
 
   object Test {
+
     def apply(): Seq[ModuleID] =
       new TestDependencies {
+
         override lazy val test = Seq(
           "org.scalatestplus.play" %% "scalatestplus-play" % scalatestplusPlayVersion % scope,
           "org.scalamock"          %% "scalamock"          % scalamockVersion         % scope,
@@ -40,6 +42,7 @@ object AppDependencies {
   }
 
   object IntegrationTest {
+
     def apply(): Seq[ModuleID] =
       new TestDependencies {
 
@@ -57,7 +60,8 @@ object AppDependencies {
     // compatible with wiremock, so we need to pin the jetty stuff to the older version.
     // see https://groups.google.com/forum/#!topic/play-framework/HAIM1ukUCnI
     val jettyVersion = "9.2.13.v20150730"
-    def overrides(): Set[ModuleID] = Set(
+
+    def overrides(): Seq[ModuleID] = Seq(
       "org.eclipse.jetty"           % "jetty-server"       % jettyVersion,
       "org.eclipse.jetty"           % "jetty-servlet"      % jettyVersion,
       "org.eclipse.jetty"           % "jetty-security"     % jettyVersion,
@@ -76,5 +80,5 @@ object AppDependencies {
   }
 
   def apply():   Seq[ModuleID] = compile ++ Test() ++ IntegrationTest()
-  val overrides: Set[ModuleID] = IntegrationTest.overrides
+  val overrides: Seq[ModuleID] = IntegrationTest.overrides()
 }
