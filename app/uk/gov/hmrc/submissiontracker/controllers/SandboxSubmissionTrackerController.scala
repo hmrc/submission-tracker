@@ -16,6 +16,9 @@
 
 package uk.gov.hmrc.submissiontracker.controllers
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 import com.google.inject.Singleton
 import javax.inject.Inject
 import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
@@ -34,6 +37,8 @@ class SandboxSubmissionTrackerController @Inject() (
     with HeaderValidator
     with FileResource {
 
+  private val dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd")
+
   def trackingData(
     id:        String,
     idType:    IdType,
@@ -47,7 +52,10 @@ class SandboxSubmissionTrackerController @Inject() (
         case _ =>
           val resource: String = findResource(s"/resources/SandboxTrackingData.json")
             .getOrElse(throw new IllegalArgumentException("Resource not found!"))
-          Ok(resource)
+          val response = resource
+            .replace("<RECEIVED_DATE>", LocalDate.now().minusDays(3).toString.replace("-", ""))
+            .replace("<COMPLETION_DATE>", LocalDate.now().plusDays(5).toString.replace("-", ""))
+          Ok(response)
       })
     }
   override def parser: BodyParser[AnyContent] = cc.parsers.anyContent
