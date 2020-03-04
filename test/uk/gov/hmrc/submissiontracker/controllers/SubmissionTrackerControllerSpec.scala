@@ -31,10 +31,10 @@ class SubmissionTrackerControllerSpec extends TestSetup {
 
   "trackingData Live" should {
     val controller = new SubmissionTrackerController(mockAuthConnector,
-                                                     mockSubmissionTrackerService,
-                                                     L200.level,
-                                                     stubControllerComponents(),
-                                                     mockShutteringConnector)
+      mockSubmissionTrackerService,
+      L200.level,
+      stubControllerComponents(),
+      mockShutteringConnector)
 
     "return the tracking data successfully" in {
       stubAuthorisationGrantAccess(Some(nino.value) and L200)
@@ -104,7 +104,7 @@ class SubmissionTrackerControllerSpec extends TestSetup {
       val result = controller.trackingData(nino.value, idType, journeyId)(requestWithAcceptHeader)
 
       status(result)        shouldBe 200
-      contentAsJson(result) shouldBe Json.toJson(trackingDataResponseWithCorrectDateFormat)
+      contentAsJson(result) shouldBe Json.toJson(sandboxTrackingDataResponseWithCorrectDateFormat)
     }
 
     "return status code 406 when the Accept header is missing" in {

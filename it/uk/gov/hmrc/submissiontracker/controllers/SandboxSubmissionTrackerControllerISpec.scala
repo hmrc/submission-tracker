@@ -16,8 +16,8 @@ class SandboxSubmissionTrackerControllerISpec
 
   val resource: String = findResource(s"/resources/SandboxTrackingData.json")
     .getOrElse(throw new IllegalArgumentException("Resource not found!"))
-    .replace("<RECEIVED_DATE>", LocalDate.now().minusDays(3).toString.replace("-", ""))
-    .replace("<COMPLETION_DATE>", LocalDate.now().plusDays(5).toString.replace("-", ""))
+    .replace("<RECEIVED_DATE>", "\"" + LocalDate.now().minusDays(3).toString.replace("-", "") + "\"")
+    .replace("<COMPLETION_DATE>", "\"" + LocalDate.now().plusDays(5).toString.replace("-", "") + "\"")
 
   "GET /sandbox/tracking/:id/:idType" should {
 

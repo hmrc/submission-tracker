@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.submissiontracker.stub
 
+import java.time.LocalDate
+
 import eu.timepit.refined.auto._
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
@@ -34,7 +36,7 @@ import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.{IdType, JourneyId}
 import uk.gov.hmrc.submissiontracker.services.{FormNameService, SubmissionTrackerService}
 
 trait TestSetup
-    extends MockFactory
+  extends MockFactory
     with WordSpecLike
     with Matchers
     with AuthorisationStub
@@ -117,6 +119,22 @@ trait TestSetup
           "111-ABCD-456",
           "20150412",
           "20150517",
+          "InProgress",
+          milestones
+        )
+      )
+    )
+  )
+
+  val sandboxTrackingDataResponseWithCorrectDateFormat = TrackingDataSeqResponse(
+    Some(
+      Seq(
+        TrackingDataResponse(
+          "R39_EN",
+          "Claim a tax refund",
+          "111-ABCD-456",
+          LocalDate.now().minusDays(3).toString.replace("-", ""),
+          LocalDate.now().plusDays(5).toString.replace("-", ""),
           "InProgress",
           milestones
         )
