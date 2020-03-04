@@ -1,7 +1,10 @@
 package uk.gov.hmrc.submissiontracker.controllers
 
+import java.time.LocalDate
+
 import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
+import play.libs.Json
 import uk.gov.hmrc.api.sandbox.FileResource
 import uk.gov.hmrc.submissiontracker.support.BaseISpec
 
@@ -13,6 +16,8 @@ class SandboxSubmissionTrackerControllerISpec
 
   val resource: String = findResource(s"/resources/SandboxTrackingData.json")
     .getOrElse(throw new IllegalArgumentException("Resource not found!"))
+    .replace("<RECEIVED_DATE>", LocalDate.now().minusDays(3).toString.replace("-", ""))
+    .replace("<COMPLETION_DATE>", LocalDate.now().plusDays(5).toString.replace("-", ""))
 
   "GET /sandbox/tracking/:id/:idType" should {
 
@@ -25,6 +30,8 @@ class SandboxSubmissionTrackerControllerISpec
 
       verify(0, postRequestedFor(urlEqualTo("/auth/authorise")))
       verify(0, postRequestedFor(urlEqualTo(s"/tracking-data/user/$idType/$nino$journeyIdUrlVar")))
+
+      println(Json.prettyPrint(Json.parse(resource)))
 
       response.status shouldBe 200
       response.body   shouldBe resource
