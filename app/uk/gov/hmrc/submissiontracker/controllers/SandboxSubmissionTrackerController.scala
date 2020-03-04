@@ -31,30 +31,31 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SandboxSubmissionTrackerController @Inject() (
-  cc:                            ControllerComponents
-)(implicit val executionContext: ExecutionContext)
-    extends BackendController(cc)
+                                                     cc:                            ControllerComponents
+                                                   )(implicit val executionContext: ExecutionContext)
+  extends BackendController(cc)
     with HeaderValidator
     with FileResource {
 
   private val dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd")
 
   def trackingData(
-    id:        String,
-    idType:    IdType,
-    journeyId: JourneyId
-  ): Action[AnyContent] =
+                    id:        String,
+                    idType:    IdType,
+                    journeyId: JourneyId
+                  ): Action[AnyContent] =
     validateAccept(acceptHeaderValidationRules).async { implicit request =>
       Future successful (request.headers.get("SANDBOX-CONTROL") match {
         case Some("ERROR-401") => Unauthorized
         case Some("ERROR-403") => Forbidden
         case Some("ERROR-500") => InternalServerError
         case _ =>
+
           val resource: String = findResource(s"/resources/SandboxTrackingData.json")
             .getOrElse(throw new IllegalArgumentException("Resource not found!"))
           val response = resource
-            .replace("<RECEIVED_DATE>", LocalDate.now().minusDays(3).toString.replace("-", ""))
-            .replace("<COMPLETION_DATE>", LocalDate.now().plusDays(5).toString.replace("-", ""))
+            .replace("<RECEIVED_DATE>", "\"" + LocalDate.now().minusDays(3).toString.replace("-", "") + "\"")
+            .replace("<COMPLETION_DATE>", "\"" + LocalDate.now().plusDays(5).toString.replace("-", "") + "\"")
           Ok(response)
       })
     }
