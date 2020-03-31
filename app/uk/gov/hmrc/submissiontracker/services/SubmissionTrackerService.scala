@@ -49,8 +49,6 @@ class SubmissionTrackerService @Inject() (
       trackingConnector.getUserTrackingData(id, idType).map(data => convertData(data))
     }
 
-  private def convert(in: String): String = outFormat.print(inFormat.parseDateTime(in))
-
   private def getCurrentMilestone(milestones: Seq[Milestone]): String =
     milestones.find(milestone => milestone.status.toLowerCase == ("current")) match {
       case Some(currentMilestone) => currentMilestone.milestone
@@ -64,8 +62,8 @@ class SubmissionTrackerService @Inject() (
           formId                 = item.formId,
           formName               = formNameService.getFormName(item.formId),
           dfsSubmissionReference = item.dfsSubmissionReference,
-          receivedDate           = convert(item.receivedDate),
-          completionDate         = convert(item.completionDate),
+          receivedDate           = item.receivedDate,
+          completionDate         = item.completionDate,
           milestone              = getCurrentMilestone(item.milestones),
           milestones             = item.milestones
         )

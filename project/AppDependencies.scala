@@ -13,14 +13,16 @@ object AppDependencies {
   private val mockitoVersion           = "3.2.4"
   private val scalatestplusPlayVersion = "3.1.2"
   private val refinedVersion           = "0.9.4"
+  private val playJsonJodaVersion      = "2.6.14"
 
   val compile = Seq(
     ws,
-    "uk.gov.hmrc" %% "bootstrap-play-26" % bootstrapPlayVersion,
-    "uk.gov.hmrc" %% "play-hmrc-api"     % playHmrcApiVersion,
-    "uk.gov.hmrc" %% "domain"            % domainVersion,
-    "uk.gov.hmrc" %% "emailaddress"      % emailAdressVersion,
-    "eu.timepit"  %% "refined"           % refinedVersion
+    "uk.gov.hmrc"       %% "bootstrap-play-26" % bootstrapPlayVersion,
+    "uk.gov.hmrc"       %% "play-hmrc-api"     % playHmrcApiVersion,
+    "uk.gov.hmrc"       %% "domain"            % domainVersion,
+    "uk.gov.hmrc"       %% "emailaddress"      % emailAdressVersion,
+    "eu.timepit"        %% "refined"           % refinedVersion,
+    "com.typesafe.play" %% "play-json-joda"    % playJsonJodaVersion
   )
 
   trait TestDependencies {

@@ -19,6 +19,7 @@ package uk.gov.hmrc.submissiontracker.stub
 import java.time.LocalDate
 
 import eu.timepit.refined.auto._
+import org.joda.time.DateTime
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, WordSpecLike}
@@ -36,7 +37,7 @@ import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.{IdType, JourneyId}
 import uk.gov.hmrc.submissiontracker.services.{FormNameService, SubmissionTrackerService}
 
 trait TestSetup
-  extends MockFactory
+    extends MockFactory
     with WordSpecLike
     with Matchers
     with AuthorisationStub
@@ -86,13 +87,51 @@ trait TestSetup
 
   val trackingData = TrackingDataSeq(
     Some(
-      Seq(TrackingData("R39_EN", "Claim a tax refund", "111-ABCD-456", "PSA", "12 Apr 2015", "17 May 2015", milestones))
+      Seq(
+        TrackingData("R39_EN",
+                     "Claim a tax refund",
+                     "111-ABCD-456",
+                     "PSA",
+                     new DateTime(2015, 4, 12, 0, 0),
+                     new DateTime(2015, 5, 17, 0, 0),
+                     milestones)
+      )
     )
   )
 
-  val trackingDataWithCorrectDateFormat = TrackingDataSeq(
-    Some(Seq(TrackingData("R39_EN", "Claim a tax refund", "111-ABCD-456", "PSA", "20150412", "20150517", milestones)))
-  )
+  val trackingDataWithIncorrectDateFormat: JsValue =
+    Json.parse("""
+                 |{
+                 |   "submissions":[
+                 |      {
+                 |         "formId":"R39_EN",
+                 |         "formName":"Claim a tax refund",
+                 |         "dfsSubmissionReference":"111-ABCD-456",
+                 |         "businessArea":"PSA",
+                 |         "receivedDate":"INVALIDDATE",
+                 |         "completionDate":"2015-05-17T00:00:00.000+01:00",
+                 |         "milestones":[
+                 |            {
+                 |               "milestone":"Received",
+                 |               "status":"complete"
+                 |            },
+                 |            {
+                 |               "milestone":"Acquired",
+                 |               "status":"complete"
+                 |            },
+                 |            {
+                 |               "milestone":"InProgress",
+                 |               "status":"current"
+                 |            },
+                 |            {
+                 |               "milestone":"Done",
+                 |               "status":"incomplete"
+                 |            }
+                 |         ]
+                 |      }
+                 |   ]
+                 |}
+                 |""".stripMargin)
 
   val trackingDataResponse = TrackingDataSeqResponse(
     Some(
@@ -101,8 +140,8 @@ trait TestSetup
           "R39_EN",
           "Claim a tax refund",
           "111-ABCD-456",
-          "12 Apr 2015",
-          "17 May 2015",
+          new DateTime(2015, 4, 12, 0, 0),
+          new DateTime(2015, 5, 17, 0, 0),
           "InProgress",
           milestones
         )
@@ -117,8 +156,8 @@ trait TestSetup
           "R39_EN",
           "Claim a tax refund",
           "111-ABCD-456",
-          "20150412",
-          "20150517",
+          new DateTime(2015, 4, 12, 0, 0),
+          new DateTime(2015, 5, 17, 0, 0),
           "InProgress",
           milestones
         )
@@ -133,8 +172,8 @@ trait TestSetup
           "R39_EN",
           "Claim a tax refund",
           "111-ABCD-456",
-          LocalDate.now().minusDays(3).toString.replace("-", ""),
-          LocalDate.now().plusDays(5).toString.replace("-", ""),
+          DateTime.now().minusDays(3),
+          DateTime.now().plusDays(5),
           "InProgress",
           milestones
         )

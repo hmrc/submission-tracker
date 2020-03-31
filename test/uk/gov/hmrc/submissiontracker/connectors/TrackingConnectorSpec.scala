@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.submissiontracker.connectors
 
+import play.api.libs.json.{JsResultException, Json}
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.submissiontracker.domain.TrackingDataSeq
 import uk.gov.hmrc.submissiontracker.stub.TestSetup
@@ -62,6 +63,12 @@ class TrackingConnectorSpec extends TestSetup {
       trackingGetSuccess(trackingData)
 
       await(connector.getUserTrackingData(nino.value, idType)) shouldBe trackingData
+    }
+
+    "return a error when DateTime is malformed" in {
+      intercept[JsResultException] {
+        Json.toJson(trackingDataWithIncorrectDateFormat).as[TrackingDataSeq]
+      }
     }
   }
 }
