@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.submissiontracker.domain
 
-import play.api.libs.json.{Format, Json}
+import org.joda.time.DateTime
+import play.api.libs.json._
 
 case class Milestone(
   milestone: String,
@@ -31,11 +32,14 @@ case class TrackingData(
   formName:               String,
   dfsSubmissionReference: String,
   businessArea:           String,
-  receivedDate:           String,
-  completionDate:         String,
+  receivedDate:           DateTime,
+  completionDate:         DateTime,
   milestones:             Seq[Milestone])
 
 object TrackingData {
+  implicit val dateTimeWriter:   Writes[DateTime] = JodaWrites.JodaDateTimeWrites
+  implicit val dateTimeJsReader: Reads[DateTime]  = JodaReads.DefaultJodaDateTimeReads
+
   implicit val trackingDataFormat: Format[TrackingData] = Json.format[TrackingData]
 }
 
@@ -57,12 +61,14 @@ case class TrackingDataResponse(
   formId:                 String,
   formName:               String,
   dfsSubmissionReference: String,
-  receivedDate:           String,
-  completionDate:         String,
+  receivedDate:           DateTime,
+  completionDate:         DateTime,
   milestone:              String,
   milestones:             Seq[Milestone])
 
 object TrackingDataResponse {
+  implicit val dateTimeWriter:     Writes[DateTime]             = JodaWrites.jodaDateWrites("yyyyMMdd")
+  implicit val dateTimeJsReader:   Reads[DateTime]              = JodaReads.DefaultJodaDateTimeReads
   implicit val trackingDataFormat: Format[TrackingDataResponse] = Json.format[TrackingDataResponse]
 }
 

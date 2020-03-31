@@ -31,8 +31,6 @@ class SandboxSubmissionTrackerControllerISpec
       verify(0, postRequestedFor(urlEqualTo("/auth/authorise")))
       verify(0, postRequestedFor(urlEqualTo(s"/tracking-data/user/$idType/$nino$journeyIdUrlVar")))
 
-      println(Json.prettyPrint(Json.parse(resource)))
-
       response.status shouldBe 200
       response.body   shouldBe resource
     }

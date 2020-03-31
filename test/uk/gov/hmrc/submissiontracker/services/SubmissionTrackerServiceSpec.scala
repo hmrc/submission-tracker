@@ -42,22 +42,5 @@ class SubmissionTrackerServiceSpec extends TestSetup {
 
       await(service.trackingData(nino.value, idType)) shouldBe trackingDataResponseWithCorrectDateFormat
     }
-
-    "return an IllegalArgumentException with incorrect received date format" in {
-      stubAuditTrackingData(nino.value, idType.value)
-      (mockTrackingConnector
-        .getUserTrackingData(_: String, _: IdType)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(nino.value, idType, *, *)
-        .returns(Future successful trackingDataWithCorrectDateFormat)
-
-      (mockFormNameService
-        .getFormName(_: String))
-        .expects(*)
-        .returns("Claim a tax refund")
-
-      intercept[IllegalArgumentException] {
-        await(service.trackingData(nino.value, idType))
-      }
-    }
   }
 }

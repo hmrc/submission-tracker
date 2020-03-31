@@ -16,11 +16,12 @@ object AppDependencies {
 
   val compile = Seq(
     ws,
-    "uk.gov.hmrc" %% "bootstrap-play-26" % bootstrapPlayVersion,
-    "uk.gov.hmrc" %% "play-hmrc-api"     % playHmrcApiVersion,
-    "uk.gov.hmrc" %% "domain"            % domainVersion,
-    "uk.gov.hmrc" %% "emailaddress"      % emailAdressVersion,
-    "eu.timepit"  %% "refined"           % refinedVersion
+    "uk.gov.hmrc"       %% "bootstrap-play-26" % bootstrapPlayVersion,
+    "uk.gov.hmrc"       %% "play-hmrc-api"     % playHmrcApiVersion,
+    "uk.gov.hmrc"       %% "domain"            % domainVersion,
+    "uk.gov.hmrc"       %% "emailaddress"      % emailAdressVersion,
+    "eu.timepit"        %% "refined"           % refinedVersion,
+    "com.typesafe.play" %% "play-json-joda"    % "2.6.14"
   )
 
   trait TestDependencies {
