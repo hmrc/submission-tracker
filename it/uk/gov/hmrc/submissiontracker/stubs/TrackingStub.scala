@@ -26,8 +26,8 @@ object TrackingStub {
                                |    "formName" : "Claim a tax refund",
                                |    "dfsSubmissionReference" : "E4H-384D-EFZ",
                                |    "businessArea" : "PSD",
-                               |    "receivedDate" : "2016-08-01T00:00:00.000+01:00",
-                               |    "completionDate" : "2016-06-20T00:00:00.000+01:00",
+                               |    "receivedDate" : "2016-08-14T00:00:00.000+00:00",
+                               |    "completionDate" : "2016-06-20T00:00:00.000+00:00",
                                |    "milestones" : [
                                |    {
                                |      "milestone" : "Received",
