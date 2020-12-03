@@ -31,6 +31,7 @@ To test different scenarios, add a header "SANDBOX-CONTROL" with one of the foll
 
 | *Value* | *Description* |
 |--------|----|
+| "NO-FORMS" | Happy path with no form data |
 | "ERROR-401" | Unhappy path, trigger a 401 Unauthorized response |
 | "ERROR-403" | Unhappy path, trigger a 403 Forbidden response |
 | "ERROR-500" | Unhappy path, trigger a 500 Internal Server Error response |

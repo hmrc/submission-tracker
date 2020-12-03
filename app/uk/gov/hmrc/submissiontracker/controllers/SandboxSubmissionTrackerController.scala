@@ -21,6 +21,7 @@ import java.time.format.DateTimeFormatter
 
 import com.google.inject.Singleton
 import javax.inject.Inject
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
 import uk.gov.hmrc.api.controllers._
 import uk.gov.hmrc.api.sandbox.FileResource
@@ -49,6 +50,7 @@ class SandboxSubmissionTrackerController @Inject() (
         case Some("ERROR-401") => Unauthorized
         case Some("ERROR-403") => Forbidden
         case Some("ERROR-500") => InternalServerError
+        case Some("NO-FORMS") => Ok(Json.parse("""{ "submissions": [] }"""))
         case _ =>
 
           val resource: String = findResource(s"/resources/SandboxTrackingData.json")

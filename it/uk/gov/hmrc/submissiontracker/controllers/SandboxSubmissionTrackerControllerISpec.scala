@@ -35,6 +35,20 @@ class SandboxSubmissionTrackerControllerISpec
       response.body   shouldBe resource
     }
 
+    "return valid tracking data from sandbox with accept header when have no forms" in {
+      val response = await(
+        wsUrl(s"/tracking/$nino/$idType$journeyIdUrlVar")
+          .addHttpHeaders(acceptJsonHeader, mobileUserIdHeader, "SANDBOX-CONTROL" -> "NO-FORMS")
+          .get()
+      )
+
+      verify(0, postRequestedFor(urlEqualTo("/auth/authorise")))
+      verify(0, postRequestedFor(urlEqualTo(s"/tracking-data/user/$idType/$nino$journeyIdUrlVar")))
+
+      response.status shouldBe 200
+      response.body   shouldBe """{"submissions":[]}"""
+    }
+
     "return 406 when missing accept header" in {
       val response = await(
         wsUrl(s"/tracking/$nino/$idType$journeyIdUrlVar")
