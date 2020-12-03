@@ -39,6 +39,7 @@ The Tracking object
       "businessArea": "PSA",
       "receivedDate": "20150412",
       "completionDate": "20150517",
+      "milestone": "InProgress",
       "milestones": [
         {
           "milestone": "Received",
