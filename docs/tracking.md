@@ -21,6 +21,13 @@ The Tracking object
    `idType=[String]`
 
    The name of the tax identifier. i.e. nino or utr.
+   
+    **Required:**
+      
+    `journeyId=[String]`
+   
+    a string which is included for journey tracking purposes but has no functional impact
+ 
 
 * **Success Response:**
 
