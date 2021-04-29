@@ -24,7 +24,7 @@ import uk.gov.hmrc.http.{CorePost, HttpGet}
 import uk.gov.hmrc.play.audit.model.Audit
 import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.submissiontracker.controllers.api.ApiAccess
 
 import scala.collection.JavaConverters._

@@ -22,7 +22,7 @@ import play.api.mvc._
 import uk.gov.hmrc.api.controllers._
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.HeaderCarrierConverter
+import uk.gov.hmrc.play.http.HeaderCarrierConverter.fromRequest
 import uk.gov.hmrc.submissiontracker.controllers._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -67,7 +67,7 @@ trait AccessControl extends HeaderValidator with Results with Authorisation {
     block:   Request[A] => Future[Result],
     taxId:   Option[Nino]
   ): Future[Result] = {
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, None)
+    implicit val hc: HeaderCarrier = fromRequest(request)
 
     grantAccess(taxId.getOrElse(Nino("")))
       .flatMap { _ =>

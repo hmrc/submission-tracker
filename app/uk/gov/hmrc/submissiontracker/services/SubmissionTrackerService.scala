@@ -56,7 +56,7 @@ class SubmissionTrackerService @Inject() (
     }
 
   private def convertData(data: TrackingDataSeq): TrackingDataSeqResponse =
-    data.submissions.fold(TrackingDataSeqResponse.noSumbissions) { found =>
+    data.submissions.fold(TrackingDataSeqResponse.noSubmissions) { found =>
       TrackingDataSeqResponse(Some(found.map { item =>
         TrackingDataResponse(
           formId                 = item.formId,

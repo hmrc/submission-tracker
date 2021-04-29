@@ -77,5 +77,5 @@ case class TrackingDataSeqResponse(submissions: Option[Seq[TrackingDataResponse]
 object TrackingDataSeqResponse {
   implicit val trackingDataSeqFormat: Format[TrackingDataSeqResponse] = Json.format[TrackingDataSeqResponse]
 
-  val noSumbissions = apply(None)
+  val noSubmissions: TrackingDataSeqResponse = apply(None)
 }

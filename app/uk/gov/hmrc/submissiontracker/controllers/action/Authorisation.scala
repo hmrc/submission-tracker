@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.submissiontracker.controllers.action
 
-import uk.gov.hmrc.auth.core.retrieve.Retrievals._
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.{AuthorisedFunctions, Enrolment, EnrolmentIdentifier}
 import uk.gov.hmrc.domain.Nino

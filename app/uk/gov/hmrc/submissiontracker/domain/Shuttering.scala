@@ -26,6 +26,6 @@ case class Shuttering(
 case object Shuttering {
   implicit val format: OFormat[Shuttering] = Json.format[Shuttering]
 
-  def shutteringDisabled = this.apply(false)
+  def shutteringDisabled: Shuttering = this.apply(shuttered = false)
 
 }
