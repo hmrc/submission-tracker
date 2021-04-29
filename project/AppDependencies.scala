@@ -4,9 +4,9 @@ object AppDependencies {
   import play.core.PlayVersion
   import play.sbt.PlayImport._
 
-  private val bootstrapPlayVersion     = "1.3.0"
+  private val bootstrapPlayVersion     = "4.3.0"
   private val domainVersion            = "5.6.0-play-26"
-  private val playHmrcApiVersion       = "4.1.0-play-26"
+  private val playHmrcApiVersion       = "6.2.0-play-26"
   private val wireMockVersion          = "2.21.0"
   private val emailAdressVersion       = "3.4.0"
   private val scalamockVersion         = "4.1.0"
@@ -17,12 +17,12 @@ object AppDependencies {
 
   val compile = Seq(
     ws,
-    "uk.gov.hmrc"       %% "bootstrap-play-26" % bootstrapPlayVersion,
-    "uk.gov.hmrc"       %% "play-hmrc-api"     % playHmrcApiVersion,
-    "uk.gov.hmrc"       %% "domain"            % domainVersion,
-    "uk.gov.hmrc"       %% "emailaddress"      % emailAdressVersion,
-    "eu.timepit"        %% "refined"           % refinedVersion,
-    "com.typesafe.play" %% "play-json-joda"    % playJsonJodaVersion
+    "uk.gov.hmrc"       %% "bootstrap-backend-play-26" % bootstrapPlayVersion,
+    "uk.gov.hmrc"       %% "play-hmrc-api"             % playHmrcApiVersion,
+    "uk.gov.hmrc"       %% "domain"                    % domainVersion,
+    "uk.gov.hmrc"       %% "emailaddress"              % emailAdressVersion,
+    "eu.timepit"        %% "refined"                   % refinedVersion,
+    "com.typesafe.play" %% "play-json-joda"            % playJsonJodaVersion
   )
 
   trait TestDependencies {

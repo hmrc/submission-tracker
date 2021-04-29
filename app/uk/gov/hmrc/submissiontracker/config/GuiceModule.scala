@@ -23,7 +23,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.{CorePost, HttpGet}
 import uk.gov.hmrc.play.audit.model.Audit
 import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
-import uk.gov.hmrc.play.bootstrap.config.{RunMode, ServicesConfig}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.submissiontracker.controllers.api.ApiAccess
 
@@ -34,10 +34,7 @@ class GuiceModule(
   configuration: Configuration)
     extends AbstractModule {
 
-  val servicesConfig = new ServicesConfig(
-    configuration,
-    new RunMode(configuration, environment.mode)
-  )
+  val servicesConfig = new ServicesConfig(configuration)
 
   override def configure(): Unit = {
 
