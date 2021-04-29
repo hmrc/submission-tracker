@@ -17,14 +17,15 @@
 package uk.gov.hmrc.submissiontracker.controllers
 
 import com.google.inject.Singleton
+
 import javax.inject.{Inject, Named}
 import play.api.libs.json.Json._
 import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.HeaderCarrierConverter
-import uk.gov.hmrc.play.bootstrap.controller.BackendController
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import uk.gov.hmrc.play.http.HeaderCarrierConverter.fromRequest
 import uk.gov.hmrc.submissiontracker.connectors.ShutteringConnector
 import uk.gov.hmrc.submissiontracker.controllers.action.AccessControl
 import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.{IdType, JourneyId}
@@ -51,7 +52,7 @@ class SubmissionTrackerController @Inject() (
     journeyId: JourneyId
   ): Action[AnyContent] =
     validateAcceptWithAuth(acceptHeaderValidationRules, Some(Nino(id))).async { implicit request =>
-      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, None)
+      implicit val hc: HeaderCarrier = fromRequest(request)
       shutteringConnector.getShutteringStatus(journeyId).flatMap { shuttered =>
         withShuttering(shuttered) {
           errorWrapper {

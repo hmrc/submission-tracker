@@ -4,7 +4,6 @@ import java.time.LocalDate
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
-import play.libs.Json
 import uk.gov.hmrc.api.sandbox.FileResource
 import uk.gov.hmrc.submissiontracker.support.BaseISpec
 

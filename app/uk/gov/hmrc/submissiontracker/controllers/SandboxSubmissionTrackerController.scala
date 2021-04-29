@@ -25,7 +25,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
 import uk.gov.hmrc.api.controllers._
 import uk.gov.hmrc.api.sandbox.FileResource
-import uk.gov.hmrc.play.bootstrap.controller.BackendController
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.{IdType, JourneyId}
 
 import scala.concurrent.{ExecutionContext, Future}
