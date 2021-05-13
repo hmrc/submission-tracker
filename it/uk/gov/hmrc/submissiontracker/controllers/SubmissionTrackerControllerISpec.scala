@@ -28,7 +28,7 @@ class SubmissionTrackerControllerISpec extends BaseISpec with FutureAwaits with 
     }
 
     "fail with a 401 if confidence level is low" in {
-      AuthStub.grantAccess(nino, nino, 100)
+      AuthStub.grantAccess(nino, nino, 50)
 
       val response = await(
         wsUrl(s"/tracking/$nino/$idType/$journeyIdUrlVar")

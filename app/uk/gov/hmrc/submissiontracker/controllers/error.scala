@@ -40,16 +40,18 @@ class AccountWithWeakCredStrength(message: String) extends uk.gov.hmrc.http.Http
 trait ErrorHandling {
   self: BaseController =>
 
+  val logger: Logger = Logger(this.getClass)
+
   def errorWrapper(func: => Future[mvc.Result])(implicit hc: HeaderCarrier): Future[Result] =
     func.recover {
       case _: NotFoundException => Status(ErrorNotFound.httpStatusCode)(toJson(ErrorNotFound))
 
-      case _: UnauthorizedException => Unauthorized(toJson(ErrorUnauthorizedNoNino))
+      case ex: Upstream4xxResponse if ex.upstreamResponseCode == 401 => Unauthorized(toJson(ErrorUnauthorizedNoNino))
 
-      case _: ForbiddenException => Unauthorized(toJson(ErrorUnauthorizedLowCL))
+      case ex: Upstream4xxResponse if ex.upstreamResponseCode == 403 => Unauthorized(toJson(ErrorUnauthorizedLowCL))
 
       case e: Throwable =>
-        Logger.error(s"Internal server error: ${e.getMessage}", e)
+        logger.error(s"Internal server error: ${e.getMessage}", e)
         Status(ErrorInternalServerError.httpStatusCode)(toJson(ErrorInternalServerError))
     }
 }

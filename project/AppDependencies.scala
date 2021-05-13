@@ -4,20 +4,21 @@ object AppDependencies {
   import play.core.PlayVersion
   import play.sbt.PlayImport._
 
-  private val bootstrapPlayVersion     = "4.3.0"
-  private val domainVersion            = "5.6.0-play-26"
-  private val playHmrcApiVersion       = "6.2.0-play-26"
+  private val bootstrapPlayVersion     = "5.1.0"
+  private val domainVersion            = "5.11.0-play-27"
+  private val playHmrcApiVersion       = "6.2.0-play-27"
   private val wireMockVersion          = "2.21.0"
   private val emailAdressVersion       = "3.4.0"
   private val scalamockVersion         = "4.1.0"
   private val mockitoVersion           = "3.2.4"
-  private val scalatestplusPlayVersion = "3.1.2"
+  private val scalatestplusPlayVersion = "4.0.3"
   private val refinedVersion           = "0.9.4"
   private val playJsonJodaVersion      = "2.6.14"
+  private val pegdownVersion           = "1.6.0"
 
   val compile = Seq(
     ws,
-    "uk.gov.hmrc"       %% "bootstrap-backend-play-26" % bootstrapPlayVersion,
+    "uk.gov.hmrc"       %% "bootstrap-backend-play-27" % bootstrapPlayVersion,
     "uk.gov.hmrc"       %% "play-hmrc-api"             % playHmrcApiVersion,
     "uk.gov.hmrc"       %% "domain"                    % domainVersion,
     "uk.gov.hmrc"       %% "emailaddress"              % emailAdressVersion,
@@ -38,7 +39,7 @@ object AppDependencies {
         override lazy val test = Seq(
           "org.scalatestplus.play" %% "scalatestplus-play" % scalatestplusPlayVersion % scope,
           "org.scalamock"          %% "scalamock"          % scalamockVersion         % scope,
-          "org.pegdown"            % "pegdown"             % "1.6.0"                  % scope
+          "org.pegdown"            % "pegdown"             % pegdownVersion           % scope
         )
       }.test
   }

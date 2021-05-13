@@ -21,6 +21,7 @@ import play.api._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
 import uk.gov.hmrc.submissiontracker.domain.TrackingDataSeq
 import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.IdType
+import uk.gov.hmrc.http.HttpReads.Implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -28,6 +29,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class TrackingConnector @Inject() (
   @Named("trackingUrl") val trackingBaseUrl: String,
   val httpGet:                               HttpGet) {
+
+  val logger: Logger = Logger(this.getClass)
 
   def trackingDataLink(
     id:     String,
@@ -40,7 +43,7 @@ class TrackingConnector @Inject() (
   )(implicit hc: HeaderCarrier,
     ec:          ExecutionContext
   ): Future[TrackingDataSeq] = {
-    Logger.debug("submission-tracker: Requesting tracking data")
+    logger.debug("submission-tracker: Requesting tracking data")
     httpGet.GET[TrackingDataSeq](trackingDataLink(id, idType.value))
   }
 
