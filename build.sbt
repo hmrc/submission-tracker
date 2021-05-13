@@ -1,8 +1,6 @@
 import play.sbt.PlayImport.PlayKeys.playDefaultPort
 import sbt.Tests.{Group, SubProcess}
-import uk.gov.hmrc.SbtArtifactory
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
-import uk.gov.hmrc.versioning.SbtGitVersioning
 
 val appName: String = "submission-tracker"
 
@@ -10,9 +8,7 @@ lazy val microservice = Project(appName, file("."))
   .enablePlugins(
     Seq(play.sbt.PlayScala,
         SbtAutoBuildPlugin,
-        SbtGitVersioning,
         SbtDistributablesPlugin,
-        SbtArtifactory,
         ScoverageSbtPlugin): _*
   )
   .configs(IntegrationTest)

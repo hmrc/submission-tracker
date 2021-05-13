@@ -17,7 +17,7 @@
 package uk.gov.hmrc.submissiontracker.controllers
 
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.auth.core.ConfidenceLevel.{L100, L200}
+import uk.gov.hmrc.auth.core.ConfidenceLevel.{L200, L50}
 import uk.gov.hmrc.auth.core.syntax.retrieved._
 import uk.gov.hmrc.submissiontracker.controllers.action.Authorisation
 import uk.gov.hmrc.submissiontracker.stub.TestSetup
@@ -41,7 +41,7 @@ class AuthorisationSpec extends TestSetup {
     }
 
     "error with unauthorised when account has low CL" in {
-      stubAuthorisationGrantAccess(Some(nino.value) and L100)
+      stubAuthorisationGrantAccess(Some(nino.value) and L50)
 
       intercept[AccountWithLowCL] {
         await(authorisation.grantAccess(nino))

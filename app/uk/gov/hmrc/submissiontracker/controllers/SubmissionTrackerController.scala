@@ -17,6 +17,7 @@
 package uk.gov.hmrc.submissiontracker.controllers
 
 import com.google.inject.Singleton
+import play.api.Logger
 
 import javax.inject.{Inject, Named}
 import play.api.libs.json.Json._
@@ -45,6 +46,8 @@ class SubmissionTrackerController @Inject() (
     with AccessControl
     with ErrorHandling
     with ControllerChecks {
+
+  override val logger: Logger = Logger(this.getClass)
 
   def trackingData(
     id:        String,

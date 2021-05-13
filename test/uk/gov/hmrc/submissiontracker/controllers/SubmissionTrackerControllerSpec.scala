@@ -75,7 +75,7 @@ class SubmissionTrackerControllerSpec extends TestSetup {
     }
 
     "return forbidden when authority record does not have correct confidence level" in {
-      stubAuthorisationGrantAccess(Some(nino.value) and L100)
+      stubAuthorisationGrantAccess(Some(nino.value) and L50)
       status(controller.trackingData(incorrectNino.value, idType, journeyId)(requestWithAcceptHeader)) shouldBe 401
     }
 

@@ -17,7 +17,6 @@
 package uk.gov.hmrc.submissiontracker.controllers
 
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 import com.google.inject.Singleton
 import javax.inject.Inject
@@ -37,8 +36,6 @@ class SandboxSubmissionTrackerController @Inject() (
   extends BackendController(cc)
     with HeaderValidator
     with FileResource {
-
-  private val dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd")
 
   def trackingData(
                     id:        String,

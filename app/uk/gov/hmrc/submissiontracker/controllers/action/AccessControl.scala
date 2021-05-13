@@ -39,6 +39,7 @@ trait AccessControl extends HeaderValidator with Results with Authorisation {
 
   implicit val executionContext: ExecutionContext
   val parser:                    BodyParser[AnyContent]
+  val logger: Logger = Logger(this.getClass)
 
   lazy val requiresAuth: Boolean = true
 
@@ -75,23 +76,23 @@ trait AccessControl extends HeaderValidator with Results with Authorisation {
       }
       .recover {
         case _: uk.gov.hmrc.http.Upstream4xxResponse =>
-          Logger.info("Unauthorized! Failed to grant access since 4xx response!")
+          logger.info("Unauthorized! Failed to grant access since 4xx response!")
           Unauthorized(Json.toJson(ErrorUnauthorizedMicroService))
 
         case _: NinoNotFoundOnAccount =>
-          Logger.info("Unauthorized! NINO not found on account!")
+          logger.info("Unauthorized! NINO not found on account!")
           Unauthorized(Json.toJson(ErrorUnauthorizedNoNino))
 
         case _: FailToMatchTaxIdOnAuth =>
-          Logger.info("Unauthorized! Failure to match URL NINO against Auth NINO")
+          logger.info("Unauthorized! Failure to match URL NINO against Auth NINO")
           Status(ErrorUnauthorized.httpStatusCode)(Json.toJson(ErrorUnauthorized))
 
         case _: AccountWithLowCL =>
-          Logger.info("Unauthorized! Account with low CL!")
+          logger.info("Unauthorized! Account with low CL!")
           Unauthorized(Json.toJson(ErrorUnauthorizedLowCL))
 
         case _: AccountWithWeakCredStrength =>
-          Logger.info("Unauthorized! Account with weak cred strength!")
+          logger.info("Unauthorized! Account with weak cred strength!")
           Unauthorized(Json.toJson(ErrorUnauthorizedWeakCredStrength))
       }
   }
