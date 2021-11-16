@@ -44,14 +44,14 @@ trait ErrorHandling {
 
   def errorWrapper(func: => Future[mvc.Result])(implicit hc: HeaderCarrier): Future[Result] =
     func.recover {
-      case _: NotFoundException => Status(ErrorNotFound.httpStatusCode)(toJson(ErrorNotFound))
+      case _: NotFoundException => Status(ErrorNotFound.httpStatusCode)(toJson[ErrorResponse](ErrorNotFound))
 
-      case ex: Upstream4xxResponse if ex.upstreamResponseCode == 401 => Unauthorized(toJson(ErrorUnauthorizedNoNino))
+      case ex: Upstream4xxResponse if ex.upstreamResponseCode == 401 => Unauthorized(toJson[ErrorResponse](ErrorUnauthorizedNoNino))
 
-      case ex: Upstream4xxResponse if ex.upstreamResponseCode == 403 => Unauthorized(toJson(ErrorUnauthorizedLowCL))
+      case ex: Upstream4xxResponse if ex.upstreamResponseCode == 403 => Unauthorized(toJson[ErrorResponse](ErrorUnauthorizedLowCL))
 
       case e: Throwable =>
         logger.error(s"Internal server error: ${e.getMessage}", e)
-        Status(ErrorInternalServerError.httpStatusCode)(toJson(ErrorInternalServerError))
+        Status(ErrorInternalServerError.httpStatusCode)(toJson[ErrorResponse](ErrorInternalServerError))
     }
 }
