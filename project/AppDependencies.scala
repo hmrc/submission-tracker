@@ -5,10 +5,10 @@ object AppDependencies {
   import play.sbt.PlayImport._
 
   private val bootstrapPlayVersion     = "5.16.0"
-  private val domainVersion            = "6.2.0-play-28"
+  private val domainVersion            = "8.1.0-play-28"
   private val playHmrcApiVersion       = "6.4.0-play-28"
   private val wireMockVersion          = "2.21.0"
-  private val emailAdressVersion       = "3.5.0"
+  private val emailAdressVersion       = "3.6.0"
   private val scalamockVersion         = "4.1.0"
   private val mockitoVersion           = "3.2.4"
   private val scalatestplusPlayVersion = "4.0.3"
