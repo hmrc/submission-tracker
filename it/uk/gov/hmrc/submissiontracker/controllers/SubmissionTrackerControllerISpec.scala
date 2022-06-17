@@ -16,7 +16,7 @@ class SubmissionTrackerControllerISpec extends BaseISpec with FutureAwaits with 
 
       val response = await(
         wsUrl(s"/tracking/$nino/$idType/$journeyIdUrlVar")
-          .addHttpHeaders(acceptJsonHeader)
+          .addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
           .get()
       )
 
@@ -94,7 +94,7 @@ class SubmissionTrackerControllerISpec extends BaseISpec with FutureAwaits with 
 
       val response = await(
         wsUrl(s"/tracking/$nino/$idType/$journeyIdUrlVar")
-          .addHttpHeaders(acceptJsonHeader)
+          .addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)
           .get()
       )
 
