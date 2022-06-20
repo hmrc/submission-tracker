@@ -35,6 +35,8 @@ class BaseISpec
   override implicit lazy val app: Application = appBuilder
     .build()
 
+  protected val authorisationJsonHeader: (String, String) = "AUTHORIZATION" -> "Bearer 123"
+
   def config: Map[String, Any] = Map(
     "auditing.enabled"                             -> false,
     "microservice.services.auth.port"              -> wireMockPort,
