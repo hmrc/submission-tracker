@@ -94,7 +94,7 @@ paths:
       deprecated: false
       security:
         - userRestricted:
-            - read:native-apps-api-orchestration
+            - read:submission-tracker
 components:
   securitySchemes:
     userRestricted:
