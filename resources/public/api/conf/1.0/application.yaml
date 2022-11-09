@@ -1,0 +1,211 @@
+openapi: 3.0.0
+info:
+  title: Submission Tracker
+  description: >-
+    ### What is this API for?
+
+    The API is used to retrieve tracking information.
+  contact: {}
+  version: '1.0'
+servers:
+  - url: https://test-api.service.hmrc.gov.uk/submission-tracker
+    description: Sandbox
+  - url: https://api.service.hmrc.gov.uk/submission-tracker
+    description: Production
+    variables: {}
+paths:
+  /submission-tracker/tracking/{id}/{idType}:
+    get:
+      tags:
+        - submission-tracker
+      summary: Tracking data id
+      description: This endpoint retrieves the tracking data from a tax identifier.
+      operationId: Trackingdataid
+      parameters:
+        - name: id
+          in: path
+          description: The NINO for the individual. This could also be a UTR.
+          required: true
+          style: simple
+          schema:
+            type: string
+            example: NS123456B
+        - name: idType
+          in: path
+          description: The name of the tax identifier that is supplied in the 'id' field.
+          required: true
+          style: simple
+          schema:
+            type: string
+            example: nino
+        - name: journeyId
+          in: query
+          description: ''
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SubmissionTrackerTrackingresponse'
+                  - example:
+                      submissions:
+                        - formId: R39_EN
+                          formName: Claim a tax refund
+                          dfsSubmissionReference: 111-ABCD-456
+                          receivedDate: '20150412'
+                          completionDate: '20150517'
+                          milestone: InProgress
+                          milestones:
+                            - milestone: Received
+                              status: complete
+                            - milestone: Acquired
+                              status: complete
+                            - milestone: InProgress
+                              status: current
+                            - milestone: Done
+                              status: incomplete
+              examples:
+                example-1:
+                  value:
+                    submissions:
+                      - formId: R39_EN
+                        formName: Claim a tax refund
+                        dfsSubmissionReference: 111-ABCD-456
+                        receivedDate: '20150412'
+                        completionDate: '20150517'
+                        milestone: InProgress
+                        milestones:
+                          - milestone: Received
+                            status: complete
+                          - milestone: Acquired
+                            status: complete
+                          - milestone: InProgress
+                            status: current
+                          - milestone: Done
+                            status: incomplete
+      deprecated: false
+      security:
+        - userRestricted:
+            - read:native-apps-api-orchestration
+components:
+  securitySchemes:
+    userRestricted:
+      type: oauth2
+      description: |
+        HMRC supports OAuth 2.0 for authenticating user-restricted API requests using an OAuth 2.0 Bearer Token in the
+        AUTHORIZATION header.
+        See https://developer.service.hmrc.gov.uk/api-documentation/docs/authorisation/user-restricted-endpoints for details.
+      flows:
+        authorizationCode:
+          authorizationUrl: https://api.service.hmrc.gov.uk/oauth/authorize
+          tokenUrl: https://api.service.hmrc.gov.uk/oauth/token
+          refreshUrl: https://api.service.hmrc.gov.uk/oauth/refresh
+          scopes:
+            read:submission-tracker: The API is used to retrieve tracking information for HMRC mobile apps
+  schemas:
+    errorResponse:
+      title: errorResponse
+      required:
+        - code
+      type: object
+      properties:
+        code:
+          type: string
+    Milestone:
+      title: Milestone
+      required:
+        - milestone
+        - status
+      type: object
+      properties:
+        milestone:
+          type: string
+        status:
+          type: string
+      example:
+        milestone: Received
+        status: complete
+    Submission:
+      title: Submission
+      required:
+        - formId
+        - formName
+        - dfsSubmissionReference
+        - receivedDate
+        - completionDate
+        - milestone
+        - milestones
+      type: object
+      properties:
+        formId:
+          type: string
+        formName:
+          type: string
+        dfsSubmissionReference:
+          type: string
+        receivedDate:
+          type: string
+        completionDate:
+          type: string
+        milestone:
+          type: string
+        milestones:
+          type: array
+          items:
+            $ref: '#/components/schemas/Milestone'
+          description: ''
+      example:
+        formId: R39_EN
+        formName: Claim a tax refund
+        dfsSubmissionReference: 111-ABCD-456
+        receivedDate: '20150412'
+        completionDate: '20150517'
+        milestone: InProgress
+        milestones:
+          - milestone: Received
+            status: complete
+          - milestone: Acquired
+            status: complete
+          - milestone: InProgress
+            status: current
+          - milestone: Done
+            status: incomplete
+    SubmissionTrackerTrackingresponse:
+      title: SubmissionTrackerTrackingresponse
+      required:
+        - submissions
+      type: object
+      properties:
+        submissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Submission'
+          description: ''
+      example:
+        submissions:
+          - formId: R39_EN
+            formName: Claim a tax refund
+            dfsSubmissionReference: 111-ABCD-456
+            receivedDate: '20150412'
+            completionDate: '20150517'
+            milestone: InProgress
+            milestones:
+              - milestone: Received
+                status: complete
+              - milestone: Acquired
+                status: complete
+              - milestone: InProgress
+                status: current
+              - milestone: Done
+                status: incomplete
+tags:
+  - name: submission-tracker
+    description: ''
