@@ -55,10 +55,10 @@ class TrackingConnectorSpec extends TestSetup {
       }
     }
 
-    "throw Upstream5xxResponse when a 500 response is returned" in {
-      trackingGetFailure(Upstream5xxResponse("Error", 500, 500))
+    "throw UpstreamErrorResponse when a 500 response is returned" in {
+      trackingGetFailure(UpstreamErrorResponse("Error", 500, 500))
 
-      intercept[Upstream5xxResponse] {
+      intercept[UpstreamErrorResponse] {
         await(connector.getUserTrackingData(nino.value, idType))
       }
     }

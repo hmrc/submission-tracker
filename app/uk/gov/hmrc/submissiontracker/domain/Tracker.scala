@@ -43,14 +43,6 @@ object TrackingData {
   implicit val trackingDataFormat: Format[TrackingData] = Json.format[TrackingData]
 }
 
-case class TrackingDataPresenter(
-  trackingData:    TrackingData,
-  latestMilestone: String)
-
-object TrackingDataPresenter {
-  implicit val trackingDataPresenterFormat: Format[TrackingDataPresenter] = Json.format[TrackingDataPresenter]
-}
-
 case class TrackingDataSeq(submissions: Option[Seq[TrackingData]])
 
 object TrackingDataSeq {
@@ -60,6 +52,7 @@ object TrackingDataSeq {
 case class TrackingDataResponse(
   formId:                 String,
   formName:               String,
+  formNameCy:             String,
   dfsSubmissionReference: String,
   receivedDate:           DateTime,
   completionDate:         DateTime,

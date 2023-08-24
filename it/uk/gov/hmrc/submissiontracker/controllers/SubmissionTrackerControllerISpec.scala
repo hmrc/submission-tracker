@@ -22,6 +22,8 @@ class SubmissionTrackerControllerISpec extends BaseISpec with FutureAwaits with 
 
       response.status                                                      shouldBe 200
       ((response.json \ "submissions").head \ "receivedDate").as[String]   shouldBe "20160814"
+      ((response.json \ "submissions").head \ "formName").as[String]       shouldBe "Excise duty return and payment of duty for biofuels and other fuel substitutes"
+      ((response.json \ "submissions").head \ "formNameCy").as[String]     shouldBe "Datganiad toll ecséis a thalu toll ar gyfer biodanwyddau ac amnewidion tanwydd eraill"
       ((response.json \ "submissions").head \ "completionDate").as[String] shouldBe "20160620"
       ((response.json \ "submissions").head \ "milestone").as[String]      shouldBe "Received"
       ((response.json \ "submissions").head \ "businessArea").isEmpty

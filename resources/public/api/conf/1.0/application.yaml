@@ -59,6 +59,7 @@ paths:
                       submissions:
                         - formId: R39_EN
                           formName: Claim a tax refund
+                          formNameCy: Hawlio ad-daliad treth
                           dfsSubmissionReference: 111-ABCD-456
                           receivedDate: '20150412'
                           completionDate: '20150517'
@@ -78,6 +79,7 @@ paths:
                     submissions:
                       - formId: R39_EN
                         formName: Claim a tax refund
+                        formNameCy: Hawlio ad-daliad treth
                         dfsSubmissionReference: 111-ABCD-456
                         receivedDate: '20150412'
                         completionDate: '20150517'
@@ -138,6 +140,7 @@ components:
       required:
         - formId
         - formName
+        - formNameCy
         - dfsSubmissionReference
         - receivedDate
         - completionDate
@@ -148,6 +151,8 @@ components:
         formId:
           type: string
         formName:
+          type: string
+        formNameCy:
           type: string
         dfsSubmissionReference:
           type: string
@@ -165,6 +170,7 @@ components:
       example:
         formId: R39_EN
         formName: Claim a tax refund
+        formNameCy: Hawlio ad-daliad treth
         dfsSubmissionReference: 111-ABCD-456
         receivedDate: '20150412'
         completionDate: '20150517'
@@ -193,6 +199,7 @@ components:
         submissions:
           - formId: R39_EN
             formName: Claim a tax refund
+            formNameCy: Hawlio ad-daliad treth
             dfsSubmissionReference: 111-ABCD-456
             receivedDate: '20150412'
             completionDate: '20150517'
