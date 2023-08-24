@@ -17,7 +17,6 @@
 package uk.gov.hmrc.submissiontracker.services
 
 import javax.inject.{Inject, Named, Singleton}
-import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import play.api.Configuration
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -25,6 +24,7 @@ import uk.gov.hmrc.service.Auditor
 import uk.gov.hmrc.submissiontracker.connectors.TrackingConnector
 import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.IdType
 import uk.gov.hmrc.submissiontracker.domain.{Milestone, TrackingDataResponse, TrackingDataSeq, TrackingDataSeqResponse}
+import uk.gov.hmrc.submissiontracker.utils.WelshFormNameTranslator
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -36,9 +36,8 @@ class SubmissionTrackerService @Inject() (
   val formNameService:           FormNameService,
   val configuration:             Configuration,
   @Named("appName") val appName: String)
-    extends Auditor {
-  val inFormat:  DateTimeFormatter = DateTimeFormat.forPattern("dd MMM yyyy")
-  val outFormat: DateTimeFormatter = DateTimeFormat.forPattern("yyyyMMdd")
+    extends Auditor
+    with WelshFormNameTranslator {
 
   def trackingData(
     id:          String,
@@ -61,6 +60,7 @@ class SubmissionTrackerService @Inject() (
         TrackingDataResponse(
           formId                 = item.formId,
           formName               = formNameService.getFormName(item.formId),
+          formNameCy             = getFormNameInWelsh(item.formId),
           dfsSubmissionReference = item.dfsSubmissionReference,
           receivedDate           = item.receivedDate,
           completionDate         = item.completionDate,

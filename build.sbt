@@ -1,19 +1,14 @@
 import play.sbt.PlayImport.PlayKeys.playDefaultPort
 import sbt.Tests.{Group, SubProcess}
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName: String = "submission-tracker"
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(
-    Seq(play.sbt.PlayScala,
-        SbtAutoBuildPlugin,
-        SbtDistributablesPlugin,
-        ScoverageSbtPlugin): _*
+    Seq(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtDistributablesPlugin, ScoverageSbtPlugin): _*
   )
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
-  .settings(publishingSettings: _*)
   .settings(
     routesImport ++= Seq(
       "uk.gov.hmrc.domain._",
@@ -27,13 +22,12 @@ lazy val microservice = Project(appName, file("."))
     scalaVersion := "2.12.15",
     playDefaultPort := 8232,
     libraryDependencies ++= AppDependencies(),
-    dependencyOverrides ++= AppDependencies.overrides,
-    evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
+    update / evictionWarningOptions := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
     resolvers += Resolver.jcenterRepo,
-    unmanagedResourceDirectories in Compile += baseDirectory.value / "resources",
-    unmanagedSourceDirectories in IntegrationTest := (baseDirectory in IntegrationTest)(base => Seq(base / "it")).value,
-    testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
-    coverageMinimum := 80,
+    Compile / unmanagedResourceDirectories += baseDirectory.value / "resources",
+    IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory)(base => Seq(base / "it")).value,
+    IntegrationTest / testGrouping := oneForkedJvmPerTest((IntegrationTest / definedTests).value),
+    coverageMinimumStmtTotal := 90,
     coverageFailOnMinimum := true,
     coverageHighlighting := true,
     coverageExcludedPackages := "<empty>;.*Routes.*;app.*;.*prod;.*definition;.*testOnlyDoNotUseInAppConf;.*com.kenshoo.*;.*javascript.*;.*BuildInfo;.*Reverse.*;.*binder.*"

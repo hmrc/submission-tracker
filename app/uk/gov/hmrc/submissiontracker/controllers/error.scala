@@ -42,13 +42,13 @@ trait ErrorHandling {
 
   val logger: Logger = Logger(this.getClass)
 
-  def errorWrapper(func: => Future[mvc.Result])(implicit hc: HeaderCarrier): Future[Result] =
+  def errorWrapper(func: => Future[mvc.Result]): Future[Result] =
     func.recover {
       case _: NotFoundException => Status(ErrorNotFound.httpStatusCode)(toJson[ErrorResponse](ErrorNotFound))
 
-      case ex: Upstream4xxResponse if ex.upstreamResponseCode == 401 => Unauthorized(toJson[ErrorResponse](ErrorUnauthorizedNoNino))
+      case ex: UpstreamErrorResponse if ex.statusCode == 401 => Unauthorized(toJson[ErrorResponse](ErrorUnauthorizedNoNino))
 
-      case ex: Upstream4xxResponse if ex.upstreamResponseCode == 403 => Unauthorized(toJson[ErrorResponse](ErrorUnauthorizedLowCL))
+      case ex: UpstreamErrorResponse if ex.statusCode == 403 => Unauthorized(toJson[ErrorResponse](ErrorUnauthorizedLowCL))
 
       case e: Throwable =>
         logger.error(s"Internal server error: ${e.getMessage}", e)

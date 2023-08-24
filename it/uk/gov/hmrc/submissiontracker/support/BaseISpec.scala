@@ -16,17 +16,16 @@
 
 package uk.gov.hmrc.submissiontracker.support
 
-import org.scalatest.{Matchers, WordSpecLike}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.WsScalaTestClient
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
 
-import scala.language.postfixOps
-
 class BaseISpec
-    extends WordSpecLike
+    extends AnyWordSpecLike
     with Matchers
     with WsScalaTestClient
     with GuiceOneServerPerSuite

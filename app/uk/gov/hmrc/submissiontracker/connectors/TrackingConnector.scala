@@ -32,11 +32,6 @@ class TrackingConnector @Inject() (
 
   val logger: Logger = Logger(this.getClass)
 
-  def trackingDataLink(
-    id:     String,
-    idType: String
-  ): String = s"$trackingBaseUrl/tracking-data/user/$idType/$id"
-
   def getUserTrackingData(
     id:          String,
     idType:      IdType
@@ -46,5 +41,10 @@ class TrackingConnector @Inject() (
     logger.debug("submission-tracker: Requesting tracking data")
     httpGet.GET[TrackingDataSeq](trackingDataLink(id, idType.value))
   }
+
+  private def trackingDataLink(
+    id:     String,
+    idType: String
+  ): String = s"$trackingBaseUrl/tracking-data/user/$idType/$id"
 
 }

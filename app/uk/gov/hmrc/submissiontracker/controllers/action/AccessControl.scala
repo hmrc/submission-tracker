@@ -75,10 +75,6 @@ trait AccessControl extends HeaderValidator with Results with Authorisation {
         block(request)
       }
       .recover {
-        case _: uk.gov.hmrc.http.Upstream4xxResponse =>
-          logger.info("Unauthorized! Failed to grant access since 4xx response!")
-          Unauthorized(Json.toJson[ErrorResponse](ErrorUnauthorizedMicroService))
-
         case _: NinoNotFoundOnAccount =>
           logger.info("Unauthorized! NINO not found on account!")
           Unauthorized(Json.toJson[ErrorResponse](ErrorUnauthorizedNoNino))
@@ -94,6 +90,10 @@ trait AccessControl extends HeaderValidator with Results with Authorisation {
         case _: AccountWithWeakCredStrength =>
           logger.info("Unauthorized! Account with weak cred strength!")
           Unauthorized(Json.toJson[ErrorResponse](ErrorUnauthorizedWeakCredStrength))
+
+        case _: uk.gov.hmrc.http.UpstreamErrorResponse =>
+          logger.info("Unauthorized! Failed to grant access since 4xx response!")
+          Unauthorized(Json.toJson[ErrorResponse](ErrorUnauthorizedMicroService))
       }
   }
 }

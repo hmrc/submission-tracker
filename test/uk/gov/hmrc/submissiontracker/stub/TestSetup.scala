@@ -16,13 +16,12 @@
 
 package uk.gov.hmrc.submissiontracker.stub
 
-import java.time.LocalDate
-
 import eu.timepit.refined.auto._
 import org.joda.time.DateTime
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Matchers, WordSpecLike}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.Configuration
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.AnyContentAsEmpty
@@ -38,7 +37,7 @@ import uk.gov.hmrc.submissiontracker.services.{FormNameService, SubmissionTracke
 
 trait TestSetup
     extends MockFactory
-    with WordSpecLike
+    with AnyWordSpecLike
     with Matchers
     with AuthorisationStub
     with AuditStub
@@ -139,6 +138,7 @@ trait TestSetup
         TrackingDataResponse(
           "R39_EN",
           "Claim a tax refund",
+          "Hawlio ad-daliad treth",
           "111-ABCD-456",
           new DateTime(2015, 4, 12, 0, 0),
           new DateTime(2015, 5, 17, 0, 0),
@@ -155,6 +155,7 @@ trait TestSetup
         TrackingDataResponse(
           "R39_EN",
           "Claim a tax refund",
+          "Hawlio ad-daliad treth",
           "111-ABCD-456",
           new DateTime(2015, 4, 12, 0, 0),
           new DateTime(2015, 5, 17, 0, 0),
@@ -171,6 +172,7 @@ trait TestSetup
         TrackingDataResponse(
           "R39_EN",
           "Claim a tax refund",
+          "Hawlio ad-daliad treth",
           "111-ABCD-456",
           DateTime.now().minusDays(3),
           DateTime.now().plusDays(5),
