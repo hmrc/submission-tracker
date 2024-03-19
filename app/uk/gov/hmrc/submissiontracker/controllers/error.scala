@@ -22,8 +22,7 @@ import play.api.{Logger, mvc}
 import uk.gov.hmrc.api.controllers.{ErrorInternalServerError, ErrorNotFound, ErrorResponse, ErrorUnauthorizedLowCL}
 import uk.gov.hmrc.http._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 case object ErrorUnauthorizedNoNino extends ErrorResponse(401, "UNAUTHORIZED", "NINO does not exist on account")
 
@@ -42,7 +41,7 @@ trait ErrorHandling {
 
   val logger: Logger = Logger(this.getClass)
 
-  def errorWrapper(func: => Future[mvc.Result]): Future[Result] =
+  def errorWrapper(func: => Future[mvc.Result])(implicit ec: ExecutionContext): Future[Result] =
     func.recover {
       case _: NotFoundException => Status(ErrorNotFound.httpStatusCode)(toJson[ErrorResponse](ErrorNotFound))
 

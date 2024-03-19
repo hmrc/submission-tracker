@@ -17,7 +17,6 @@
 package uk.gov.hmrc.submissiontracker.stub
 
 import eu.timepit.refined.auto._
-import org.joda.time.DateTime
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
@@ -33,7 +32,10 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.submissiontracker.connectors.{ShutteringConnector, TrackingConnector}
 import uk.gov.hmrc.submissiontracker.domain._
 import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.{IdType, JourneyId}
-import uk.gov.hmrc.submissiontracker.services.{FormNameService, SubmissionTrackerService}
+import uk.gov.hmrc.submissiontracker.services.{AuditService, FormNameService, SubmissionTrackerService}
+
+import java.time.LocalDateTime
+import scala.concurrent.ExecutionContext.Implicits.global
 
 trait TestSetup
     extends MockFactory
@@ -54,6 +56,7 @@ trait TestSetup
   implicit val mockFormNameService:          FormNameService          = mock[FormNameService]
   implicit val mockHttp:                     HttpGet                  = mock[HttpGet]
   implicit val mockShutteringConnector:      ShutteringConnector      = mock[ShutteringConnector]
+  implicit val mockAuditService:             AuditService             = new AuditService("submission-tracker", mockAuditConnector)
 
   val shuttered =
     Shuttering(shuttered = true, Some("Shuttered"), Some("Form Tracker is currently not available"))
@@ -91,8 +94,8 @@ trait TestSetup
                      "Claim a tax refund",
                      "111-ABCD-456",
                      "PSA",
-                     new DateTime(2015, 4, 12, 0, 0),
-                     new DateTime(2015, 5, 17, 0, 0),
+                     LocalDateTime.of(2015, 4, 12, 0, 0),
+                     LocalDateTime.of(2015, 5, 17, 0, 0),
                      milestones)
       )
     )
@@ -140,8 +143,8 @@ trait TestSetup
           "Claim a tax refund",
           "Hawlio ad-daliad treth",
           "111-ABCD-456",
-          new DateTime(2015, 4, 12, 0, 0),
-          new DateTime(2015, 5, 17, 0, 0),
+          LocalDateTime.of(2015, 4, 12, 0, 0),
+          LocalDateTime.of(2015, 5, 17, 0, 0),
           "InProgress",
           milestones
         )
@@ -157,8 +160,8 @@ trait TestSetup
           "Claim a tax refund",
           "Hawlio ad-daliad treth",
           "111-ABCD-456",
-          new DateTime(2015, 4, 12, 0, 0),
-          new DateTime(2015, 5, 17, 0, 0),
+          LocalDateTime.of(2015, 4, 12, 0, 0),
+          LocalDateTime.of(2015, 5, 17, 0, 0),
           "InProgress",
           milestones
         )
@@ -174,8 +177,8 @@ trait TestSetup
           "Claim a tax refund",
           "Hawlio ad-daliad treth",
           "111-ABCD-456",
-          DateTime.now().minusDays(3),
-          DateTime.now().plusDays(5),
+          LocalDateTime.now().minusDays(3),
+          LocalDateTime.now().plusDays(5),
           "InProgress",
           milestones
         )

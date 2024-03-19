@@ -16,8 +16,10 @@
 
 package uk.gov.hmrc.submissiontracker.domain
 
-import org.joda.time.DateTime
 import play.api.libs.json._
+
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 case class Milestone(
   milestone: String,
@@ -32,14 +34,11 @@ case class TrackingData(
   formName:               String,
   dfsSubmissionReference: String,
   businessArea:           String,
-  receivedDate:           DateTime,
-  completionDate:         DateTime,
+  receivedDate:           LocalDateTime,
+  completionDate:         LocalDateTime,
   milestones:             Seq[Milestone])
 
 object TrackingData {
-  implicit val dateTimeWriter:   Writes[DateTime] = JodaWrites.JodaDateTimeWrites
-  implicit val dateTimeJsReader: Reads[DateTime]  = JodaReads.DefaultJodaDateTimeReads
-
   implicit val trackingDataFormat: Format[TrackingData] = Json.format[TrackingData]
 }
 
@@ -54,14 +53,14 @@ case class TrackingDataResponse(
   formName:               String,
   formNameCy:             String,
   dfsSubmissionReference: String,
-  receivedDate:           DateTime,
-  completionDate:         DateTime,
+  receivedDate:           LocalDateTime,
+  completionDate:         LocalDateTime,
   milestone:              String,
   milestones:             Seq[Milestone])
 
 object TrackingDataResponse {
-  implicit val dateTimeWriter:     Writes[DateTime]             = JodaWrites.jodaDateWrites("yyyyMMdd")
-  implicit val dateTimeJsReader:   Reads[DateTime]              = JodaReads.DefaultJodaDateTimeReads
+  private val df: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+  implicit val dateTimeWriter:     Writes[LocalDateTime]        = (dateTime: LocalDateTime) => JsString(dateTime.format(df))
   implicit val trackingDataFormat: Format[TrackingDataResponse] = Json.format[TrackingDataResponse]
 }
 

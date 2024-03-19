@@ -20,14 +20,12 @@ import javax.inject.{Inject, Named, Singleton}
 import play.api.Configuration
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.service.Auditor
 import uk.gov.hmrc.submissiontracker.connectors.TrackingConnector
 import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.IdType
 import uk.gov.hmrc.submissiontracker.domain.{Milestone, TrackingDataResponse, TrackingDataSeq, TrackingDataSeqResponse}
 import uk.gov.hmrc.submissiontracker.utils.WelshFormNameTranslator
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SubmissionTrackerService @Inject() (
@@ -35,16 +33,16 @@ class SubmissionTrackerService @Inject() (
   val auditConnector:            AuditConnector,
   val formNameService:           FormNameService,
   val configuration:             Configuration,
-  @Named("appName") val appName: String)
-    extends Auditor
-    with WelshFormNameTranslator {
+  @Named("appName") val appName: String,
+  auditService:                  AuditService)(implicit ec: ExecutionContext)
+    extends WelshFormNameTranslator {
 
   def trackingData(
     id:          String,
     idType:      IdType
   )(implicit hc: HeaderCarrier
   ): Future[TrackingDataSeqResponse] =
-    withAudit("trackingData", Map("id" -> id, "idType" -> idType.value)) {
+    auditService.withAudit("trackingData", Map("id" -> id, "idType" -> idType.value)) {
       trackingConnector.getUserTrackingData(id, idType).map(data => convertData(data))
     }
 
