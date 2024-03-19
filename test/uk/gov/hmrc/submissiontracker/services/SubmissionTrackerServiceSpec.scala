@@ -21,11 +21,17 @@ import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.IdType
 import uk.gov.hmrc.submissiontracker.stub.TestSetup
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class SubmissionTrackerServiceSpec extends TestSetup {
 
   val service =
-    new SubmissionTrackerService(mockTrackingConnector, mockAuditConnector, mockFormNameService, configuration, appName)
+    new SubmissionTrackerService(mockTrackingConnector,
+                                 mockAuditConnector,
+                                 mockFormNameService,
+                                 configuration,
+                                 appName,
+                                 mockAuditService)
 
   "trackingData(id: String, idType: String)" should {
     "return trackingDataSeq with valid date formats" in {

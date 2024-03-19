@@ -23,8 +23,7 @@ import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.submissiontracker.controllers.{AccountWithLowCL, FailToMatchTaxIdOnAuth, NinoNotFoundOnAccount}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 case class Authority(nino: Nino)
 
@@ -36,7 +35,11 @@ trait Authorisation extends AuthorisedFunctions {
   lazy val failedToMatchNino     = new FailToMatchTaxIdOnAuth
   lazy val lowConfidenceLevel    = new AccountWithLowCL
 
-  def grantAccess(requestedNino: Nino)(implicit hc: HeaderCarrier): Future[Authority] =
+  def grantAccess(
+    requestedNino: Nino
+  )(implicit hc:   HeaderCarrier,
+    ec:            ExecutionContext
+  ): Future[Authority] =
     authorised(Enrolment("HMRC-NI", Seq(EnrolmentIdentifier("NINO", requestedNino.value)), "Activated", None))
       .retrieve(nino and confidenceLevel) {
         case Some(foundNino) ~ foundConfidenceLevel =>
