@@ -44,7 +44,7 @@ trait AccessControl extends HeaderValidator with Results with Authorisation {
   lazy val requiresAuth: Boolean = true
 
   def validateAcceptWithAuth(
-    rules: Option[String] ⇒ Boolean,
+    rules: Option[String] => Boolean,
     taxId: Option[Nino]
   ): ActionBuilder[Request, AnyContent] =
     new ActionBuilder[Request, AnyContent] {
