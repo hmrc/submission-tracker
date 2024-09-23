@@ -5,6 +5,26 @@
 
 Retrieve tracking data based on the supplied tax identifier.
 
+## Development Setup
+- Run locally: `sbt run` which runs on port `8232` by default
+- Run with test endpoints: `sbt 'run -Dplay.http.router=testOnlyDoNotUseInAppConf.Routes'`
+
+##  Service Manager Profiles
+The service can be run locally from Service Manager, using the following profiles:
+
+| Profile Details               | Command                                                                                                           |
+|-------------------------------|:------------------------------------------------------------------------------------------------------------------|
+| MOBILE_SUBMISSION_TRACKER        | sm2 --start MOBILE_SUBMISSION_TRACKER                                                     |
+
+
+## Run Tests
+- Run Unit Tests:  `sbt test`
+- Run Integration Tests: `sbt it:test`
+- Run Unit and Integration Tests: `sbt test it:test`
+- Run Unit and Integration Tests with coverage report: `sbt clean compile coverage test it:test coverageReport dependencyUpdates`
+
+
+
 Requirements
 ------------
 

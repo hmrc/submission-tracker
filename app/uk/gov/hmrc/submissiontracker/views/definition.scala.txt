@@ -3,13 +3,6 @@
 
 @(apiAccess: ApiAccess)
 {
-  "scopes":[
-    {
-      "key":"read:submission-tracker",
-      "name":"Execute submission-tracker call",
-      "description":"Retrieve tracking data"
-    }
-  ],
   "api":{
     "name":"Submission Tracker",
     "description":"The API is used to retrieve tracking information.",
