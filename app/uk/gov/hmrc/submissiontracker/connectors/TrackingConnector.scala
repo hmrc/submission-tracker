@@ -18,17 +18,18 @@ package uk.gov.hmrc.submissiontracker.connectors
 
 import javax.inject.{Inject, Named, Singleton}
 import play.api._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
+import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import uk.gov.hmrc.submissiontracker.domain.TrackingDataSeq
 import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.IdType
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class TrackingConnector @Inject() (
   @Named("trackingUrl") val trackingBaseUrl: String,
-  val httpGet:                               HttpGet) {
+  val http:                                  HttpClientV2) {
 
   val logger: Logger = Logger(this.getClass)
 
@@ -39,7 +40,9 @@ class TrackingConnector @Inject() (
     ec:          ExecutionContext
   ): Future[TrackingDataSeq] = {
     logger.debug("submission-tracker: Requesting tracking data")
-    httpGet.GET[TrackingDataSeq](trackingDataLink(id, idType.value))
+    http
+      .get(url"${trackingDataLink(id, idType.value)}")
+      .execute[TrackingDataSeq]
   }
 
   private def trackingDataLink(

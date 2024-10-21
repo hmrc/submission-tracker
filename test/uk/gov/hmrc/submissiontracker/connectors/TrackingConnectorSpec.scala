@@ -16,39 +16,40 @@
 
 package uk.gov.hmrc.submissiontracker.connectors
 
+import org.scalamock.handlers.CallHandler
 import play.api.libs.json.{JsResultException, Json}
 import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.submissiontracker.domain.TrackingDataSeq
 import uk.gov.hmrc.submissiontracker.stub.TestSetup
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import java.net.URL
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class TrackingConnectorSpec extends TestSetup {
 
-  private val trackingBaseUrl = "someUrl"
-  val connector               = new TrackingConnector(trackingBaseUrl, mockHttp)
+  val mockHttpClient:     HttpClientV2   = mock[HttpClientV2]
+  val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
+  val trackingBaseUrl = "https://someUrl"
+  val connector       = new TrackingConnector(trackingBaseUrl, mockHttpClient)
 
-  def trackingGetSuccess(response: TrackingDataSeq): Unit =
-    (mockHttp
-      .GET(_: String, _: Seq[(String, String)], _: Seq[(String, String)])(_: HttpReads[TrackingDataSeq],
-                                                                          _: HeaderCarrier,
-                                                                          _: ExecutionContext))
-      .expects(s"$trackingBaseUrl/tracking-data/user/$idType/${nino.value}", *, *, *, *, *)
-      .returns(Future successful response)
+  def trackingGet[T]: CallHandler[Future[T]] = {
+    (mockHttpClient
+      .get(_: URL)(_: HeaderCarrier))
+      .expects(url"${s"$trackingBaseUrl/tracking-data/user/$idType/${nino.value}"}", *)
+      .returns(mockRequestBuilder)
 
-  def trackingGetFailure(response: Exception): Unit =
-    (mockHttp
-      .GET(_: String, _: Seq[(String, String)], _: Seq[(String, String)])(_: HttpReads[TrackingDataSeq],
-                                                                          _: HeaderCarrier,
-                                                                          _: ExecutionContext))
-      .expects(s"$trackingBaseUrl/tracking-data/user/$idType/${nino.value}", *, *, *, *, *)
-      .returns(Future failed response)
+    (mockRequestBuilder
+      .execute[T](_: HttpReads[T], _: ExecutionContext))
+      .expects(*, *)
+
+  }
 
   "trackingConnector" should {
 
     "throw BadRequestException when a 400 response is returned" in {
-      trackingGetFailure(new BadRequestException("bad request"))
+      trackingGet.returns(Future failed new BadRequestException("bad request"))
 
       intercept[BadRequestException] {
         await(connector.getUserTrackingData(nino.value, idType))
@@ -56,7 +57,7 @@ class TrackingConnectorSpec extends TestSetup {
     }
 
     "throw UpstreamErrorResponse when a 500 response is returned" in {
-      trackingGetFailure(UpstreamErrorResponse("Error", 500, 500))
+      trackingGet.returns(Future failed UpstreamErrorResponse("Error", 500, 500))
 
       intercept[UpstreamErrorResponse] {
         await(connector.getUserTrackingData(nino.value, idType))
@@ -64,7 +65,7 @@ class TrackingConnectorSpec extends TestSetup {
     }
 
     "return a valid response when a 200 response is received" in {
-      trackingGetSuccess(trackingData)
+      trackingGet.returns(Future successful trackingData)
 
       await(connector.getUserTrackingData(nino.value, idType)) shouldBe trackingData
     }

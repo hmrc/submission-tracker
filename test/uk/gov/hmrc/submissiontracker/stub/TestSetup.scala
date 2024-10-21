@@ -27,7 +27,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.submissiontracker.connectors.{ShutteringConnector, TrackingConnector}
 import uk.gov.hmrc.submissiontracker.domain._
@@ -51,16 +51,15 @@ trait TestSetup
   implicit val hc:                           HeaderCarrier            = HeaderCarrier()
   implicit val mockAuthConnector:            AuthConnector            = mock[AuthConnector]
   implicit val mockAuditConnector:           AuditConnector           = mock[AuditConnector]
-  implicit val mockSubmissionTrackerService: SubmissionTrackerService = mock[SubmissionTrackerService]
-  implicit val mockTrackingConnector:        TrackingConnector        = mock[TrackingConnector]
-  implicit val mockFormNameService:          FormNameService          = mock[FormNameService]
-  implicit val mockHttp:                     HttpGet                  = mock[HttpGet]
   implicit val mockShutteringConnector:      ShutteringConnector      = mock[ShutteringConnector]
-  implicit val mockAuditService:             AuditService             = new AuditService("submission-tracker", mockAuditConnector)
+  val mockSubmissionTrackerService: SubmissionTrackerService = mock[SubmissionTrackerService]
+  val mockTrackingConnector:        TrackingConnector        = mock[TrackingConnector]
+  val mockFormNameService:          FormNameService          = mock[FormNameService]
+  val mockAuditService:             AuditService             = new AuditService("submission-tracker", mockAuditConnector)
 
-  val shuttered =
+  val shuttered: Shuttering =
     Shuttering(shuttered = true, Some("Shuttered"), Some("Form Tracker is currently not available"))
-  val notShuttered = Shuttering.shutteringDisabled
+  val notShuttered: Shuttering = Shuttering.shutteringDisabled
 
   val configuration: Configuration = mock[Configuration]
 
@@ -73,13 +72,13 @@ trait TestSetup
   val lowConfidenceLevelError: JsValue =
     Json.parse("""{"code":"LOW_CONFIDENCE_LEVEL","message":"Confidence Level on account does not allow access"}""")
 
-  val nino          = Nino("CS700100A")
-  val incorrectNino = Nino("SC100700A")
+  val nino: Nino = Nino("CS700100A")
+  val incorrectNino: Nino = Nino("SC100700A")
   val acceptHeader: (String, String) = "Accept" -> "application/vnd.hmrc.1.0+json"
   val idType:       IdType           = "nino"
   val journeyId:    JourneyId        = "decf6382-0c09-4ea8-8225-d59d188db41f"
 
-  val milestones =
+  val milestones: Seq[Milestone] =
     Seq(
       Milestone("Received", "complete"),
       Milestone("Acquired", "complete"),
@@ -87,7 +86,7 @@ trait TestSetup
       Milestone("Done", "incomplete")
     )
 
-  val trackingData = TrackingDataSeq(
+  val trackingData: TrackingDataSeq = TrackingDataSeq(
     Some(
       Seq(
         TrackingData("R39_EN",
@@ -135,7 +134,7 @@ trait TestSetup
                  |}
                  |""".stripMargin)
 
-  val trackingDataResponse = TrackingDataSeqResponse(
+  val trackingDataResponse: TrackingDataSeqResponse = TrackingDataSeqResponse(
     Some(
       Seq(
         TrackingDataResponse(
@@ -152,7 +151,7 @@ trait TestSetup
     )
   )
 
-  val trackingDataResponseWithCorrectDateFormat = TrackingDataSeqResponse(
+  val trackingDataResponseWithCorrectDateFormat: TrackingDataSeqResponse = TrackingDataSeqResponse(
     Some(
       Seq(
         TrackingDataResponse(
@@ -169,7 +168,7 @@ trait TestSetup
     )
   )
 
-  val sandboxTrackingDataResponseWithCorrectDateFormat = TrackingDataSeqResponse(
+  val sandboxTrackingDataResponseWithCorrectDateFormat: TrackingDataSeqResponse = TrackingDataSeqResponse(
     Some(
       Seq(
         TrackingDataResponse(

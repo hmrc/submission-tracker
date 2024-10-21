@@ -16,39 +16,9 @@
 
 package uk.gov.hmrc.submissiontracker.config
 
-import org.apache.pekko.actor.ActorSystem
-import com.typesafe.config.Config
 import javax.inject.{Inject, Named}
-import play.api.Configuration
-import play.api.libs.ws.WSClient
-import uk.gov.hmrc.http.hooks.HttpHooks
-import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.Audit
-import uk.gov.hmrc.http.HttpClient
-import uk.gov.hmrc.play.http.ws._
-
-trait Hooks extends HttpHooks with HttpAuditing {
-  val hooks = Seq(AuditingHook)
-}
-
-trait WSHttp extends HttpClient with WSGet with WSPut with WSPost with WSDelete with WSPatch with Hooks
-
-class WSHttpImpl @Inject() (
-  override val wsClient:         WSClient,
-  @Named("appName") val appName: String,
-  val auditConnector:            AuditConnector,
-  val actorSystem:               ActorSystem,
-  config:                        Configuration)
-    extends HttpClient
-    with WSGet
-    with WSPut
-    with WSPost
-    with WSDelete
-    with WSPatch
-    with Hooks {
-  override val configuration: Config = config.underlying
-}
 
 class MicroserviceAudit @Inject() (
   @Named("appName") val applicationName: String,
