@@ -21,14 +21,15 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import play.api.Configuration
+import play.api.{Configuration, Environment}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.submissiontracker.connectors.{ShutteringConnector, TrackingConnector}
 import uk.gov.hmrc.submissiontracker.domain._
 import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.{IdType, JourneyId}
@@ -54,9 +55,11 @@ trait TestSetup
   implicit val mockSubmissionTrackerService: SubmissionTrackerService = mock[SubmissionTrackerService]
   implicit val mockTrackingConnector:        TrackingConnector        = mock[TrackingConnector]
   implicit val mockFormNameService:          FormNameService          = mock[FormNameService]
-  implicit val mockHttp:                     HttpGet                  = mock[HttpGet]
   implicit val mockShutteringConnector:      ShutteringConnector      = mock[ShutteringConnector]
   implicit val mockAuditService:             AuditService             = new AuditService("submission-tracker", mockAuditConnector)
+  val mockServicesConfig:                    ServicesConfig           = mock[ServicesConfig]
+  val config:                                Configuration            = mock[Configuration]
+  val environment:                           Environment              = mock[Environment]
 
   val shuttered =
     Shuttering(shuttered = true, Some("Shuttered"), Some("Form Tracker is currently not available"))
