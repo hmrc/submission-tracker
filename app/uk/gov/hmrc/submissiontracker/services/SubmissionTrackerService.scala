@@ -21,33 +21,32 @@ import play.api.Configuration
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.submissiontracker.connectors.TrackingConnector
-import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.IdType
+import uk.gov.hmrc.submissiontracker.domain.types.IdType
 import uk.gov.hmrc.submissiontracker.domain.{Milestone, TrackingDataResponse, TrackingDataSeq, TrackingDataSeqResponse}
 import uk.gov.hmrc.submissiontracker.utils.WelshFormNameTranslator
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmissionTrackerService @Inject() (
-  val trackingConnector:         TrackingConnector,
-  val auditConnector:            AuditConnector,
-  val formNameService:           FormNameService,
-  val configuration:             Configuration,
-  @Named("appName") val appName: String,
-  auditService:                  AuditService)(implicit ec: ExecutionContext)
+class SubmissionTrackerService @Inject() (val trackingConnector: TrackingConnector,
+                                          val auditConnector: AuditConnector,
+                                          val formNameService: FormNameService,
+                                          val configuration: Configuration,
+                                          @Named("appName") val appName: String,
+                                          auditService: AuditService
+                                         )(implicit ec: ExecutionContext)
     extends WelshFormNameTranslator {
 
   def trackingData(
-    id:          String,
-    idType:      IdType
-  )(implicit hc: HeaderCarrier
-  ): Future[TrackingDataSeqResponse] =
-    auditService.withAudit("trackingData", Map("id" -> id, "idType" -> idType.value)) {
+    id: String,
+    idType: IdType
+  )(implicit hc: HeaderCarrier): Future[TrackingDataSeqResponse] =
+    auditService.withAudit("trackingData", Map("id" -> id, "idType" -> idType.value.toString)) {
       trackingConnector.getUserTrackingData(id, idType).map(data => convertData(data))
     }
 
   private def getCurrentMilestone(milestones: Seq[Milestone]): String =
-    milestones.find(milestone => milestone.status.toLowerCase == ("current")) match {
+    milestones.find(milestone => milestone.status.toLowerCase == "current") match {
       case Some(currentMilestone) => currentMilestone.milestone
       case None                   => throw new IllegalStateException("No Milestone with a status of current returned from Tracking")
     }

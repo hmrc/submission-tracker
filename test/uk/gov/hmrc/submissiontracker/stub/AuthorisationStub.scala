@@ -17,6 +17,7 @@
 package uk.gov.hmrc.submissiontracker.stub
 
 import org.scalamock.scalatest.MockFactory
+import org.scalatest.TestSuite
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
 import uk.gov.hmrc.auth.core.{AuthConnector, ConfidenceLevel}
@@ -24,7 +25,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait AuthorisationStub extends MockFactory {
+trait AuthorisationStub extends MockFactory { this: TestSuite =>
 
   type GrantAccess = Option[String] ~ ConfidenceLevel
 

@@ -25,27 +25,23 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AuditService @Inject() (
   @Named("appName") val appName: String,
-  val auditConnector:            AuditConnector
+  val auditConnector: AuditConnector
 )(implicit val executionContext: ExecutionContext) {
 
   lazy val auditType: String = "ServiceResponseSent"
 
   def withAudit[T](
-    service:     String,
-    details:     Map[String, String]
-  )(func:        Future[T]
-  )(implicit hc: HeaderCarrier,
-    ec:          ExecutionContext
-  ): Future[T] = {
+    service: String,
+    details: Map[String, String]
+  )(func: Future[T])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[T] = {
     audit(service, details) // No need to wait!
     func
   }
 
   def audit(
-    service:     String,
-    details:     Map[String, String]
-  )(implicit hc: HeaderCarrier
-  ): Future[AuditResult] =
+    service: String,
+    details: Map[String, String]
+  )(implicit hc: HeaderCarrier): Future[AuditResult] =
     auditConnector.sendEvent(DataEvent(appName, auditType, tags = Map("transactionName" -> service), detail = details))
 
 }

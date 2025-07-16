@@ -13,7 +13,6 @@ class SubmissionTrackerControllerISpec extends BaseISpec with FutureAwaits with 
       AuthStub.grantAccess(nino, nino)
       TrackingStub.getUserTrackingData(idType, nino)
       ShutteringStub.stubForShutteringDisabled
-
       val response = await(
         wsUrl(s"/tracking/$nino/$idType/$journeyIdUrlVar")
           .addHttpHeaders(acceptJsonHeader, authorisationJsonHeader)

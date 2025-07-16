@@ -20,7 +20,7 @@ import play.api.libs.json.Json.toJson
 import play.api.mvc.{BaseController, Result}
 import play.api.{Logger, mvc}
 import uk.gov.hmrc.api.controllers.{ErrorInternalServerError, ErrorNotFound, ErrorResponse, ErrorUnauthorizedLowCL}
-import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.*
 
 import scala.concurrent.{ExecutionContext, Future}
 

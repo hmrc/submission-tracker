@@ -16,18 +16,19 @@
 
 package uk.gov.hmrc.submissiontracker.controllers
 
+import org.scalatest.TestSuite
 import play.api.libs.json.Json
-import play.api.test.Helpers._
-import uk.gov.hmrc.auth.core.ConfidenceLevel._
-import uk.gov.hmrc.auth.core.syntax.retrieved._
+import play.api.test.Helpers.*
+import uk.gov.hmrc.auth.core.ConfidenceLevel.*
+import uk.gov.hmrc.auth.core.syntax.retrieved.*
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.IdType
+import uk.gov.hmrc.submissiontracker.domain.types.IdType
 import uk.gov.hmrc.submissiontracker.stub.TestSetup
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SubmissionTrackerControllerSpec extends TestSetup {
+class SubmissionTrackerControllerSpec extends TestSetup { this: TestSuite =>
 
   "trackingData Live" should {
     val controller = new SubmissionTrackerController(mockAuthConnector,

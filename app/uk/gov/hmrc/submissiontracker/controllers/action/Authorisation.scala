@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.submissiontracker.controllers.action
 
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.*
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.{AuthorisedFunctions, Enrolment, EnrolmentIdentifier}
 import uk.gov.hmrc.domain.Nino
@@ -32,14 +32,12 @@ trait Authorisation extends AuthorisedFunctions {
   val confLevel: Int
 
   lazy val ninoNotFoundOnAccount = new NinoNotFoundOnAccount
-  lazy val failedToMatchNino     = new FailToMatchTaxIdOnAuth
-  lazy val lowConfidenceLevel    = new AccountWithLowCL
+  lazy val failedToMatchNino = new FailToMatchTaxIdOnAuth
+  lazy val lowConfidenceLevel = new AccountWithLowCL
 
   def grantAccess(
     requestedNino: Nino
-  )(implicit hc:   HeaderCarrier,
-    ec:            ExecutionContext
-  ): Future[Authority] =
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Authority] =
     authorised(Enrolment("HMRC-NI", Seq(EnrolmentIdentifier("NINO", requestedNino.value)), "Activated", None))
       .retrieve(nino and confidenceLevel) {
         case Some(foundNino) ~ foundConfidenceLevel =>

@@ -16,14 +16,15 @@
 
 package uk.gov.hmrc.submissiontracker.services
 
+import org.scalatest.TestSuite
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.IdType
+import uk.gov.hmrc.submissiontracker.domain.types.IdType
 import uk.gov.hmrc.submissiontracker.stub.TestSetup
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class SubmissionTrackerServiceSpec extends TestSetup {
+class SubmissionTrackerServiceSpec extends TestSetup { this: TestSuite =>
 
   val service =
     new SubmissionTrackerService(mockTrackingConnector,
@@ -35,7 +36,7 @@ class SubmissionTrackerServiceSpec extends TestSetup {
 
   "trackingData(id: String, idType: String)" should {
     "return trackingDataSeq with valid date formats" in {
-      stubAuditTrackingData(nino.value, idType.value)
+      stubAuditTrackingData(nino.value, idType.value.toString)
       (mockTrackingConnector
         .getUserTrackingData(_: String, _: IdType)(_: HeaderCarrier, _: ExecutionContext))
         .expects(nino.value, idType, *, *)

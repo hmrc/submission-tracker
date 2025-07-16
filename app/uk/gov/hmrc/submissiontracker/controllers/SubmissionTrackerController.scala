@@ -20,7 +20,7 @@ import com.google.inject.Singleton
 import play.api.Logger
 
 import javax.inject.{Inject, Named}
-import play.api.libs.json.Json._
+import play.api.libs.json.Json.*
 import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.domain.Nino
@@ -29,19 +29,19 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter.fromRequest
 import uk.gov.hmrc.submissiontracker.connectors.ShutteringConnector
 import uk.gov.hmrc.submissiontracker.controllers.action.AccessControl
-import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.{IdType, JourneyId}
+import uk.gov.hmrc.submissiontracker.domain.types.{IdType, JourneyId}
 import uk.gov.hmrc.submissiontracker.services.SubmissionTrackerService
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
 class SubmissionTrackerController @Inject() (
-  override val authConnector:                                   AuthConnector,
-  val service:                                                  SubmissionTrackerService,
+  override val authConnector: AuthConnector,
+  val service: SubmissionTrackerService,
   @Named("controllers.confidenceLevel") override val confLevel: Int,
-  cc:                                                           ControllerComponents,
-  shutteringConnector:                                          ShutteringConnector
-)(implicit val executionContext:                                ExecutionContext)
+  cc: ControllerComponents,
+  shutteringConnector: ShutteringConnector
+)(implicit val executionContext: ExecutionContext)
     extends BackendController(cc)
     with AccessControl
     with ErrorHandling
@@ -50,8 +50,8 @@ class SubmissionTrackerController @Inject() (
   override val logger: Logger = Logger(this.getClass)
 
   def trackingData(
-    id:        String,
-    idType:    IdType,
+    id: String,
+    idType: IdType,
     journeyId: JourneyId
   ): Action[AnyContent] =
     validateAcceptWithAuth(acceptHeaderValidationRules, Some(Nino(id))).async { implicit request =>
