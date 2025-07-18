@@ -25,10 +25,7 @@ import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.submissiontracker.controllers.api.ApiAccess
 
-class GuiceModule(
-  environment:   Environment,
-  configuration: Configuration)
-    extends AbstractModule {
+class GuiceModule(environment: Environment, configuration: Configuration) extends AbstractModule {
 
   val servicesConfig = new ServicesConfig(configuration)
 
@@ -48,9 +45,8 @@ class GuiceModule(
       .toInstance(servicesConfig.baseUrl("mobile-shuttering"))
   }
 
-  /**
-    * Binds a configuration value using the `path` as the name for the binding.
-    * Throws an exception if the configuration value does not exist or cannot be read as an Int.
+  /** Binds a configuration value using the `path` as the name for the binding. Throws an exception if the configuration value does not exist or
+    * cannot be read as an Int.
     */
   private def bindConfigInt(path: String): Unit =
     bindConstant()

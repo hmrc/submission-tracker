@@ -17,29 +17,29 @@
 package uk.gov.hmrc.submissiontracker.controllers
 
 import java.time.LocalDate
-
 import com.google.inject.Singleton
+
 import javax.inject.Inject
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, BodyParser, ControllerComponents}
-import uk.gov.hmrc.api.controllers._
+import uk.gov.hmrc.api.controllers.*
 import uk.gov.hmrc.api.sandbox.FileResource
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.{IdType, JourneyId}
+import uk.gov.hmrc.submissiontracker.domain.types.{IdType, JourneyId}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SandboxSubmissionTrackerController @Inject() (
-  cc:                            ControllerComponents
+  cc: ControllerComponents
 )(implicit val executionContext: ExecutionContext)
     extends BackendController(cc)
     with HeaderValidator
     with FileResource {
 
   def trackingData(
-    id:        String,
-    idType:    IdType,
+    id: String,
+    idType: IdType,
     journeyId: JourneyId
   ): Action[AnyContent] =
     validateAccept(acceptHeaderValidationRules).async { implicit request =>

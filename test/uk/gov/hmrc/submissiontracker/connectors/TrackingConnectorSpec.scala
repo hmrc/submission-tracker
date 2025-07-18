@@ -17,8 +17,9 @@
 package uk.gov.hmrc.submissiontracker.connectors
 
 import org.scalamock.handlers.CallHandler
+import org.scalatest.TestSuite
 import play.api.libs.json.{JsResultException, Json}
-import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.*
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.submissiontracker.domain.TrackingDataSeq
 import uk.gov.hmrc.submissiontracker.stub.TestSetup
@@ -27,7 +28,7 @@ import java.net.URL
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class TrackingConnectorSpec extends TestSetup {
+class TrackingConnectorSpec extends TestSetup { this: TestSuite =>
 
   val mockHttpClient:     HttpClientV2   = mock[HttpClientV2]
   val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
@@ -37,11 +38,11 @@ class TrackingConnectorSpec extends TestSetup {
   def trackingGet[T]: CallHandler[Future[T]] = {
     (mockHttpClient
       .get(_: URL)(_: HeaderCarrier))
-      .expects(url"${s"$trackingBaseUrl/tracking-data/user/$idType/${nino.value}"}", *)
+      .expects(url"${s"$trackingBaseUrl/tracking-data/user/${idType.value}/${nino.value}"}", *)
       .returns(mockRequestBuilder)
 
     (mockRequestBuilder
-      .execute[T](_: HttpReads[T], _: ExecutionContext))
+      .execute[T](using _: HttpReads[T], _: ExecutionContext))
       .expects(*, *)
 
   }
@@ -66,7 +67,6 @@ class TrackingConnectorSpec extends TestSetup {
 
     "return a valid response when a 200 response is received" in {
       trackingGet.returns(Future successful trackingData)
-
       await(connector.getUserTrackingData(nino.value, idType)) shouldBe trackingData
     }
 

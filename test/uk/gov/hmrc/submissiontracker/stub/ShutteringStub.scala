@@ -18,14 +18,15 @@ package uk.gov.hmrc.submissiontracker.stub
 
 import org.scalamock.handlers.CallHandler
 import org.scalamock.scalatest.MockFactory
+import org.scalatest.TestSuite
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.submissiontracker.connectors.ShutteringConnector
 import uk.gov.hmrc.submissiontracker.domain.Shuttering
-import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.JourneyId
+import uk.gov.hmrc.submissiontracker.domain.types.JourneyId
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait ShutteringStub extends MockFactory {
+trait ShutteringStub extends MockFactory { this: TestSuite =>
 
   def stubShutteringResponse(
     response:                     Shuttering

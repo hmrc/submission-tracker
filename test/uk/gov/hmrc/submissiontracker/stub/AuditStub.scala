@@ -18,6 +18,7 @@ package uk.gov.hmrc.submissiontracker.stub
 
 import org.scalamock.matchers.MatcherBase
 import org.scalamock.scalatest.MockFactory
+import org.scalatest.TestSuite
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
@@ -25,7 +26,7 @@ import uk.gov.hmrc.play.audit.model.DataEvent
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait AuditStub extends MockFactory {
+trait AuditStub extends MockFactory { this: TestSuite =>
 
   def dataEventWith(
     auditSource: String,

@@ -16,14 +16,16 @@
 
 package uk.gov.hmrc.submissiontracker.controllers
 
+import org.scalatest.TestSuite
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.auth.core.ConfidenceLevel.{L200, L50}
-import uk.gov.hmrc.auth.core.syntax.retrieved._
+import uk.gov.hmrc.auth.core.syntax.retrieved.*
 import uk.gov.hmrc.submissiontracker.controllers.action.Authorisation
 import uk.gov.hmrc.submissiontracker.stub.TestSetup
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class AuthorisationSpec extends TestSetup {
+class AuthorisationSpec extends TestSetup { this: TestSuite =>
 
   def authorisation(implicit mockAuthConnector: AuthConnector): Authorisation =
     new Authorisation {

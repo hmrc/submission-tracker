@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
 import uk.gov.hmrc.api.sandbox.FileResource
 import uk.gov.hmrc.submissiontracker.support.BaseISpec
+import play.api.libs.ws.DefaultBodyReadables.readableAsString
 
 class SandboxSubmissionTrackerControllerISpec
     extends BaseISpec

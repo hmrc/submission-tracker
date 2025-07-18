@@ -17,37 +17,33 @@
 package uk.gov.hmrc.submissiontracker.connectors
 
 import javax.inject.{Inject, Named, Singleton}
-import play.api._
+import play.api.*
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps}
 import uk.gov.hmrc.submissiontracker.domain.TrackingDataSeq
-import uk.gov.hmrc.submissiontracker.domain.types.ModelTypes.IdType
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.submissiontracker.domain.types.IdType
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class TrackingConnector @Inject() (
-  @Named("trackingUrl") val trackingBaseUrl: String,
-  val http:                                  HttpClientV2) {
+class TrackingConnector @Inject() (@Named("trackingUrl") val trackingBaseUrl: String, val http: HttpClientV2) {
 
   val logger: Logger = Logger(this.getClass)
 
   def getUserTrackingData(
-    id:          String,
-    idType:      IdType
-  )(implicit hc: HeaderCarrier,
-    ec:          ExecutionContext
-  ): Future[TrackingDataSeq] = {
+    id: String,
+    idType: IdType
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[TrackingDataSeq] = {
     logger.debug("submission-tracker: Requesting tracking data")
     http
-      .get(url"${trackingDataLink(id, idType.value)}")
+      .get(url"${trackingDataLink(id, idType)}")
       .execute[TrackingDataSeq]
   }
 
   private def trackingDataLink(
-    id:     String,
-    idType: String
-  ): String = s"$trackingBaseUrl/tracking-data/user/$idType/$id"
+    id: String,
+    idType: IdType
+  ): String = s"$trackingBaseUrl/tracking-data/user/${idType.value}/$id"
 
 }

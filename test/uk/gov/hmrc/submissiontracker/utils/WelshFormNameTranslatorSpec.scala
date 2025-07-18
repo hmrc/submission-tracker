@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.submissiontracker.utils
 
+import org.scalatest.TestSuite
 import uk.gov.hmrc.submissiontracker.stub.TestSetup
 
-class WelshFormNameTranslatorSpec extends TestSetup with WelshFormNameTranslator {
+class WelshFormNameTranslatorSpec extends TestSetup with WelshFormNameTranslator { this: TestSuite =>
 
   "getFormName(formId: String)" should {
     "return the correct form name when provided with a valid formId" in {

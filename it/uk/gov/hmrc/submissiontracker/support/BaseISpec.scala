@@ -23,6 +23,7 @@ import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.WSClient
+import uk.gov.hmrc.submissiontracker.domain.types.{IdType, JourneyId}
 
 class BaseISpec
     extends AnyWordSpecLike

@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.submissiontracker.services
 
+import org.scalatest.TestSuite
 import uk.gov.hmrc.submissiontracker.stub.TestSetup
 
-class FormNameServiceSpec extends TestSetup {
+class FormNameServiceSpec extends TestSetup { this: TestSuite =>
   val service = new FormNameService
 
   "getFormName(formId: String)" should {

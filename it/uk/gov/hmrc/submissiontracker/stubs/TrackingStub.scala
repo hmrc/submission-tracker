@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.submissiontracker.stubs
 
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
+import uk.gov.hmrc.submissiontracker.domain.types.IdType
 
 object TrackingStub {
 
@@ -49,9 +50,9 @@ object TrackingStub {
                                |}""".stripMargin
 
   def getUserTrackingData(
-    idType: String,
-    id:     String
-  ): Unit =
+                           idType: String,
+                           id:     String
+  ): Unit = {
     stubFor(
       get(urlEqualTo(s"/tracking-data/user/$idType/$id"))
         .willReturn(
@@ -61,5 +62,6 @@ object TrackingStub {
             .withBody(trackingData)
         )
     )
+  }
 
 }
