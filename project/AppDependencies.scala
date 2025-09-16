@@ -4,9 +4,9 @@ object AppDependencies {
   import play.sbt.PlayImport._
 
   private val bootstrapPlayVersion = "10.1.0"
-  private val domainVersion        = "12.1.0"
+  private val domainVersion        = "13.0.0"
   private val playHmrcApiVersion   = "8.3.0"
-  private val scalamockVersion     = "7.4.1"
+  private val scalamockVersion     = "7.5.0"
   private val refinedVersion       = "0.11.3"
 
   val compile = Seq(
