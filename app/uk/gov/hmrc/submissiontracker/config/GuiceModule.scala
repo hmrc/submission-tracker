@@ -33,7 +33,7 @@ class GuiceModule(environment: Environment, configuration: Configuration) extend
     bind(classOf[Audit]).to(classOf[MicroserviceAudit])
     bind(classOf[AuthConnector]).to(classOf[DefaultAuthConnector])
 
-    bind(classOf[ApiAccess]).toInstance(ApiAccess("PRIVATE"))
+    bind(classOf[ApiAccess]).toInstance(ApiAccess("INTERNAL"))
 
     bindConfigInt("controllers.confidenceLevel")
     bind(classOf[String])
