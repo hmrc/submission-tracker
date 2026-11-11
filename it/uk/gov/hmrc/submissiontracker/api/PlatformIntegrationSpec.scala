@@ -35,7 +35,7 @@ class PlatformIntegrationSpec
       (versionJson \ "version").as[String] shouldBe "1.0"
 
       val accessDetails: JsValue = (versionJson \\ "access").head
-      (accessDetails \ "type").as[String]                           shouldBe "PRIVATE"
+      (accessDetails \ "type").as[String]                           shouldBe "INTERNAL"
     }
 
     "provide YAML conf endpoint" in {
