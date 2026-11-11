@@ -12,7 +12,7 @@
         "version":"1.0",
         "status":"STABLE",
         "endpointsEnabled": true,
-        "access": @Json.toJson(apiAccess)
+        "access": @Json.toJson(apiAccess.`type`)
       }
     ]
   }
