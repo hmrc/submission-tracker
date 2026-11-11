@@ -23,7 +23,7 @@ class PlatformIntegrationSpec
     with DefaultAwaitTimeout {
 
   "microservice" should {
-    "provide definition with configurable whitelist" in {
+    "provide the API definition with internal access" in {
       val result: WSResponse = await(wsUrl("/api/definition").get())
       result.status shouldBe 200
 
@@ -34,8 +34,7 @@ class PlatformIntegrationSpec
       val versionJson: JsValue = versions.head
       (versionJson \ "version").as[String] shouldBe "1.0"
 
-      val accessDetails: JsValue = (versionJson \\ "access").head
-      (accessDetails \ "type").as[String]                           shouldBe "INTERNAL"
+      (versionJson \ "access").as[String] shouldBe "INTERNAL"
     }
 
     "provide YAML conf endpoint" in {
